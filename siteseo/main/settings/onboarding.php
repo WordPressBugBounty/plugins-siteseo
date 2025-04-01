@@ -374,7 +374,7 @@ echo '</head>
 			</div>
 			<div class="siteseo-input-block">
 				<div class="siteseo-radiogroup">
-					<label><input type="checkbox" name="redirect_attachment"/>'.esc_html__('Remove /category/ in your permalinks', 'siteseo').'</label>
+					<label><input type="checkbox" name="category_url"/>'.esc_html__('Remove /category/ in your permalinks', 'siteseo').'</label>
 				</div>
 				<p class="siteseo-input-description">'.esc_html__('This reduces the length of the URL.', 'siteseo').'</p>
 			</div>

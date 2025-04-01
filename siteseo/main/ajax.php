@@ -484,7 +484,7 @@ class Ajax{
 				$title_options = get_option('siteseo_titles_option_name', []);				
 				$title_options['titles_archives_author_noindex'] = isset($data['author_noindex']) ? $data['author_noindex'] : '';
 
-				$advanced_options['advanced_attachments_file'] = isset($data['attachments_file']) ? $data['attachments_file'] : '';
+				$advanced_options['advanced_attachments_file'] = isset($data['redirect_attachment']) ? $data['redirect_attachment'] : '';
 				$advanced_options['advanced_category_url'] = isset($data['category_url']) ? $data['category_url'] : '';
 				$advanced_options['appearance_universal_metabox_disable'] = isset($data['universal_seo_metabox']) ? '' : '1';
 				$advanced_options['appearance_universal_metabox'] = isset($data['universal_seo_metabox']) ? '1' : '';

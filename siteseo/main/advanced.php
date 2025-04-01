@@ -81,7 +81,8 @@ class Advanced{
 		}
 		
 		if(!empty($siteseo->advanced_settings['advanced_category_url'])){
-			add_action('init', '\SiteSEO\Advanced::remove_category_base');
+			add_action('init', '\SiteSEO\Advanced::remove_category_base', 111);
+			add_action('template_redirect', '\SiteSEO\Advanced::redirect_category');
 		}
 	}
 	
@@ -139,16 +140,34 @@ class Advanced{
 	}
 	
 	static function remove_category_base(){
-		if(is_category() && !is_admin()){
-			wp_redirect(home_url('/' . get_query_var('category_name') . '/'));
-			exit;
-		}
+		
+		$categories = get_categories(array('hide_empty' => false));
+		$category_slugs = wp_list_pluck($categories, 'slug');
 
+		if(empty($category_slugs)){
+			return;
+		}
+    
+		$category_pattern = '(' . implode('|', $category_slugs) .')';
+    
 		add_rewrite_rule(
-			'^([^/]+)/?$',
+			'^'.$category_pattern.'/?$',
 			'index.php?category_name=$matches[1]',
 			'top'
 		);
+	}
+	
+	static function redirect_category(){
+		if(is_category() && !is_admin()){
+			$category = get_query_var('category_name');
+			$category_base = get_option('category_base');
+			$base_to_check = !empty($category_base) ? $category_base : 'category';
+
+			if(!empty($category) && strpos(sanitize_url($_SERVER['REQUEST_URI']), '/'.$base_to_check.'/') !== false){
+				wp_safe_redirect(home_url('/' . $category . '/'), 301);
+				exit;
+			}
+		}
 	}
 		
 	static function remove_wc_category_base(){

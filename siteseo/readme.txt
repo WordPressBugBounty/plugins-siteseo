@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.7
 Requires PHP: 7.2
-Stable tag: 1.1.9
+Stable tag: 1.2.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,6 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 
 - **Content Analysis :** Get valuable insights to create content that is perfectly optimized for search engines.
 - **Universal SEO Metabox :** Edit your SEO metadata from any page builder or theme builder effortlessly.
-- **White Label and Ad-free :** No intrusive ads or branding, ensuring a professional look for both the backend and frontend of your website.
 - **Easy Import :** Migrate your post and term metadata from other plugins with a simple one-click process.
 
 ===Why Choose SiteSEO :===
@@ -32,7 +31,6 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 - **Save Time and Money:** Import and export metadata easily with SiteSEO PRO, available for just $49 per year for unlimited sites.
 - **All-in-One Solution:** SiteSEO comes with all the features you need to optimize your WordPress site's SEO, eliminating the need for additional extensions and potential conflicts.
 - **Easy and User-Friendly:** You don't need to be an SEO expert or coder to use SiteSEO. Most settings are automatically configured, and an installation wizard guides you through the setup process.
-- **Abundant Resources:** Access free tutorials and ebooks to enhance your SEO knowledge and improve your content's search engine positioning.
 
 ==SiteSEO Free Features : ==
 
@@ -50,13 +48,8 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 
 ===Unlock advanced capabilities with SiteSEO PRO, such as:===
 
-- **Video XML Sitemap:** Improve video search result rankings, with automatic addition of YouTube videos.
 - **Enhanced WooCommerce Support:** Optimize e-commerce sites with price and currency meta tags, product XML sitemaps, and more.
 - **Google Page Speed Insights:** Analyze your site's performance on mobile and desktop, including Core Web Vitals.
-
-= For Developers : =
-
-SiteSEO offers numerous hooks for seamless extension, and a REST API for building static websites.
 
 = Multi-language Support : =
 
@@ -64,7 +57,7 @@ SiteSEO is available in multiple languages, and you can contribute to further lo
 
 = Integrations: =
 
-SiteSEO smoothly integrates with popular tools such as Elementor, WooCommerce, WPML and more.
+SiteSEO smoothly integrates with popular tools such as Elementor, WooCommerce and more.
 
 = Get Started with SiteSEO Today! =
 
@@ -92,7 +85,7 @@ Go to SiteSEO > Analytics > Custom Tracking tab. Paste GTM / Facebook Pixel trac
 
 XML sitemaps for search engines: post, page, post type, taxonomies, images and author.
 HTML sitemap for accessibility and SEO.
-SiteSEO PRO supports Google News XML and Video sitemaps.
+SiteSEO PRO supports Google News XML.
 
 = Is SiteSEO GDPR compliant? =
 
@@ -115,6 +108,11 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.2.0 (April 1, 2025) =
+* [Bug-Fix] There was an issue with H1 heading analysis that has been fixed.
+* [Bug-Fix] There was an issue with Remove Category slug, this has been fixed.
+* [Bug-Fix] A few onboarding settings were not getting saved, that has been fixed.
 
 = 1.1.9 (March 26, 2025) =
 * [Bug-Fix] There was issue with Social Network settings getting erased on update, that has been fixed.

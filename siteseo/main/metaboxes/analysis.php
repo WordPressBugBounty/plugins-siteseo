@@ -928,19 +928,13 @@ class Analysis{
 
 		
 		$h1_count = $heading_counts[1] ?? 0;
-		if($h1_count === 0){
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span><strong>' . 
-				__('No Heading 1 (H1) tag was found in your content. This is essential for both SEO and accessibility!', 'siteseo') . 
-				'</strong></p>';
-			$status = 'Error';
-			$status_class = 'error';
-		} elseif($h1_count > 1){
+		if($h1_count > 0){
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
 				/* translators: %d represents the number of h1 tags */
-				sprintf(esc_html__('We found %d Heading 1 (H1) tags in your content.', 'siteseo'), $h1_count) . '</p>';
+				sprintf(esc_html__('We found %d Heading 1 (H1) tags in your content.', 'siteseo'), $h1_count+1) . '</p>';
 
 			$details .= '<p>' . __('You should avoid using more than one H1 heading in your post content. The rule is simple: each web page should have only one H1, which benefits both SEO and accessibility. Below is the list:', 'siteseo') . '</p>';
-			
+
 			$details .= '<ul>';
 			foreach(array_keys($heading_matches[1], '1') as $index){
 				$details .= '<li><span class="dashicons dashicons-arrow-right"></span>' . 
