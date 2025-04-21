@@ -67,7 +67,7 @@ class Install{
 
 			foreach($post_types as $post_type){
 				$titles_metas['titles_single_titles'][$post_type]['title'] = !isset($titles_metas['titles_single_titles'][$post_type]['title']) ? '%%post_title%% %%sep%% %%sitetitle%%' : $titles_metas['titles_single_titles'][$post_type]['title'];
-				$titles_metas['titles_single_titles'][$post_type]['description'] = !isset($titles_metas['titles_single_titles'][$post_type]['title']) ? '%%post_excerpt%% ' : $titles_metas['titles_single_titles'][$post_type]['description'];
+				$titles_metas['titles_single_titles'][$post_type]['description'] = !isset($titles_metas['titles_single_titles'][$post_type]['description']) ? '%%post_excerpt%% ' : $titles_metas['titles_single_titles'][$post_type]['description'];
 			}
 		}
 

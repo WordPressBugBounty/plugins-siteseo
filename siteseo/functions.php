@@ -144,9 +144,13 @@ function siteseo_get_docs_links(){
 }
 
 function siteseo_universal_assets(){
-	global $siteseo;
+	global $siteseo, $post;
+	
+	if(!current_user_can('edit_post', $post->ID)){
+		return;
+	}
 
-	// Cechking if it is a block editor
+	// Checking if it is a block editor
 	if(function_exists('get_current_screen')){
 		$screen = get_current_screen();
 		
@@ -200,4 +204,27 @@ function siteseo_post_types(){
 	
 	return apply_filters('siteseo_post_types', $post_types);
 	
+}
+
+function siteseo_user_can($cap){
+	return current_user_can('manage_options') || current_user_can('siteseo_'. $cap);
+}
+
+function siteseo_user_can_metabox(){
+	if(!is_user_logged_in()){
+		return false;
+	}
+	
+	global $siteseo;
+
+	$metabox_roles = !empty($siteseo->advanced_settings['security_metaboxe_role']) ? $siteseo->advanced_settings['security_metaboxe_role'] : [];
+
+	$user = wp_get_current_user();
+	$user_role = current($user->roles);
+
+	if(array_key_exists($user_role, $metabox_roles)){
+		return false;
+	}
+	
+	return true;
 }

@@ -38,7 +38,7 @@ class Ajax{
 	static function handle_import(){
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!siteseo_user_can('manage_tools')){
 			wp_send_json_error(['message' => esc_html__('Insufficient permissions', 'siteseo')]);
 		}
 		
@@ -77,7 +77,7 @@ class Ajax{
 
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!siteseo_user_can('manage_tools')){
 			wp_send_json_error(['message' => esc_html__('Insufficient permissions', 'siteseo')]);
 		}
 		
@@ -103,7 +103,7 @@ class Ajax{
 	static function import_settings(){
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!siteseo_user_can('manage_tools')){
 			wp_send_json_error(['message' => esc_html__('Insufficient permissions', 'siteseo')]);
 		}
 		
@@ -184,7 +184,7 @@ class Ajax{
 	static function export_settings(){
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!siteseo_user_can('manage_tools')){
 			wp_send_json_error(['message' => esc_html__('Insufficient permissions', 'siteseo')]);
 		}
 
@@ -248,7 +248,7 @@ class Ajax{
 		
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!siteseo_user_can('manage_instant_indexing')){
 			wp_send_json_error(['message' => esc_html__('Insufficient permissions', 'siteseo')]);
 		}
 		
@@ -367,7 +367,7 @@ class Ajax{
 	static function save_onboarding_settings(){
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!current_user_can('manage_options')){
 			wp_send_json_error(__('You do not have required permission to edit this file.', 'siteseo'));
 		}
 		
@@ -509,7 +509,7 @@ class Ajax{
 	static function save_universal_metabox(){
 		check_ajax_referer('siteseo_universal_nonce', 'security');
 		
-		if(!current_user_can('siteseo_manage')){
+		if(!current_user_can('siteseo_manage') || !siteseo_user_can_metabox()){
 			wp_send_json_error(__('You do not have required permission to edit this file.', 'siteseo'));
 		}
 		

@@ -211,7 +211,7 @@ class Instant{
 
 		check_admin_referer('siteseo_instant_indexing');
 
-		if(!current_user_can('siteseo_manage')|| !is_admin()){
+		if(!siteseo_user_can('manage_instant_indexing')|| !is_admin()){
 			return;
 		}
 

@@ -748,7 +748,7 @@ class Titles{
 		
 		check_admin_referer('siteseo_title_settings');
 
-		if(!current_user_can('siteseo_manage') || !is_admin()){
+		if(!siteseo_user_can('manage_title') || !is_admin()){
 			return;
 		}
 

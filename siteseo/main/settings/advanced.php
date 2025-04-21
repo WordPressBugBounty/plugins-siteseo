@@ -602,6 +602,12 @@ class Advanced{
 			'siteseo-metaboxes' => 'SiteSEO Metaboxes',
 			'siteseo-settings-pages' => 'SiteSEO setting pages',
 		];
+		
+		$roles = get_editable_roles();
+
+		if(empty($roles)){
+			return;
+		}
 
 		wp_nonce_field('siteseo_advance_settings');
 
@@ -635,11 +641,15 @@ class Advanced{
 									<tr>
 										<th scope="row">'.esc_html__('Block SEO metabox to user roles', 'siteseo').'</th>
 										<td>';
-										foreach($wp_roles->get_names() as $key => $value){
+										foreach($roles as $key => $role){
+											if(empty($role['capabilities']) || !is_array($role['capabilities']) || !array_key_exists('publish_posts' , $role['capabilities'])){
+												continue;
+											}
+
 											$checked = isset($options['security_metaboxe_role'][$key]) ? 'checked' : '';
 											echo '<label>
 												<input type="checkbox" name="siteseo_options[security_metaboxe_role]['.esc_attr($key).']" value="1" '.esc_attr($checked).'/>
-												<strong>'.esc_html($value).'</strong>
+												<strong>'.esc_html($role['name']).'</strong>
 											</label><br/><br/>';
 										}
 										echo '</td>
@@ -648,10 +658,14 @@ class Advanced{
 									<tr>
 										<th scope="row">'.esc_html__('Block Content analysis metabox to user roles', 'siteseo').'</th>
 										<td>';
-										foreach($wp_roles->get_names() as $key => $value){
+										foreach($roles as $key => $role){
+											if(empty($role['capabilities']) || !is_array($role['capabilities']) || !array_key_exists('publish_posts' , $role['capabilities'])){
+												continue;
+											}
+
 											$checked = isset($options['security_metaboxe_ca_role'][$key]) ? 'checked' : '';
 										echo '<label>
-											<input type="checkbox" name="siteseo_options[security_metaboxe_ca_role]['.esc_attr($key).']" value="1" '.esc_attr($checked).'/><strong>'.esc_html($value).'</strong>
+											<input type="checkbox" name="siteseo_options[security_metaboxe_ca_role]['.esc_attr($key).']" value="1" '.esc_attr($checked).'/><strong>'.esc_html($role['name']).'</strong>
 											</label><br/><br/>';
 										}
 										echo '</td>
@@ -681,15 +695,15 @@ class Advanced{
 									echo '<tr>
 										<th scope="row">' . esc_html($page_title) . '</th>
 										<td>';
-										foreach($wp_roles->get_names() as $role_key => $role_value){
-											if($role_key === 'administrator'){
+										foreach($roles as $role_key => $role){
+											if(empty($role['capabilities']) || !is_array($role['capabilities']) || !array_key_exists('publish_posts' , $role['capabilities']) || $role_key == 'administrator'){
 												continue;
 											}
 											
 											$checked = isset($options['siteseo_advanced_security_metaboxe_siteseo-' . $page_key][$role_key]) ? 'checked' : '';
 											echo '<label>
 												<input type="checkbox" name="siteseo_options[siteseo_advanced_security_metaboxe_siteseo-' . esc_attr($page_key) . '][' . esc_attr($role_key) . ']" value="1" ' . esc_attr($checked) . '/>
-												<strong>' . esc_html($role_value) . '</strong>
+												<strong>' . esc_html($role['name']) . '</strong>
 											</label><br/><br/>';
 										}
 										echo '</td>
@@ -701,11 +715,15 @@ class Advanced{
 									echo '<tr>
 										<th scope="row">' . esc_html__('Pro Features', 'siteseo') . '</th>
 										<td>';
-										foreach($wp_roles->get_names() as $key => $value){
+										foreach($roles as $key => $role){
+											if(empty($role['capabilities']) || !is_array($role['capabilities']) || !array_key_exists('publish_posts' , $role['capabilities']) || $key == 'administrator'){
+												continue;
+											}
+											
 											$checked = isset($options['siteseo_advanced_security_page_pro'][$key]) ? 'checked' : '';
 											echo '<label>
 												<input type="checkbox" name="siteseo_options[siteseo_advanced_security_page_pro][' . esc_attr($key) . ']" value="1" ' . esc_attr($checked) . '/>
-												<strong>'.esc_html($value).'</strong>
+												<strong>'.esc_html($role['name']).'</strong>
 											</label><br/><br/>';
 										}
 										echo '</td>
@@ -794,18 +812,17 @@ class Advanced{
 		
 		check_admin_referer('siteseo_advance_settings');
 		
-		if(!current_user_can('siteseo_manage') || !is_admin()){
+		if(!siteseo_user_can('manage_advanced') || !is_admin()){
 			return;
 		}
 		
 		$options = [];
 		
-		if(!empty($_post['siteseo_options'])){
+		if(empty($_POST['siteseo_options'])){
 			return;
 		}
 		
 		if(isset($_POST['siteseo_options']['image_seo'])){
-
 			$options['advanced_attachments'] = isset($_POST['siteseo_options']['attachment']);
 			$options['advanced_attachments_file'] = isset($_POST['siteseo_options']['attachment_file']);
 			$options['advanced_clean_filename'] = isset($_POST['siteseo_options']['clean_filename']);
@@ -866,7 +883,7 @@ class Advanced{
 			$options['toc_enable'] = isset($_POST['siteseo_options']['toc_enable']);
 			$options['toc_label'] = isset($_POST['siteseo_options']['toc_label']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['toc_label'])) : '';
 			$options['toc_heading_type'] = isset($_POST['siteseo_options']['toc_heading_type']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['toc_heading_type'])) : '';
-			
+
 			//toc_excluded_headings
 			if(isset($_POST['siteseo_options']['toc_excluded_headings'])){
 				$options['toc_excluded_headings'] = map_deep(wp_unslash($_POST['siteseo_options']['toc_excluded_headings']), 'sanitize_text_field');
@@ -877,16 +894,18 @@ class Advanced{
 		
 		if(isset($_POST['siteseo_options']['security_tab'])){
 			
-			$security_sections = [
-				'security_metaboxe_role' => ['administrator', 'editor','author', 'contributor', 'subscriber' ],
-				'security_metaboxe_ca_role' => ['administrator', 'editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-titles' => ['editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-xml-sitemap' => ['editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-social' => ['editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-google-analytics' => ['editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-instant-indexing' => ['editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-advanced' => ['editor', 'author', 'contributor', 'subscriber'],
-				'siteseo_advanced_security_metaboxe_siteseo-import-export' => ['editor', 'author', 'contributor', 'subscriber']
+			$has_admin = ['security_metaboxe_role', 'security_metaboxe_ca_role'];
+			
+			$settings = [
+				'security_metaboxe_role',
+				'security_metaboxe_ca_role',
+				'siteseo_advanced_security_metaboxe_siteseo-titles',
+				'siteseo_advanced_security_metaboxe_siteseo-xml-sitemap',
+				'siteseo_advanced_security_metaboxe_siteseo-social',
+				'siteseo_advanced_security_metaboxe_siteseo-google-analytics',
+				'siteseo_advanced_security_metaboxe_siteseo-instant-indexing',
+				'siteseo_advanced_security_metaboxe_siteseo-advanced',
+				'siteseo_advanced_security_metaboxe_siteseo-import-export'
 			];
 
 			$advanced_options = map_deep($_POST['siteseo_options'], function($value){
@@ -903,19 +922,34 @@ class Advanced{
 			});
 			
 			$filtered_options = [];
-			foreach($security_sections as $section => $roles){
-				if(isset($advanced_options[$section])){
-					$filtered_options[$section] = array_intersect_key(
-						$advanced_options[$section], 
-						array_flip($roles)
+			$roles = get_editable_roles();
+			foreach($settings as $setting){
+				$accepted_roles = [];
+				foreach($roles as $key => $role){
+					// We will skip, admin if the setting does not require it.
+					if(!in_array($setting, $has_admin) && $key ==  'administrator'){
+						continue;
+					}
+					
+					// We only accept roles which has capability to 'publish_posts', as giving access to anyone less does not makes sense.
+					if(empty($role['capabilities']) || !is_array($role['capabilities']) || !array_key_exists('publish_posts' , $role['capabilities'])){
+						continue;
+					}
+
+					array_push($accepted_roles, $key);
+				}
+				
+				// Making sure the roles being pushed are the once we want.
+				if(isset($advanced_options[$setting])){
+					$filtered_options[$setting] = array_intersect(
+						$advanced_options[$setting],
+						array_flip($accepted_roles)
 					);
 				}
 			}
 
 			$options = array_merge($options, $filtered_options);
 		}
-
-	
 
 		update_option('siteseo_advanced_option_name', $options);
 	}

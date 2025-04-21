@@ -84,27 +84,51 @@ class Admin{
 
 		foreach($roles->get_names() as $role_slug => $role_name){
 			$role = get_role($role_slug);
-			if(!$role || $role_slug === 'administrator') continue;
+			if(!$role) continue;
+
+			if($role_slug === 'administrator'){
+				$role->add_cap('siteseo_manage', true); // Adding the only cap to admin.
+				continue;
+			}
 
 			$has_any_permission = false;
-				foreach(['titles', 'xml-sitemap', 'social', 'google-analytics', 'instant-indexing', 'advanced', 'import-export'] as $page){
-					$option_key = "siteseo_advanced_security_metaboxe_siteseo-{$page}";
-		        	if(isset($options[$option_key][$role_slug]) && $options[$option_key][$role_slug]){
-						$has_any_permission = true;
-						break;
-		        	}
+			
+			// The structure is page name => capability name without the prefix of siteseo_manage_
+			// Will need to add it here whenever a new page is added to SiteSEO
+			$pages = [
+				'titles' => 'titles',
+				'xml-sitemap' => 'sitemap', 
+				'social' => 'social',
+				'google-analytics' => 'analytics',
+				'instant-indexing' => 'instant_indexing',
+				'advanced' => 'advanced', 
+				'import-export' => 'tools'
+			];
+			
+			$has_access = 0; // To make sure siteseo_manage is added once.
+			foreach($pages as $page => $cap){
+				$option_key = "siteseo_advanced_security_metaboxe_siteseo-{$page}";
+				if(isset($options[$option_key][$role_slug]) && $options[$option_key][$role_slug]){
+					$has_any_permission = true;
+					$has_access++;
 				}
 
-		    	if($has_any_permission){
-		        	$role->add_cap('siteseo_manage', true);
-		    	}else{
-		        	$role->remove_cap('siteseo_manage');
-		    	}
-		}
+				if($has_any_permission){
+					if($has_access == 1){
+						$role->add_cap('siteseo_manage', true);
+					}
 
-		$admin_role = get_role('administrator');
-		if($admin_role){
-			$admin_role->add_cap('siteseo_manage', true);
+					$role->add_cap('siteseo_manage_'.$cap, true);
+				}else{
+					$role->remove_cap('siteseo_manage_'.$cap);
+				}
+				
+			}
+			
+			// If no one has this access then just remove siteseo_manage as well.
+			if(empty($has_access)){
+				$role->remove_cap('siteseo_manage');
+			}
 		}
 	}
 
@@ -146,9 +170,9 @@ class Admin{
 		$is_admin = in_array('administrator', $current_user->roles);
 		$options = get_option('siteseo_advanced_option_name');
 
-		add_menu_page(__('SiteSEO', 'siteseo'), 'SiteSEO', $capability, 'siteseo', '\SiteSEO\Settings\Dashboard::dashboard_tab', esc_url($siteseo_icon));
+		add_menu_page(__('SiteSEO', 'siteseo'), 'SiteSEO', 'manage_options', 'siteseo', '\SiteSEO\Settings\Dashboard::dashboard_tab', esc_url($siteseo_icon));
 
-		add_submenu_page('siteseo', __('Dashboard', 'siteseo'), 'Dashboard', $capability, 'siteseo','\SiteSEO\Settings\Dashboard::dashboard_tab');
+		add_submenu_page('siteseo', __('Dashboard', 'siteseo'), 'Dashboard', 'manage_options', 'siteseo','\SiteSEO\Settings\Dashboard::dashboard_tab');
 
 		$menu_pages = [
 			'titles' => [
@@ -199,7 +223,6 @@ class Admin{
 			$show_page = $is_admin;
 
 			if(!$is_admin){
-
 				foreach($current_user->roles as $role){
 					if(isset($options[$page['option_key']][$role]) && $options[$page['option_key']][$role]){
 						$show_page = true;
@@ -458,22 +481,20 @@ class Admin{
 	static function add_metaboxes($post_type, $post = false){
 		global $siteseo;
 		
+		if(!is_user_logged_in()){
+			return;
+		}
+
 		$metabox_roles = !empty($siteseo->advanced_settings['security_metaboxe_role']) ? $siteseo->advanced_settings['security_metaboxe_role'] : [];
-
-		$allow_user = true; 
 		
-		if(is_user_logged_in()){
-			$user = wp_get_current_user();
-			
-			if(is_super_admin()){
-				$allow_user = true;
-			} else{				
-				$user_role = current($user->roles);
+		$allow_user = true;
 
-				if(array_key_exists($user_role, $metabox_roles)){
-					$allow_user = false;
-				}
-			}
+		$user = wp_get_current_user();
+
+		$user_role = current($user->roles);
+
+		if(array_key_exists($user_role, $metabox_roles)){
+			$allow_user = false;
 		}
 
 		if(empty($allow_user)){

@@ -49,6 +49,21 @@ class ImageSeo{
 		$file_name = sanitize_file_name($file_name);
 		$file_name = ucwords(str_replace(['-', '_'], ' ', $file_name));
 		
+		// WooCommerce product img
+		$is_woocommerce_product_image = false;
+		$product_title = '';
+		
+		$parent_id = $attachment->post_parent;
+		if(!empty($parent_id)){
+			$parent_post = get_post($parent_id);
+			if(!empty($parent_post) && $parent_post->post_type === 'product'){
+				$is_woocommerce_product_image = true;
+				$product_title = get_the_title($parent_id);
+			}
+		}
+		
+		$file_name = $is_woocommerce_product_image ? $product_title : $file_name;
+		
 		// Adding alt text to the image
 		if(!empty($siteseo->advanced_settings['advanced_image_auto_alt_editor'])){
 			update_post_meta($attachment_id, '_wp_attachment_image_alt', $file_name);

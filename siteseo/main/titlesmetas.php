@@ -44,6 +44,30 @@ class TitlesMetas{
 			'noarchive' => !empty($settings['titles_noarchive']),
 			'noimageindex' => !empty($settings['titles_noimageindex'])
 		];
+		
+		// shop page woocommerce
+		if(function_exists('is_shop') && is_shop()){
+			$shop_page_id = wc_get_page_id('shop');
+			
+			if($shop_page_id){
+				$robots['noindex'] = !empty(get_post_meta($shop_page_id, '_siteseo_robots_index', true)) || $robots['noindex'];
+				$robots['nofollow'] = !empty(get_post_meta($shop_page_id, '_siteseo_robots_follow', true)) || $robots['nofollow'];
+				$robots['nosnippet'] = !empty(get_post_meta($shop_page_id, '_siteseo_robots_snippet', true)) || $robots['nosnippet'];
+				$robots['noarchive'] = !empty(get_post_meta($shop_page_id)) || $robots['noarchive'];
+				$robots['noimageindex'] = !empty(get_post_meta($shop_page_id, '_siteseo_robots_imageindex', true)) || $robots['noimageindex'];
+			}
+
+			if(!$robots['noindex']){
+				$robots['index'] = true;
+				$robots = array_merge($robots, $index_extras);
+			}
+
+			if(!$robots['nofollow']){
+				$robots['follow'] = true;
+			}
+
+			return array_filter($robots);
+		}
     
 		// taxonomies
 		$term_id = 0;
@@ -211,6 +235,14 @@ class TitlesMetas{
 			$canonical = trailingslashit(home_url());
 			echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";				
 		}
+		
+		// shop page woocommerce
+		if(function_exists('is_shop') && is_shop()){
+			$shop_page_id = wc_get_page_id('shop');
+			$canonical_meta = get_post_meta($shop_page_id, '_siteseo_robots_canonical', true);
+			$canonical = !empty($canonical_meta) ? $canonical_meta : get_permalink(wc_get_page_id('shop'));
+			echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+		}
 	}
 	
 	static function replace_variables($content, $in_editor = false){
@@ -361,6 +393,18 @@ class TitlesMetas{
 		// Check set by meta
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
 		$post_meta_title = !empty(get_post_meta($post_id, '_siteseo_titles_title', true)) ? get_post_meta($post_id, '_siteseo_titles_title', true) : '';
+		
+		// shop page woocommerce
+		if(function_exists('is_shop') && is_shop()){
+			$shop_page_id = wc_get_page_id('shop');
+			$new_title =  esc_attr(self::replace_variables(get_post_meta($shop_page_id, '_siteseo_titles_title', true)));
+			
+			if(!empty($sep)){
+				$new_title .= " $sep " . get_bloginfo('name');
+			}
+
+			return $new_title;
+		}
 		
 		// front page
 		if(is_front_page() && !empty($settings['titles_home_site_title'])){
@@ -513,6 +557,19 @@ class TitlesMetas{
 		$taxonomies = get_taxonomies(array('public' => true), 'objects');
 
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
+		
+		// shop page woocommerce
+		if(function_exists('is_shop') && is_shop()){
+			$shop_page_id = wc_get_page_id('shop');
+			$meta_desc = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
+			$default_desc = isset($settings['titles_single_titles']['page']['description']) ? $settings['titles_single_titles']['page']['description'] : '';
+
+			$description = !empty($meta_desc) ? $meta_desc : $default_desc;
+
+			if(!empty($description)){
+				echo '<meta name="description" content="'.esc_attr(self::replace_variables($description)).'">';
+			}
+		}
 
 		//front page
 		if(is_front_page() && is_home()){

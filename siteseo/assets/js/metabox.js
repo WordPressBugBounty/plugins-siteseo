@@ -416,25 +416,25 @@ jQuery(document).ready(function($){
 	function createTag(text){
 		if(!text || tags.includes(text)) return;
 
-		const $tag = $('<span>').addClass('siteseo-tag').text(text),
+		  const $tag = $('<span>').addClass('siteseo-tag').text(text),
         $removeBtn = $('<span>').addClass('siteseo-remove-tag').text('×');
 
-		$(document).on('click', '.siteseo-remove-tag', function(e){
+        let input = $(document).find('.siteseo_analysis_target_kw_meta');
+
+        $tag.append($removeBtn);
+        $tag.insertBefore($input);
+        tags.push(text);
+        updateHiddenInput();
+    }
+
+    $(document).on('click', '.siteseo-remove-tag', function(e){
 			let tag = $(e.target).closest('.siteseo-tag'),
 			tag_text = tag[0].innerText.substring(0, tag[0].innerText.length - 1);
 			tags = tags.filter(item => item !== tag_text);
 			tag.remove();
 			updateHiddenInput();
 		});
-		
-		let input = $(document).find('.siteseo_analysis_target_kw_meta');
-
-        $tag.append($removeBtn);
-        $tag.insertBefore(input);
-        tags.push(text);
-        updateHiddenInput();
-    }
-
+  
     function updateHiddenInput(){
         $('[name="siteseo_analysis_target_kw"]').val(tags.join(','));
     }
@@ -449,7 +449,8 @@ jQuery(document).ready(function($){
         });
     }
 
-    $(document).on('blur keypress', '.siteseo_analysis_target_kw_meta', function(e){
+      
+      $input.on('blur keypress', function(e){
         if(e.type === 'blur' || (e.type === 'keypress' && e.key === 'Enter')){
             let jEle = $(this);
             const text = jEle.val().trim();

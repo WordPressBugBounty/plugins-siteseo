@@ -286,6 +286,14 @@ class Settings{
 		if(!empty($pro_settings['enable_structured_data']) && !empty($pro_settings['toggle_state_stru_data']) && !empty($show_content_analysis)){
 			$siteseo_metabox_tabs['structured-data-types'] = __('Structured Data Types', 'siteseo');
 		}
+		
+		if(!empty($pro_settings['toggle_state_video_sitemap']) && !empty($pro_settings['enable_video_sitemap']) && !empty($show_content_analysis)){
+			$siteseo_metabox_tabs['video-sitemap'] = __('Video Sitemap', 'siteseo');
+		}
+		
+		if(!empty($pro_settings['toggle_state_google_news']) && !empty($pro_settings['google_news']) && !empty($show_content_analysis)){
+			$siteseo_metabox_tabs['google-news'] = __('Google News', 'siteseo');
+		}
 
 		echo'<div id="siteseo-metabox-wrapper" class="siteseo-metabox-wrapper">
 		<div class="siteseo-metabox-tabs" data-home-id="'.esc_attr($data_attr['isHomeId']).'" data-term-id="'.esc_attr($data_attr['termId']).'" data_id="'.esc_attr($data_attr['current_id']).'" data_origin="'.esc_attr($data_attr['origin']).'" data_tax="'.esc_attr($data_attr['data_tax']).'">';
@@ -540,6 +548,22 @@ class Settings{
 			<div class="siteseo-metabox-tab-structured-data-types siteseo-metabox-tab">';
 				// Pro fearure
 				do_action('siteseo_display_structured_data_types');
+			echo'</div>';
+		}
+		
+		// video sitemap
+		if(!empty($pro_settings['toggle_state_video_sitemap']) && !empty($pro_settings['enable_video_sitemap']) && !empty($show_content_analysis)){
+			echo'<div class="siteseo-sidebar-tabs"><span>'.esc_html__('Video Sitemap', 'siteseo').'</span><span class="siteseo-sidebar-tabs-arrow"><span class="dashicons dashicons-arrow-down-alt2"></span></span></div>
+			<div class="siteseo-metabox-tab-video-sitemap siteseo-metabox-tab">';
+				do_action('siteseo_display_video_sitemap');
+			echo'</div>';
+		}
+		
+		// gooogle news exclude 
+		if(!empty($pro_settings['toggle_state_google_news']) && !empty($pro_settings['google_news']) && !empty($show_content_analysis)){
+			echo'<div class="siteseo-sidebar-tabs"><span>'.esc_html__('Google News', 'siteseo').'</span><span class="siteseo-sidebar-tabs-arrow"><span class="dashicons dashicons-arrow-down-alt2"></span></span></div>
+			<div class="siteseo-metabox-tab-google-news siteseo-metabox-tab">';
+				do_action('siteseo_display_google_news');
 			echo'</div>';
 		}
 		
@@ -882,13 +906,15 @@ class Settings{
 		$post_type = get_post_type_object($post->post_type);
 
 		//Check permission
-		if(!current_user_can($post_type->cap->edit_post, $post_id)){
+		if(!current_user_can($post_type->cap->edit_post, $post_id) || !siteseo_user_can_metabox()){
 			return $post_id;
 		}
 
 		if('attachment' !== get_post_type($post_id)){
 			if(isset($_POST['siteseo_analysis_target_kw'])){
 				update_post_meta($post_id, '_siteseo_analysis_target_kw', self::clean_post('siteseo_analysis_target_kw'));
+			} else{
+				delete_post_meta($post_id, '_siteseo_analysis_target_kw');
 			}
 		}
 	}
@@ -907,7 +933,7 @@ class Settings{
 		$post_type = get_post_type_object($post->post_type);
 		
 		//Check permission
-		if(!current_user_can($post_type->cap->edit_post, $post_id)){
+		if(!current_user_can($post_type->cap->edit_post, $post_id) || !siteseo_user_can_metabox()){
 			return $post_id;
 		}
 		
@@ -1095,6 +1121,18 @@ class Settings{
 					\SiteSEOPro\StructuredData::save_metabox($post_id, $post);
 				}
 			}
+			
+			if(!empty($analysis_tabs) && is_array($analysis_tabs) && in_array('video-sitemap', $analysis_tabs)){
+				if(class_exists('\SiteSEOPro\VideoSitemap') && method_exists('\SiteSEOPro\VideoSitemap', 'save_video_sitemap')){
+					\SiteSEOPro\VideoSitemap::save_video_sitemap($post_id, $post);
+				}
+			}
+			
+			if(!empty($analysis_tabs) && is_array($analysis_tabs) && in_array('google-news', $analysis_tabs)){
+				if(class_exists('\SiteSEOPro\GoogleNews') && method_exists('\SiteSEOPro\GoogleNews', 'save_google_news')){
+					\SiteSEOPro\GoogleNews::save_google_news($post_id, $post);
+				}
+			}
 		}
 	}
 
@@ -1186,9 +1224,16 @@ class Settings{
 			});
 		});
 		</script>';
-		
+
 		$post = $tmp_post;
 		$pagenow = $tmp_pagenow;
+
+		global $wp_version;
+
+		if(!empty($wp_version) && version_compare($wp_version, '6.4', '>')){
+			remove_action('wp_footer', 'the_block_template_skip_link');
+		}
+
 		wp_footer();
 		exit;
 	}
@@ -1281,3 +1326,4 @@ class Settings{
 		return $term_id;
 	}
 }
+

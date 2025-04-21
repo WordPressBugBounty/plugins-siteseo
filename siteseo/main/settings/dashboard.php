@@ -31,6 +31,9 @@ class Dashboard{
 		$toggle_easy_digital = isset($pro['toggle_state_easy_digital']) ? $pro['toggle_state_easy_digital'] : '';
 		$toggle_woocommerce  = isset($pro['toggle_state_woocommerce']) ? $pro['toggle_state_woocommerce'] : '';
 		$toggle_structured_data = isset($pro['toggle_state_stru_data']) ? $pro['toggle_state_stru_data'] : '';
+		$toggle_state_redirect = isset($pro['toggle_state_redirect_monitoring']) ? $pro['toggle_state_redirect_monitoring'] : '';
+		$toggle_state_google_news = isset($pro['toggle_state_google_news']) ? $pro['toggle_state_google_news'] : '';
+		$toggle_state_video_sitemap = isset($pro['toggle_state_video_sitemap']) ? $pro['toggle_state_video_sitemap'] : '';
 
 		$nonce = wp_create_nonce('siteseo_toggle_nonce');
 
@@ -237,6 +240,63 @@ class Dashboard{
 					
 					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
 						\SiteSEOPro\Settings\Util::render_toggle('local', $toggle_localBusiness, $pro_nonce, true);
+					}
+				echo'</div>
+			</div>
+			
+			<div class="siteseo-card">
+				<div class="siteseo-card-body">
+					<span class="dashicons dashicons-editor-unlink siteseo-card-icon"></span>
+					<h3>'.esc_html__('Redirections / 404 monitoring','siteseo').'</h3>
+					<p>'.esc_html__('Track 404 errors and set up redirects to improve user experience and SEO.','siteseo').'</p>
+				</div>
+				<div class="siteseo-card-footer">';
+					if(defined('SITESEO_PRO_VERSION')){
+						echo'<a href="admin.php?page=siteseo-pro-page">'.esc_html__('Settings', 'siteseo').'</a>';
+					} else{
+						echo'<div class="siteseo-pro-badge">Pro</div>';
+					}
+					
+					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
+						\SiteSEOPro\Settings\Util::render_toggle('404_monitoring', $toggle_state_redirect, $pro_nonce, true);
+					}
+				echo'</div>
+			</div>
+			
+			<div class="siteseo-card">
+				<div class="siteseo-card-body">
+					<span class="dashicons dashicons-index-card siteseo-card-icon"></span>
+					<h3>'.esc_html__('Google News','siteseo').'</h3>
+					<p>'.esc_html__('Generate and manage a Google News sitemap to ensure your news articles get indexed quickly.','siteseo').'</p>
+				</div>
+				<div class="siteseo-card-footer">';
+					if(defined('SITESEO_PRO_VERSION')){
+						echo'<a href="admin.php?page=siteseo-pro-page">'.esc_html__('Settings', 'siteseo').'</a>';
+					} else{
+						echo'<div class="siteseo-pro-badge">Pro</div>';
+					}
+					
+					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
+						\SiteSEOPro\Settings\Util::render_toggle('google_news', $toggle_state_google_news, $pro_nonce, true);
+					}
+				echo'</div>
+			</div>
+			
+			<div class="siteseo-card">
+				<div class="siteseo-card-body">
+					<span class="dashicons dashicons-format-video siteseo-card-icon"></span>
+					<h3>'.esc_html__('Video Sitemap','siteseo').'</h3>
+					<p>'.esc_html__('Create and manage a video sitemap to help search engines index your video content efficiently.','siteseo').'</p>
+				</div>
+				<div class="siteseo-card-footer">';
+					if(defined('SITESEO_PRO_VERSION')){
+						echo'<a href="admin.php?page=siteseo-pro-page">'.esc_html__('Settings', 'siteseo').'</a>';
+					} else{
+						echo'<div class="siteseo-pro-badge">Pro</div>';
+					}
+					
+					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
+						\SiteSEOPro\Settings\Util::render_toggle('video_sitemap', $toggle_state_video_sitemap, $pro_nonce, true);
 					}
 				echo'</div>
 			</div>';

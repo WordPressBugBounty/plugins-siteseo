@@ -225,31 +225,66 @@ class InstantIndexing{
 
 	}
 
-    static function submit_urls_to_bing($urls, $api_key){
-        $host = wp_parse_url(home_url(), PHP_URL_HOST);
+	/**
+	 * Sends request to index now api with list of urls and key and key location.
+	 *
+	 * Key location is just the URL to a file which has the same name as the Key
+	 * as key.txt and the content in it is the key as well. This is a virtual file.
+	 *
+	 * @param array $urls List of URLs to submit.
+	 * @param string $api_key bing key.
+	 *
+	 * @return array with 'status_code' and response 'body'
+	 */
+	static function submit_urls_to_bing($urls, $api_key){
+        	$host = wp_parse_url(home_url(), PHP_URL_HOST);
 		$key_location = trailingslashit(home_url()) . $api_key . '.txt';
 
-        $endpoint = 'https://api.indexnow.org/indexnow/';
-        $body = wp_json_encode([
-            'host' => $host, 
-            'key' => $api_key,
-			'keyLocation' => $key_location,
-            'urlList' => $urls
-        ]);
+		$endpoint = 'https://api.indexnow.org/indexnow/';
+		$body = wp_json_encode([
+		    'host' => $host, 
+		    'key' => $api_key,
+				'keyLocation' => $key_location,
+		    'urlList' => $urls
+		]);
 
-        $response = wp_remote_post($endpoint, [
-            'body' => $body,
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ],
-            'timeout' => 30
-        ]);
+		$response = wp_remote_post($endpoint, [
+		    'body' => $body,
+		    'headers' => [
+		        'Content-Type' => 'application/json',
+		        'Accept' => 'application/json'
+		    ],
+		    'timeout' => 30
+		]);
 
-        return [
-            'status_code' => wp_remote_retrieve_response_code($response),
-            'body' => wp_remote_retrieve_body($response)
-        ];
-    }
+		return [
+		    'status_code' => wp_remote_retrieve_response_code($response),
+		    'body' => wp_remote_retrieve_body($response)
+		];
+	}
+	
+	// Sends request to bing when the status of post changes
+	// We will only do it only if the post is published.
+	static function on_status_change($new_status, $old_status, $post){
+
+		if($new_status == $old_status){
+			return;
+		}
+		
+		if($new_status != 'publish'){
+			return;
+		}
+		
+		$options = get_option('siteseo_instant_indexing_option_name', []);
+
+		$api_key = isset($options['instant_indexing_bing_api_key']) ? $options['instant_indexing_bing_api_key'] : '';
+		$url = get_permalink($post);
+
+		if(empty($url) || empty($api_key)){
+			return;
+		}
+
+		self::submit_urls_to_bing($url, $api_key);
+	}
 	
 }

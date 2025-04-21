@@ -953,7 +953,7 @@ class Analytics{
 
 		check_admin_referer('siteseo_analytics_settings');
 
-		if(!current_user_can('siteseo_manage') || !is_admin()){
+		if(!siteseo_user_can('manage_analytics') || !is_admin()){
 			return;
 		}
 

@@ -574,8 +574,7 @@ class Analysis{
 		//avg density
 		$avg_density = array_sum($all_density)/count($all_density);
 
-		$status = $avg_density > 1 ? 'Good' : 
-				  ($avg_density > 0.5 ? 'Warning' : 'Error');
+		$status = ($avg_density > 1) ? 'Good' : 'Warning';
 
 		return [
 			'label' => __('Keyword Density', 'siteseo'),
@@ -662,6 +661,8 @@ class Analysis{
 			$status_class = 'warning';
 		} elseif(strlen($description) >= 50 && strlen($description) <= 160){
 			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('The length of your meta description is appropriate.', 'siteseo').'</p>';
+		} else{
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('The description has been set properly.', 'siteseo').'</p>';
 		}
 
 		if(!empty($keywords)){
@@ -1101,7 +1102,7 @@ class Analysis{
 	}
 
     static function check_structured_data($post){
-        $schema_type = get_post_meta($post->ID, '_schema_type', true);
+        $schema_type = get_post_meta($post->ID, '_siteseo_structured_data_type', true);
         $status = !empty($schema_type) ? 'Good' : 'Warning';
 
         return [

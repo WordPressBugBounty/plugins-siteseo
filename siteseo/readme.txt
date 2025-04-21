@@ -2,9 +2,9 @@
 Contributors: pagelayer, softaculous
 Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 
 ===Why Choose SiteSEO :===
 
-- **Save Time and Money:** Import and export metadata easily with SiteSEO PRO, available for just $49 per year for unlimited sites.
+- **Save Time and Money:** Import and export metadata easily with SiteSEO PRO, which starts at $49 per year.
 - **All-in-One Solution:** SiteSEO comes with all the features you need to optimize your WordPress site's SEO, eliminating the need for additional extensions and potential conflicts.
 - **Easy and User-Friendly:** You don't need to be an SEO expert or coder to use SiteSEO. Most settings are automatically configured, and an installation wizard guides you through the setup process.
 
@@ -109,6 +109,17 @@ Yes!
 
 == Changelog ==
 
+= 1.2.1 (April 21, 2025) =
+* [Pro-Feature] Added RSS sitemap.
+* [Pro-Feature] Added Video sitemap.
+* [Bug-Fix] There was an issue with Blocking Metabox this has been fixed.
+* [Bug-Fix] Some user roles we not getting saved in Advanced security settings, this has been fixed.
+* [Bug-Fix] Setting Primary Category was not working, this has been fixed.
+* [Bug-Fix] Share of page on Facebook was not giving the correct Thumbnail image and description that has been fixed.
+* [Bug-Fix] Auto Indexing on Post publish if the option was enabled was not working that has been fixed.
+* [Task] A WordPress deprecation warning has been fixed.
+* [Task] Tested with WordPress 6.8
+
 = 1.2.0 (April 1, 2025) =
 * [Bug-Fix] There was an issue with H1 heading analysis that has been fixed.
 * [Bug-Fix] There was an issue with Remove Category slug, this has been fixed.
@@ -127,7 +138,7 @@ Yes!
 * [Bug-Fix] There was Duplicate meta description and canonical URL on the homepage, that has been fixed.
 
 = 1.1.7 (February 28, 2025) =
-* [Task] Title and Meta settigs for Post Types and Taxonomies will be enabled by default.
+* [Task] Title and Meta settings for Post Types and Taxonomies will be enabled by default.
 * [Task] WP Sitemap will be disabled, and redirected to SiteSEO sitemap, if SEO settings in SiteSEO are enabled.
 * [Bug-Fix] There was an issue with SEO metabox, it was showing up even when Universal metabox was enabled, this has been fixed.
 * [Bug-Fix] Google Instant indexing, was returning an error that has been fixed.

@@ -22,7 +22,7 @@ class Tools{
 		$plugins = Util::importable_plugins();
 
 		echo '<form method="post" id="siteseo-form" class="siteseo-option" name="siteseo-flush">
-				<span id="siteseo-tab-title"><strong>'.esc_html__('TOOLS - SiteSEO','siteseo').'</strong></span><br/><br/>
+				<span id="siteseo-tab-title"><strong>'.esc_html__('Tools - SiteSEO','siteseo').'</strong></span><br/><br/>
 				<span class="line"></span>
 				<div style="siteseo-tools-page">
 					<h3>'.esc_html__('Import Settings From Other Plugins','siteseo').'</h3>

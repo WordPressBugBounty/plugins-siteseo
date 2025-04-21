@@ -4,7 +4,7 @@ Plugin Name: SiteSEO - SEO Simplified
 Plugin URI: http://wordpress.org/plugins/siteseo/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.2.0
+Version: 1.2.1
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.2.0');
+define('SITESEO_VERSION', '1.2.1');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -112,11 +112,15 @@ function siteseo_load_plugin(){
 
 	if(!empty($siteseo->setting_enabled['toggle-instant-indexing']) && !empty($siteseo->instant_settings['instant_indexing_bing_api_key'])){
 		add_action('template_redirect', '\SiteSEO\InstantIndexing::bing_txt_file', 0);
+
+		if(!empty($siteseo->instant_settings['instant_indexing_automate_submission'])){
+			add_action('transition_post_status', '\SiteSEO\InstantIndexing::on_status_change', 10, 3);
+		}
 	}
 
 	\SiteSEO\Admin::permission();
 
-	if(!empty($siteseo->setting_enabled['toggle-advanced']) && empty($siteseo->advanced_settings['appearance_universal_metabox_disable'])){
+	if(!empty($siteseo->setting_enabled['toggle-advanced']) && empty($siteseo->advanced_settings['appearance_universal_metabox_disable']) && siteseo_user_can_metabox()){
 		add_action('wp_enqueue_scripts', 'siteseo_universal_assets');
 		add_action('enqueue_block_editor_assets', 'siteseo_universal_assets');
 	}
@@ -132,30 +136,34 @@ function siteseo_load_plugin(){
 		add_action('wp_head', '\SiteSEO\TitlesMetas::add_canonical_url', 1);
 		add_filter('wp_title', '\SiteSEO\TitlesMetas::modify_site_title', 10, 2);
 		add_filter('pre_get_document_title', '\SiteSEO\TitlesMetas::modify_site_title', 10);
-		add_action('wp_head' , '\SiteSEO\TitlesMetas::add_meta_description', 1);
+		add_action('wp_head', '\SiteSEO\TitlesMetas::add_meta_description', 1);
 		add_filter('wp_robots', '\SiteSEO\TitlesMetas::advanced_metas', 999);
 		add_action('wp_head', '\SiteSEO\TitlesMetas::add_rel_link_pages', 9);
-		add_action('wp_head' ,'\SiteSEO\TitlesMetas::date_time_publish', 3);
+		add_action('wp_head', '\SiteSEO\TitlesMetas::date_time_publish', 3);
 
 		// Social
 		add_action('wp_head', '\SiteSEO\SocialMetas::add_social_graph', 1);
-		add_action('wp_head','\SiteSEO\SocialMetas::fb_graph', 1);
-		add_action('wp_head','\SiteSEO\SocialMetas::twitter_card', 1);
+		add_action('wp_head', '\SiteSEO\SocialMetas::fb_graph', 1);
+		add_action('wp_head', '\SiteSEO\SocialMetas::twitter_card', 1);
 
 		// Sitemaps
-		add_action('init','\SiteSEO\GenerateSitemap::settings');
+		add_action('init', '\SiteSEO\GenerateSitemap::settings');
 
 		// Image & Advanced
-		add_action('wp_head','\SiteSEO\Advanced::tags');
-		add_action('init','\SiteSEO\Advanced::remove_links');
+		add_action('wp_head', '\SiteSEO\Advanced::tags');
+		add_action('init', '\SiteSEO\Advanced::remove_links');
 
 		// Analaytics
-		add_action('init','\SiteSEO\GoogleAnalytics::ga_render');
-
+		add_action('init', '\SiteSEO\GoogleAnalytics::ga_render');
+		
+		add_filter('post_link_category', '\SiteSEO\PrimaryCategory::add_primary_category', 10, 3);
+		add_filter('wc_product_post_type_link_product_cat', '\SiteSEO\PrimaryCategory::wc_primary_category', 10, 3);
+		add_filter('woocommerce_get_breadcrumb', '\SiteSEO\PrimaryCategory::replace_breadcrumb_categories', 10, 2);
+		
 		return;
 	}
 
-	if(is_admin() && current_user_can('siteseo_manage')){
+	if(is_admin()){
 		\SiteSEO\Admin::init();
 	}
 }

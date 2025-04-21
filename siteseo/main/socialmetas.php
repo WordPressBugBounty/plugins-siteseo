@@ -77,27 +77,93 @@ class SocialMetas{
 
 		$fb_page_id = !empty($siteseo->social_settings['social_facebook_link_ownership_id']) ? $siteseo->social_settings['social_facebook_link_ownership_id'] : '';
 		$fb_link_owership = !empty($siteseo->social_settings['social_facebook_admin_id']) ? $siteseo->social_settings['social_facebook_admin_id'] : '';
-		$og_type = get_post_meta(get_the_ID(), '_og_type', true);
 		$og_url = get_home_url();
 		$og_sitename = get_bloginfo('name');
-		
-		$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
 		
 		// Check
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
 		$og_title = get_the_title();
 		$og_description = get_bloginfo('description');
+		$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
 
 		// Get post types and taxonomies
 		$post_types = siteseo_post_types();
 		$taxonomies = get_taxonomies(array('public' => true), 'objects');
+		
+		// home site page
+		if(is_home() && is_front_page()){
+			$og_title = !empty($siteseo->titles_settings['titles_home_site_title']) ? $siteseo->titles_settings['titles_home_site_title'] : $og_title;
+			$og_description = !empty($siteseo->titles_settings['titles_home_site_desc']) ? $siteseo->titles_settings['titles_home_site_desc'] : $og_description;
+		}
+		
+		// shop page woocommerces
+		if(function_exists('is_shop') && is_shop()){
+			$shop_page_id = wc_get_page_id('shop');
+			
+			$og_meta_title = empty(get_post_meta($shop_page_id, '_siteseo_titles_title', true)) ? get_post_meta($shop_page_id, '_siteseo_titles_title', true) : $og_title;
+			
+			$og_meta_title = esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_meta_title));
+			$og_title = !empty(get_post_meta($shop_page_id, '_siteseo_social_fb_title', true)) ? get_post_meta($shop_page_id, '_siteseo_social_fb_title', true) : $og_meta_title;
+			
+			$og_description = !empty(get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true)) ? get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true) : $og_description;
+						
+			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true))){
+				$og_description = get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true);
+			} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
+				$og_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
+			} elseif(get_the_excerpt($shop_page_id)){
+				$og_description = wp_trim_words(get_the_excerpt($shop_page_id), 50);
+			}
+			
+			$og_description = isset($og_description) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_description)) : '';
+			
+			// OG:IMG
+			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_img', true))){
+				$og_img = get_post_meta($shop_page_id, '_siteseo_social_fb_img', true);
+			} else if(get_the_post_thumbnail_url($post, 'full')){
+				$og_img = get_the_post_thumbnail_url($post, 'full');
+			} else {
+				$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
+			}
+			
+			$og_url = urldecode(get_permalink($shop_page_id));
+		}
 
 		// single post types
 		foreach($post_types as $post_type){
-			if(is_singular($post_type->name)) {
-				$og_title = !empty(get_post_meta($post_id, '_siteseo_social_fb_title', true)) ? get_post_meta($post_id, '_siteseo_social_fb_title', true) : $og_title;
-				$og_description = !empty(get_post_meta($post_id, '_siteseo_social_fb_desc', true)) ? get_post_meta($post_id, '_siteseo_social_fb_desc', true) : $og_description;
-				$og_img = !empty(get_post_meta($post_id, '_siteseo_social_fb_img', true)) ? get_post_meta($post_id, '_siteseo_social_fb_img', true) : $og_img;
+			if(is_singular($post_type->name)){
+				
+				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_title', true))){
+					$og_title = get_post_meta($post_id, '_siteseo_social_fb_title', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_title', true))){
+					$og_title = get_post_meta($post_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'])){
+					$og_title = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'];
+				} else{
+					$og_title = $og_title;
+				}
+				
+				
+				// og:description
+				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_desc', true))){
+					$og_description = get_post_meta($post_id, '_siteseo_social_fb_desc', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_desc', true))){
+					$og_description = get_post_meta($post_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'])){
+					$og_description = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'];
+				} elseif(get_the_excerpt($post_id)){
+					$og_description = wp_trim_words(get_the_excerpt($post_id), 50);
+				}
+				
+				// OG:IMG
+				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_img', true))){
+					$og_img = get_post_meta($post_id, '_siteseo_social_fb_img', true);
+				} else if(get_the_post_thumbnail_url($post, 'full')){
+					$og_img = get_the_post_thumbnail_url($post, 'full');
+				} else {
+					$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
+				}
+
 				$og_url = urldecode(get_permalink($post_id));
 				break;
 			}
@@ -107,14 +173,38 @@ class SocialMetas{
 		foreach($taxonomies as $taxonomy){
 			if(is_tax($taxonomy->name) || is_category() || is_tag()){
 				$term = get_queried_object();
-				$term_id = $term->term_id;
-				$og_title = !empty(get_term_meta($term_id, '_siteseo_social_fb_title', true)) ? get_term_meta($term_id, '_siteseo_social_fb_title', true) : $term->name;
-				$og_description = !empty(get_term_meta($term_id, '_siteseo_social_fb_desc', true)) ? get_term_meta($term_id, '_siteseo_social_fb_desc', true) : wp_strip_all_tags(term_description($term_id));
+				$term_id = $term->term_id;	
+				
+				// og:title
+				if(!empty(get_term_meta($term_id, '_siteseo_social_fb_title', true))){
+					$og_title = get_term_meta($term_id, '_siteseo_social_fb_title', true);
+				} elseif(!empty(get_term_meta($term_id, '_siteseo_titles_title', true))){
+					$og_title = get_term_meta($term_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['title'])){
+					$og_title = $siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['title'];
+				} else{
+					$og_title = $og_title;
+				}
+								
+				// og:description
+				if(!empty(get_term_meta($term_id, '_siteseo_social_fb_desc', true))){
+					$og_description = get_term_meta($term_id, '_siteseo_social_fb_desc', true);
+				} elseif(!empty(get_term_meta($term_id, '_siteseo_titles_desc', true))){
+					$og_description = get_term_meta($term_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['description'])){
+					$og_description = $siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['description'];
+				} else{
+					$og_description = wp_strip_all_tags(term_description($term_id));
+				}
+				
 				$og_img = !empty(get_term_meta($term_id, '_siteseo_social_fb_img', true)) ? get_term_meta($term_id, '_siteseo_social_fb_img', true) : $og_img;
 				$og_url = urldecode(get_term_link($term_id));
 				break;
 			}
 		}
+		
+		$og_title = isset($og_title) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_title)) : '';
+		$og_description = isset($og_description) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_description)) : '';
 
 		if(!empty($og_img)){
 			$og_img = sanitize_url($og_img);
@@ -131,56 +221,63 @@ class SocialMetas{
 			}
 		}
 
-		if(!$og_type){
-			$og_type = 'website'; //default website
+		// Setting og:type
+		if(is_home() || is_front_page()){
+			$og_type = 'website'; // default website
+		} elseif(is_singular('product') || is_singular('download')){
+			$og_type = 'product';
+		} elseif(is_singular()){
+			$og_type = 'article';
+		} elseif(is_search() || is_archive() || is_404()){
+			$og_type = 'object';
 		}
-				
-		if(!empty($siteseo->social_settings['social_twitter_card'])){
 
-			if(!empty($og_url)){
-				echo '<meta property="og:url" content="'.esc_html($og_url).'" />';
-			}
+		if(!empty($og_url)){
+			echo '<meta property="og:url" content="'.esc_html($og_url).'" />';
+		}
 
-			if(!empty($og_sitename)){
-				echo '<meta property="og:site_name" content="'.esc_html($og_sitename).'" />';
-			}
+		if(!empty($og_sitename)){
+			echo '<meta property="og:site_name" content="'.esc_html($og_sitename).'" />';
+		}
 
-			if(function_exists('get_locale')){
-				echo '<meta property="og:locale" content="'.esc_html(get_locale()).'" />';
-			}
+		if(function_exists('get_locale')){
+			echo '<meta property="og:locale" content="'.esc_html(get_locale()).'" />';
+		}
 
-			if(!empty($og_type)){
-				echo '<meta property="og:type" content="'.esc_attr($og_type).'" />';
-			}
+		if(!empty($og_type)){
+			echo '<meta property="og:type" content="'.esc_attr($og_type).'" />';
+		}
 
-			if(!empty($og_title)){
-				echo '<meta property="og:title" content="'.esc_html($og_title).'" />';
-			}
+		if(!empty($og_title)){
+			echo '<meta property="og:title" content="'.esc_html($og_title).'" />';
+		}
 
-			if(!empty($og_description)){
-				echo '<meta property="og:description" content="'.esc_html($og_description).'" />';
-			}
+		if(!empty($og_description)){
+			echo '<meta property="og:description" content="'.esc_html($og_description).'" />';
+		}
 
-			if(!empty($og_img)){
-				echo '<meta property="og:image" content="'.esc_html($og_img).'" />';
+		if(!empty($og_img)){
+			echo '<meta property="og:image" content="'.esc_html($og_img).'" />';
+
+			if(is_ssl()){
 				echo '<meta property="og:secure_url" content="'.esc_html($og_img).'" />';
 			}
+		}
 
-			if(!empty($og_img_height)){
-				echo '<meta property="og:image:height" content="'.esc_attr($og_img_height).'" />';
-			}
+		if(!empty($og_img_height)){
+			echo '<meta property="og:image:height" content="'.esc_attr($og_img_height).'" />';
+		}
 
-			if(!empty($og_img_width)){
-				echo '<meta property="og:image:width" content="'.esc_attr($og_img_width).'" />';
-			}
+		if(!empty($og_img_width)){
+			echo '<meta property="og:image:width" content="'.esc_attr($og_img_width).'" />';
+		}
 
-			if(!empty($fb_page_id)){
-				echo '<meta property="fb:pages" content="'.esc_html($fb_page_id) .'" />';
-			}
+		if(!empty($fb_page_id)){
+			echo '<meta property="fb:pages" content="'.esc_html($fb_page_id) .'" />';
+		}
 
-			if(!empty($fb_link_owership)){
-				echo '<meta property="fb:admins" content="'. esc_html($fb_link_owership).'" />';
-			}	
+		if(!empty($fb_link_owership)){
+			echo '<meta property="fb:admins" content="'. esc_html($fb_link_owership).'" />';
 		}
 	}
 
@@ -191,25 +288,90 @@ class SocialMetas{
 			return;
 		}
 
-		$site_type = get_post_meta(get_the_ID(), '_og_type', true);
 		$site_url = get_home_url();
 		$sitename = get_bloginfo('name');
 
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
 		$site_title = get_the_title();
 		$site_description = get_bloginfo('description');
-		$twitter_img = isset($siteseo->social_settings['social_twitter_card_img']) ? $siteseo->social_settings['social_twitter_card_img'] : '';
+		$twitter_img = !empty($siteseo->social_settings['social_twitter_card_img']) ? $siteseo->social_settings['social_twitter_card_img'] : '';
+		
+		// home site page
+		if(is_home() && is_front_page()){
+			$site_title = !empty($siteseo->titles_settings['titles_home_site_title']) ? $siteseo->titles_settings['titles_home_site_title'] : $site_title;
+			$site_description = !empty($siteseo->titles_settings['titles_home_site_desc']) ? $siteseo->titles_settings['titles_home_site_desc'] : $site_description;
+		}
 
 		// types and taxonomies
 		$post_types = siteseo_post_types();
 		$taxonomies = get_taxonomies(array('public' => true), 'objects');
+		
+		if(function_exists('is_shop') && is_shop()){
+			$shop_page_id = wc_get_page_id('shop');
+			$meta_title = !empty(get_post_meta($shop_page_id, '_siteseo_titles_title', true)) ? get_post_meta($shop_page_id, '_siteseo_titles_title', true) : $site_title;
+			
+			$meta_title = esc_attr(\SiteSEO\TitlesMetas::replace_variables($meta_title));
+			
+			$site_title = !empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_title', true)) ? get_post_meta($shop_page_id, '_siteseo_social_twitter_title', true) : $meta_title;
+				
+			// twitter:description
+			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_desc', true))){
+				$site_description = get_post_meta($shop_page_id, '_siteseo_social_twitter_desc', true);
+			} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
+				$site_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
+			} elseif(get_the_excerpt($shop_page_id)){
+				$site_description = wp_trim_words(get_the_excerpt(shop_page_id), 50);
+			}
+			
+			// twitter:image
+			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_img', true))){
+				$twitter_img = get_post_meta($shop_page_id, '_siteseo_social_twitter_img', true);
+			} else if(get_the_post_thumbnail_url($post, 'full')){
+				$twitter_img = get_the_post_thumbnail_url($post, 'full');
+			} else {
+				$twitter_img = isset($siteseo->social_settings['social_twitter_card_img']) ? $siteseo->social_settings['social_twitter_card_img'] : '';
+			}
+
+			$site_url = urldecode(get_permalink($shop_page_id));
+			
+		}
 
 		// single post types
 		foreach($post_types as $post_type){
 			if(is_singular($post_type->name)){
-				$site_title = !empty(get_post_meta($post_id, '_siteseo_social_twitter_title', true)) ? get_post_meta($post_id, '_siteseo_social_twitter_title', true) : $site_title;
-				$site_description = !empty(get_post_meta($post_id, '_siteseo_social_twitter_desc', true)) ? get_post_meta($post_id, '_siteseo_social_twitter_desc', true) : $site_description;
-				$twitter_img = !empty(get_post_meta($post_id, '_siteseo_social_twitter_img', true)) ? get_post_meta($post_id, '_siteseo_social_twitter_img', true) : $twitter_img;
+				
+				// twitter:title
+				if(!empty(get_post_meta($post_id, '_siteseo_social_twitter_title', true))){
+					$site_title = get_post_meta($post_id, '_siteseo_social_twitter_title', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_title', true))){
+					$site_title = get_post_meta($post_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'])){
+					$site_title = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'];
+				} else{
+					$site_title = $site_title;
+				}
+				
+				
+				// twitter:description
+				if(!empty(get_post_meta($post_id, '_siteseo_social_twitter_desc', true))){
+					$site_description = get_post_meta($post_id, '_siteseo_social_twitter_desc', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_desc', true))){
+					$site_description = get_post_meta($post_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'])){
+					$site_description = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'];
+				} else{
+					$site_description = wp_trim_words(get_the_excerpt($post_id), 50);
+				}
+
+				// twitter:image
+				if(!empty(get_post_meta($post_id, '_siteseo_social_twitter_img', true))){
+					$twitter_img = get_post_meta($post_id, '_siteseo_social_twitter_img', true);
+				} else if(get_the_post_thumbnail_url($post, 'full')){
+					$twitter_img = get_the_post_thumbnail_url($post, 'full');
+				} else {
+					$twitter_img = isset($siteseo->social_settings['social_twitter_card_img']) ? $siteseo->social_settings['social_twitter_card_img'] : '';
+				}
+
 				$site_url = urldecode(get_permalink($post_id));
 				break;
 			}
@@ -221,25 +383,41 @@ class SocialMetas{
 			if(is_tax($taxonomy->name) || is_category() || is_tag()){
 				$term = get_queried_object();
 				$term_id = $term->term_id;
-				$site_title = !empty(get_term_meta($term_id, '_siteseo_social_twitter_title', true)) ? get_term_meta($term_id, '_siteseo_social_twitter_title', true) : $site_title;
-				$site_description = !empty(get_term_meta($term_id, '_siteseo_social_twitter_desc', true)) ? get_term_meta($term_id, '_siteseo_social_twitter_desc', true) : wp_strip_all_tags(term_description($term_id));
+				
+				//twitter:title
+				if(!empty(get_term_meta($term_id, '_siteseo_social_twitter_title', true))){
+					$site_title = get_term_meta($term_id, '_siteseo_social_twitter_title', true);
+				} elseif(!empty(get_term_meta($term_id, '_siteseo_titles_title', true))){
+					$site_title = get_term_meta($term_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['title'])){
+					$site_title = $siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['title'];
+				} else{
+					$site_title = $site_title;
+				}
+				
+				// twitter description
+				if(!empty(get_term_meta($term_id, '_siteseo_social_twitter_desc', true))){
+					$site_description = get_term_meta($term_id, '_siteseo_social_twitter_desc', true);
+				} elseif(!empty(get_term_meta($term_id, '_siteseo_titles_desc', true))){
+					$site_description = get_term_meta($term_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['description'])){
+					$site_description = $siteseo->titles_settings['titles_tax_titles'][$taxonomy->name]['description'];
+				} else{
+					$site_description = wp_strip_all_tags(term_description($term_id));
+				}
+								
 				$twitter_img = !empty(get_term_meta($term_id, '_siteseo_social_twitter_img', true)) ? get_term_meta($term_id, '_siteseo_social_twitter_img', true) : $twitter_img;
 				$site_url = urldecode(get_term_link($term_id));
 				break;
 			}
 		}
+		
+		$site_title = isset($site_title) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_title)) : '';
+		$site_description = isset($site_description) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_description)) : '';
 
-		if(!$site_type){
-			$site_type = 'website'; // default website
-		}
-	
 		echo '<meta name="twitter:card" content="summary"/>';
 		
 		echo '<meta name="twitter:locale" content="'.esc_html(get_locale()).'"/>';
-		
-		if($site_type){
-			echo '<meta name="twitter:type" content="'.esc_attr($site_type).'"/>';
-		}
 		
 		if(!empty($site_title)){
 			echo '<meta name="twitter:title"  content="'.esc_html($site_title).'"/>';

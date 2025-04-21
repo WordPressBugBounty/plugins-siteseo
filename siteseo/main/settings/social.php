@@ -397,23 +397,22 @@ class Social{
     }
 
     static function save_settings(){
-
         global $siteseo;
-		
-	check_admin_referer('siteseo_social_settings');
 
-	if(!current_user_can('siteseo_manage') || !is_admin()){
-		return;
-	}
- 
-	$options = [];
-       
-	if(empty($_POST['siteseo_options'])){
-		return;
-	}
-		
-	if(isset($_POST['siteseo_options']['knowledge_graph_tab'])){
-			
+		check_admin_referer('siteseo_social_settings');
+
+		if(!siteseo_user_can('manage_social') || !is_admin()){
+			return;
+		}
+
+		$options = [];
+
+		if(empty($_POST['siteseo_options'])){
+			return;
+		}
+
+		if(isset($_POST['siteseo_options']['knowledge_graph_tab'])){
+
 			$options['social_knowledge_type'] = isset($_POST['siteseo_options']['org_type']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['org_type'])) : '';
 			$options['social_knowledge_name'] = isset($_POST['siteseo_options']['org_name']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['org_name'])) : '';
 			$options['social_knowledge_img'] = isset($_POST['siteseo_options']['org_logo']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['org_logo'])) : '';
@@ -445,7 +444,6 @@ class Social{
 			$options['social_twitter_card_og'] = isset($_POST['siteseo_options']['card_og']);
 			$options['social_twitter_card_img'] = isset($_POST['siteseo_options']['twitter_img']) ? sanitize_url(wp_unslash($_POST['siteseo_options']['twitter_img'])) : '';
 			$options['social_twitter_card_img_size'] = isset($_POST['siteseo_options']['image_size']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['image_size'])) : '';
-
 		}
 
         update_option('siteseo_social_option_name' , $options);
