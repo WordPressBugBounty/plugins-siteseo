@@ -147,7 +147,7 @@ jQuery(document).ready(function($){
     });
 
     $(document).click(function(e){
-        if (!$(e.target).closest('.wrap-tags').length){
+        if(!$(e.target).closest('.wrap-tags').length){
             $('.siteseo-suggetion').hide();
         }
     });
@@ -314,9 +314,7 @@ jQuery(document).ready(function($){
 		setActiveTab(tabId);
 	});
 
-	
-
-	 $('#siteseo-generate-api-key-btn').on('click', function(){
+	$('#siteseo-generate-api-key-btn').on('click', function(){
         var button = $(this);
         var inputField = $('#bing-api-key');
         
@@ -660,12 +658,12 @@ jQuery(document).ready(function($){
 	});
 	
 	/** import settings**/
-  $('#siteseo-import-btn').on('click', function (e){
-	  e.preventDefault();
+	$('#siteseo-import-btn').on('click', function (e){
+		e.preventDefault();
 
-    const fileInput = $('#siteseo-import-file')[0];
+		const fileInput = $('#siteseo-import-file')[0];
 
-	  if(!fileInput.files || !fileInput.files[0]){
+		if(!fileInput.files || !fileInput.files[0]){
 			alert('Please select a file to import.');
 			return;
 		}

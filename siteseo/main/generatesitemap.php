@@ -454,10 +454,10 @@ class GenerateSitemap{
 		}
 
 		$orderby_map = [
-			'Post Title' => 'title',
-			'Modified date' => 'modified',
-			'Post ID' => 'ID',
-			'Menu Order' => 'menu_order',
+			'post_title' => 'title',
+			'modified_date' => 'modified',
+			'post_id' => 'ID',
+			'menu_order' => 'menu_order',
 			'date' => 'date', // Default
 		];
 

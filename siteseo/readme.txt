@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Webs
 
 == Description ==
 
-SiteSEO is a revolutionary WordPress SEO plugin that seamlessly integrates with all page builders and themes, making it the best choice for optimizing your website. 
+SiteSEO is a revolutionary WordPress SEO plugin that seamlessly integrates with all page builders and themes, making it the best choice for optimizing your website.
 
 SiteSEO is a powerful WordPress SEO plugin to maximize your online Visibility, boost traffic and elevate rankings. It helps you to manage XML Sitemaps, improve social sharing, manage Titles and Metas and so much more.<br><br>
 
@@ -108,6 +108,16 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.2.2 (May 19, 2025) =
+* [Improvement] Improved content saving for site verification tags.
+* [Bug-Fix] There was an issue with cookies Block which has been resolved.
+* [Bug-Fix] An issue related to archives has been resolved.
+* [Bug-Fix] A duplicate meta description issue with Elementor Pro has been resolved.
+* [Bug-Fix] A duplicate canonical URL issue from WordPress has been resolved.
+* [Bug-Fix] A pagination issue in the Remove Category feature has been fixed.
+* [Bug-Fix] An issue with the noindex setting for post types has been resolved.
+* [Bug-Fix] There was issue with save Order By settings in HTML sitemap has been resolved.
 
 = 1.2.1 (April 21, 2025) =
 * [Pro-Feature] Added RSS sitemap.

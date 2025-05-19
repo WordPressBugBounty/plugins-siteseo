@@ -37,7 +37,7 @@ class Advanced{
 		$advanced_toggle = isset($siteseo->setting_enabled['toggle-advanced']) ? $siteseo->setting_enabled['toggle-advanced'] : '';
 		$nonce = wp_create_nonce('siteseo_toggle_nonce');
 
-		Util::render_toggle('Image SEO & Advanced settings - SiteSEO', 'advanced_toggle', $advanced_toggle, $nonce);
+		Util::render_toggle('Image SEO & Advanced Settings - SiteSEO', 'advanced_toggle', $advanced_toggle, $nonce);
 
 		echo '<div id="siteseo-tabs" class="wrap">
 			<div class="nav-tab-wrapper">';
@@ -342,7 +342,7 @@ class Advanced{
 				<tr>
 					<th scope="row" style="user-select:auto;">'.esc_html__('Bing site verification','siteseo').'</th>
 					<td>
-						<input name="siteseo_options[bing_meta_value]" type="text" placeholder="'.esc_html__('Enter Google meta value site verification','siteseo').'" value="'.esc_attr($option_bing_meta_value).'"/>
+						<input name="siteseo_options[bing_meta_value]" type="text" placeholder="'.esc_html__('Enter Bing meta value site verification','siteseo').'" value="'.esc_attr($option_bing_meta_value).'"/>
 						<p class="description">'.
 						/* translators: placeholders are just <strong> tag */ 
 						wp_kses_post(sprintf(__('If your site is already verified in %1$s Bing Webmaster Tools %2$s, you can leave this field blank.', 'siteseo'), '<strong>', '</strong>')).'</p>
@@ -848,10 +848,10 @@ class Advanced{
 			$options['advanced_wp_shortlink'] = isset($_POST['siteseo_options']['shortlink']);
 			$options['advanced_wp_rsd'] = isset($_POST['siteseo_options']['rsd_meta']);
 			$options['advanced_wp_wlw'] = isset($_POST['siteseo_options']['wlw_meta']);
-			$options['advanced_google'] = isset($_POST['siteseo_options']['google_meta_value']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['google_meta_value'])) : '';
-			$options['advanced_bing'] = isset($_POST['siteseo_options']['bing_meta_value']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['bing_meta_value'])) : '';
-			$options['advanced_pinterest'] = isset($_POST['siteseo_options']['pinterest_meta_value']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['pinterest_meta_value'])) : '';
-			$options['advanced_yandex'] = isset($_POST['siteseo_options']['yandex_meta_value']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['yandex_meta_value'])) : '';
+			$options['advanced_google'] = isset($_POST['siteseo_options']['google_meta_value']) ? sanitize_text_field(Util::extract_content(wp_unslash($_POST['siteseo_options']['google_meta_value']))) : '';
+			$options['advanced_bing'] = isset($_POST['siteseo_options']['bing_meta_value']) ? sanitize_text_field(Util::extract_content(wp_unslash($_POST['siteseo_options']['bing_meta_value']))) : '';
+			$options['advanced_pinterest'] = isset($_POST['siteseo_options']['pinterest_meta_value']) ? sanitize_text_field(Util::extract_content(wp_unslash($_POST['siteseo_options']['pinterest_meta_value']))) : '';
+			$options['advanced_yandex'] = isset($_POST['siteseo_options']['yandex_meta_value']) ? sanitize_text_field(Util::extract_content(wp_unslash($_POST['siteseo_options']['yandex_meta_value']))) : '';
 
 		}
 		

@@ -320,7 +320,7 @@ class SocialMetas{
 			} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
 				$site_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
 			} elseif(get_the_excerpt($shop_page_id)){
-				$site_description = wp_trim_words(get_the_excerpt(shop_page_id), 50);
+				$site_description = wp_trim_words(get_the_excerpt($shop_page_id), 50);
 			}
 			
 			// twitter:image

@@ -90,6 +90,7 @@ class Ajax{
 			'siteseo_xml_sitemap_option_name',
 			'siteseo_google_analytics_option_name',
 			'siteseo_dismiss_intro',
+			'siteseo_pro_options'
 		];
 
 		foreach($options as $option){

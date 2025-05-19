@@ -41,6 +41,8 @@ class Admin{
 			add_action('admin_enqueue_scripts', '\SiteSEO\Admin::enqueue_metaboxes');
 			add_action('admin_init', '\SiteSEO\Admin::add_term_metabox');
 		}
+		
+		add_filter('plugin_action_links', '\SiteSEO\Install::action_links', 10, 2);
 
 		add_action('admin_enqueue_scripts', '\SiteSEO\Admin::enqueue_script');
 		add_action('enqueue_block_editor_assets', '\SiteSEO\Admin::enqueue_metaboxes');

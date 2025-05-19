@@ -312,11 +312,11 @@ class Sitemap{
                 <th>'.esc_html__('Order By:','siteseo').'</th>
                 <td>
                     <select name="siteseo_options[order_by]">
-                        <option value="Date" '.selected($order_by, 'Default (date)', false).'>'.esc_html__('Deafult (date)','siteseo').'</option>
-                        <option value="Post_title" '.selected($order_by, 'Post Title', false).'>'.esc_html__('Post Title','siteseo').'</option>
-                        <option value="Modified_date" '.selected($order_by, 'Modified date', false).'>'.esc_html__('Modified date','siteseo').'</option>
-                        <option value="Post_ID" '.selected($order_by, 'Post ID', false).'>'.esc_html__('POST ID','siteseo').'</option>
-                        <option value="menu_order" '.selected($order_by, 'Menu Order', false).'>'.esc_html__('Menu Order','siteseo').'</option>
+                        <option value="date" '.selected($order_by, 'date', false).'>'.esc_html__('Deafult (date)','siteseo').'</option>
+                        <option value="post_title" '.selected($order_by, 'post_title', false).'>'.esc_html__('Post Title','siteseo').'</option>
+                        <option value="modified_date" '.selected($order_by, 'modified_date', false).'>'.esc_html__('Modified date','siteseo').'</option>
+                        <option value="post_id" '.selected($order_by, 'post_id', false).'>'.esc_html__('POST ID','siteseo').'</option>
+                        <option value="menu_order" '.selected($order_by, 'menu_order', false).'>'.esc_html__('Menu Order','siteseo').'</option>
                     </select>
                 </td>
             </tr>

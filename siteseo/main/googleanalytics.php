@@ -67,6 +67,7 @@ class GoogleAnalytics{
 		}
 		
 		// load setting
+		$auto_accept_cookies = !empty($siteseo->analaytics_settings['google_analytics_half_disable']) ? $siteseo->analaytics_settings['google_analytics_half_disable'] : '';
 		$cookies_msg = !empty($siteseo->analaytics_settings['google_analytics_opt_out_msg']) ? $siteseo->analaytics_settings['google_analytics_opt_out_msg'] : 'By visiting our site, you agree to our privacy policy regarding cookies, tracking statistics, etc.';
 		$accept_btn_msg = !empty($siteseo->analaytics_settings['google_analytics_opt_out_msg_ok']) ? $siteseo->analaytics_settings['google_analytics_opt_out_msg_ok'] : 'Accept';
 		$close_btn_msg = !empty($siteseo->analaytics_settings['google_analytics_opt_out_msg_close']) ? $siteseo->analaytics_settings['google_analytics_opt_out_msg_close'] : 'X';
@@ -136,9 +137,9 @@ class GoogleAnalytics{
 		</style>';
 		
 		$html = $backdrop_html;
-		$html .= '<div id="siteseo-cookie-bar" class="siteseo-cookie-bar '.esc_attr($position_class).'" style="'.esc_attr($bar_styles).'">
+		$html .= '<div id="siteseo-cookie-bar" class="siteseo-cookie-bar '.esc_attr($position_class).'" style="'.esc_attr($bar_styles).'" data-half-disable="'.esc_attr($auto_accept_cookies).'">
 			<div class="siteseo-cookie-bar-content">
-				<span>'.esc_html($cookies_msg).'</span>
+				<span>'.wp_kses_post($cookies_msg).'</span>
 				<div class="siteseo-cookie-bar-buttons">
 					<button id="siteseo-cookie-bar-accept" class="siteseo-cookie-bar-button siteseo-cookie-bar-primary-btn" style="background-color: '.esc_attr($primary_btn_bg).'; color: '.esc_attr($primary_btn_txt).'">
 						'.esc_html($accept_btn_msg).'
@@ -155,13 +156,51 @@ class GoogleAnalytics{
 		
 		echo wp_kses_post($html);
 	}
-
+	
+	static function update_src_tag($tag, $handle, $src){
+		global $siteseo;
+		
+		$tracking_handles = [
+			'siteseo-gtag',
+			'siteseo-matomo-tracking',
+			'siteseo-microsoft-clarity',
+			'siteseo-microsoft-clarity-js-after',
+			'siteseo-ga-tracking'
+		];
+		
+		if(!in_array($handle, $tracking_handles)){
+			return $tag;
+		}
+		
+		if(!empty($siteseo->analaytics_settings['google_analytics_disable']) && !isset($_COOKIE['siteseo-user-consent-accept']) && !isset($_COOKIE['siteseo-user-consent-close'])){
+			$tag = str_replace(' src=', ' data-src-siteseo=', $tag);
+		}
+		
+		return $tag;
+	}
+		
+	static function process_script_src($scripts){
+		global $siteseo;
+		
+		if(!empty($siteseo->analaytics_settings['google_analytics_disable']) && !isset($_COOKIE['siteseo-user-consent-accept']) && !isset($_COOKIE['siteseo-user-consent-close'])){
+			$scripts = preg_replace('/(<script[^>]*) src=(["\'])(.*?)\\2/i', '$1 data-src-siteseo=$2$3$2', $scripts);
+		}
+    
+		return $scripts;
+	}
+	
 	static function add_custom_head_script(){
 		global $siteseo;
-		echo wp_kses($siteseo->analaytics_settings['google_analytics_other_tracking'], [
+        
+		$scripts = $siteseo->analaytics_settings['google_analytics_other_tracking'];
+       
+		$scripts = self::process_script_src($scripts);
+        
+		echo wp_kses($scripts, [
 			'script' => [
 				'async' => [],
 				'src' => [],
+				'data-src-siteseo' => [],
 				'type' => []
 			]
 		]);
@@ -170,10 +209,15 @@ class GoogleAnalytics{
 	static function add_custom_body_script(){
 		global $siteseo;
 		
-		echo wp_kses($siteseo->analaytics_settings['google_analytics_other_tracking_body'], [
+		$scripts = $siteseo->analaytics_settings['google_analytics_other_tracking_body'];
+		
+		$scripts = self::process_script_src($scripts);
+		
+		echo wp_kses($scripts, [
 			'script' => [
 				'async' => [],
 				'src' => [],
+				'data-src-siteseo' => [],
 				'type' => []
 			]
 		]);	
@@ -181,11 +225,16 @@ class GoogleAnalytics{
 	
 	static function add_custom_footer_script(){
 		global $siteseo;
-
-		echo wp_kses($siteseo->analaytics_settings['google_analytics_other_tracking_footer'], [
+		
+		$scripts = $siteseo->analaytics_settings['google_analytics_other_tracking_footer'];
+		
+		$scripts = self::process_script_src($scripts);
+		
+		echo wp_kses($scripts, [
 			'script' => [
 				'async' => [],
 				'src' => [],
+				'data-src-siteseo' => [],
 				'type' => []
 			]
 		]);
@@ -300,7 +349,9 @@ class GoogleAnalytics{
 			'in_footer' => true,
 		]);
 		wp_enqueue_script('siteseo-matomo-tracking');
-		wp_add_inline_script('siteseo-matomo-tracking', "var _paq = _paq || [];
+		
+		add_filter('script_loader_tag', '\SiteSEO\GoogleAnalytics::update_src_tag', 10, 3);
+			wp_add_inline_script('siteseo-matomo-tracking', "var _paq = _paq || [];
 			_paq.push(['setSiteId', '".esc_html($site_id)."']);
 			_paq.push(['setTrackerUrl', '".esc_html($tracking_url)."']);
             
@@ -319,8 +370,7 @@ class GoogleAnalytics{
 				_paq.push(['setSiteId', '".esc_html($site_id)."']);
 		        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
 		        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-		    })();
-		</script>");
+		    })();");
 
 		if($track_js_disabled){
 			echo '<noscript><img src="'.esc_url($tracking_url.'/matomo.php?idsite='.$site_id.'&rec=1').'" style="border:0" alt="" /></noscript>';
@@ -411,6 +461,8 @@ class GoogleAnalytics{
 			'strategy' => 'async',
 		]);
 		
+		add_filter('script_loader_tag', '\SiteSEO\GoogleAnalytics::update_src_tag', 10, 3);
+		
 		$gtag_config = [
 			'anonymize_ip' => $anonymize_ip ? true : false,
 			'link_attribution' => $enhanced_link ? true : false,
@@ -462,7 +514,11 @@ class GoogleAnalytics{
 	
 	static function microsoft_clarity(){
 		global $siteseo;
-		
+
+		if(self::exclude_user_tracking()){
+			return;
+		}
+
 		$project_id = !empty($siteseo->analaytics_settings['google_analytics_clarity_project_id']) ? $siteseo->analaytics_settings['google_analytics_clarity_project_id'] : '';
 
 		if(empty($project_id)){
@@ -480,6 +536,9 @@ class GoogleAnalytics{
 			})(window, document, 'clarity', 'script', '".esc_js($project_id)."');";
 
 		wp_add_inline_script('siteseo-microsoft-clarity', $inline_script);
+		
+		add_filter('script_loader_tag', '\SiteSEO\GoogleAnalytics::update_src_tag', 10, 3);
+		
 	}
 
 	static function ga_tracking_code(){
@@ -511,8 +570,16 @@ class GoogleAnalytics{
 	}
 	
 	static function add_async_attribute($tag, $handle){
+		global $siteseo;
 		if('siteseo-ga-tracking' === $handle){
-			return str_replace(' src', ' async src', $tag);
+       			
+			if(!empty($siteseo->analaytics_settings['google_analytics_disable'])){
+				if(isset($_COOKIE['siteseo-user-consent-accept']) && $_COOKIE['siteseo-user-consent-accept'] === 'true'){
+					return str_replace(' src', ' async src', $tag);
+				} else{
+					return str_replace(' src', ' data-src-siteseo', $tag);
+				}
+			}
 		}
 		
 		return $tag;

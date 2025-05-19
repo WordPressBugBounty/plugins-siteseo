@@ -34,6 +34,19 @@ class Install{
 		delete_option('siteseo_google_analytics_option_name');
 		delete_option('siteseo_dismiss_intro');
 	}
+	
+	static function action_links($links, $file){
+		
+		if($file === plugin_basename(SITESEO_FILE)){
+				
+			$links['siteseo-settings'] = '<a href="'.admin_url('admin.php?page=siteseo').'">'. __('Settings', 'siteseo').'</a>';
+			$links['siteseo-wizard'] = '<a href="'.admin_url('?page=siteseo-onboarding').'">'. __('Configuration Wizard', 'siteseo').'</a>';
+			$links['siteseo-docs-link'] = '<a href="https://siteseo.io/docs/" target="_blank"">'. __('Docs', 'siteseo').'</a>';
+		
+		}
+		
+		return $links;	
+	}
 
 	static function default_settings(){
 		// We do not need to set defaults if we just upgrading the plugin

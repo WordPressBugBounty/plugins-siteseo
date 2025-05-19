@@ -77,5 +77,13 @@ class Util{
 	static function submit_btn($value = ''){
 		echo '<div class="siteseo-submit-button"><input type="submit" id="submit" name="submit" value="'.esc_attr($value ?: 'Save changes') . '" class="submit-button"></div>';
 	}
+	
+	static function extract_content($input){
 
+		if(preg_match('/content=["\']([^"\']+)["\']/', $input, $matches)){
+			return $matches[1];
+		}
+		
+		return $input;
+	}
 }

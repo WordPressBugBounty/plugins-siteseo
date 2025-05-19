@@ -4,7 +4,7 @@ Plugin Name: SiteSEO - SEO Simplified
 Plugin URI: http://wordpress.org/plugins/siteseo/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.2.1
+Version: 1.2.2
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.2.1');
+define('SITESEO_VERSION', '1.2.2');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -127,7 +127,9 @@ function siteseo_load_plugin(){
 	
 	if(!is_admin()){
 		// Code that will be used in the frontend will go here.
-		
+		remove_action('wp_head', 'rel_canonical');
+		add_action('after_setup_theme', 'siteseo_remove_elementor_description_meta_tag');
+			
 		// Cookies enqueue
 		add_action('wp_enqueue_scripts', '\SiteSEO\Admin::cookies_bar');
 

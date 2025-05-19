@@ -293,10 +293,10 @@ class Titles{
 			self::save_settings();
 		}
 
-        // $options = $siteseo->titles_settings;
+        	// $options = $siteseo->titles_settings;
 		$options = get_option('siteseo_titles_option_name');
 
-        // Load settings
+        	// Load settings
 		$option_author_title = !empty($options['titles_archives_author_title']) ? $options['titles_archives_author_title'] : '';
 		$option_author_desc = !empty($options['titles_archives_author_desc']) ? $options['titles_archives_author_desc'] : '';
 		$option_author_noindex = !empty($options['titles_archives_author_noindex']) ? $options['titles_archives_author_noindex'] : '';
@@ -317,147 +317,203 @@ class Titles{
 			'search-archives' => 'Search archives',
 			'404-archives'    => '404 archives'
 		];
+		
+		$post_types = siteseo_post_types();
 
-        echo '<table class="form-table">
-            <tbody>
-                <tr>
-                    <th scope="row">
-                        <div class="siteseo-container">';
-                            $is_first = true;
-                            foreach($archives_fields as $post_key => $post_val){
-                                $active_class = $is_first ? 'active' : '';
-                                echo '<a href="-' . esc_attr($post_key) . '" class="' . esc_attr($active_class) . '">' . esc_html($post_val) . '</a>';
-                                $is_first = false;
-                            }
-                    echo '</div>
-                    </th>
-                    <td>
-                        <div id="author-archives">
-                            <h3>'.esc_html__('Archives','siteseo').'</h3>
-                            <div class="siteseo_wrap_label">
-                                <p class="description">'.esc_html__('Personalize your meta descriptions for all archives.','siteseo').'</p>
-                            </div>
-                            <span class="line"></span>
-                            <h3>'.esc_html__('Author archives','siteseo').'</h3>
-                            <div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
-                            <input type="text" name="siteseo_options[author_title]" value="'. esc_attr($option_author_title) . '">
-    
-                            <div class="wrap-tags">
-                                <button class="tag-title-btn" id="btn-author-acrhive-title" data-tag="%%post_author%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('POST AUTHOR','siteseo').'
-                                </button>
-                                <button class="tag-title-btn" id="btn-author-acrhive-separator" data-tag="%%sep%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
-                                </button>
-                                <button class="tag-title-btn" id="btn-author-acrhive-sitetitle" data-tag="%%sitetitle%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
-                                </button>';
-								siteseo_suggestion_button();
-                            echo '</div>
-    
-                            <div class="siteseo_wrap_label"><p>Meta description template</p></div>
-                            <textarea name="siteseo_options[author_desc]">'.esc_html($option_author_desc) . '</textarea><br>
-                            <div class="siteseo_wrap_label">
-                                <label>
-                                    <input name="siteseo_options[author_noindex]" type="checkbox" '.(!empty($option_author_noindex) ? 'checked="yes"' : '').' value="1"/>
-                                    ' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>', 'siteseo') .'
-                                </label>
-    
-                                <label>
-                                    <input name="siteseo_options[author_disable]" type="checkbox" '.(!empty($option_author_disabled) ? 'checked="yes"' : '').' value="1"/>
-                                    ' . esc_html__('Disable author archives', 'siteseo') . '
-                                </label>
-                            </div>
-                            <span class="line"><span>
-                        </div>
-    
-                        <div id="date-archives">
-                            <h3>'.esc_html__('Date archives','siteseo').'</h3>
-                            <div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
-                            <input type="text" name="siteseo_options[date_title]" value="'. esc_attr($option_date_title) .'">
-    
-                            <div class="wrap-tags">
-                                <button class="tag-title-btn" id="btn-date-archive" data-tag="%%archive_date%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('DATE ARCHIVES','siteseo').'
-                                </button>
-                                <button class="tag-title-btn" id="btn-date-separator" data-tag="%%sep%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
-                                </button>
-                                <button class="tag-title-btn" id="btn-date-sitetitle" data-tag="%%sitetitle%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
-                                </button>';
-								siteseo_suggestion_button();
-                            echo '</div>
-    
-                            <div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
-                            <textarea name="siteseo_options[date_desc]">'.esc_attr($option_date_desc).'</textarea><br>
-                            <div class="siteseo_wrap_label">
-                                <label>
-                                    <input name="siteseo_options[date_noindex]" type="checkbox" '.(!empty($option_date_noindex) ? 'checked="yes"' : '').' value="1"/>
-                                    ' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>', 'siteseo') . '
-                                </label>
-    
-                                <label>
-                                    <input name="siteseo_options[date_disable]" type="checkbox" '.(!empty($option_date_disabled) ? 'checked="yes"' : '').' value="1"/>
-                                    ' . esc_html__('Disable date archives', 'siteseo') . '
-                                </label>
-                            </div>
-                            <span class="line"><span>
-                        </div>
-						
-						<div id="search-archives">
-							<h3>Search archives</h3>
-							<div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
-							<input type="text" name="siteseo_options[search_title]" value="'.esc_attr($option_search_title).'">
-							
-							<div class="wrap-tags">
-                                <button class="tag-title-btn" id="btn-search-keyword" data-tag="%%search_keywords%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEARCH KEYWORDS','siteseo').'
-                                </button>
-                                <button class="tag-title-btn"  id="btn-search-separator" data-tag="%%sep%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
-                                </button>
-                                <button class="tag-title-btn" id="btn-search-sitetitle" data-tag="%%sitetitle%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
-                                </button>';
-                                siteseo_suggestion_button();
-                            echo '</div>
-							
-							<div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
-                            <textarea name="siteseo_options[search_desc]">'.esc_attr($option_search_desc).'</textarea><br>
-							<div class="siteseo_wrap_label">
-                                <label>
-                                    <input name="siteseo_options[search_noindex]" type="checkbox" '.(!empty($option_search_noindex) ? 'checked="yes"' : '').' value="1"/>
-                                    ' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>', 'siteseo') . '
-                                </label>
-							</div>
-							<span class="line"><span>
-						</div>
-						
-						<div id="404-archives">
-							<h3>404 archives</h3>
-							<div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
-							<input type="text" name="siteseo_options[title_404]" value="'.esc_attr($option_404_title).'">
-							
-							<div class="wrap-tags">
-                                <button class="tag-title-btn" id="btn-404-sitetitle" data-tag="%%sep%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
-                                </button>
-                                <button class="tag-title-btn" id="btn-404-separator" data-tag="%%sitetitle%%">
-                                    <span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
-                                </button>';
-                               siteseo_suggestion_button();
-                            echo '</div>
-							
-							<div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
-                            <textarea name="siteseo_options[desc_404]">'.esc_attr($option_404_desc).'</textarea><br>
-						</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <input type="hidden" name="siteseo_options[archives_tab]" value="1"/>';
+		echo'<table class="form-table">
+			<tbody>
+				<tr>
+					<th scope="row">
+					<div class="siteseo-container">';
+					$is_first = true;
+					foreach($archives_fields as $post_key => $post_val){
+						$active_class = $is_first ? 'active' : '';
+						echo '<a href="-' . esc_attr($post_key) . '" class="' . esc_attr($active_class) . '">' . esc_html($post_val) . '</a>';
+						$is_first = false;
+					}
 
+					foreach($post_types as $post_name => $post_type){
+						if($post_type->has_archive){
+							$active_class = $is_first ? 'active' : '';
+							echo '<a href="-' . esc_attr($post_name) . '" class="' . esc_attr($active_class) . '">' . esc_html($post_type->label) . '</a>';
+							$is_first = false;
+						}
+					}
+
+					echo '</div>
+					</th>
+					<td>
+					<div id="author-archives">
+						<h3>'.esc_html__('Archives', 'siteseo').'</h3>
+						<div class="siteseo_wrap_label">
+							<p class="description">'.esc_html__('Personalize your meta descriptions for all archives.','siteseo').'</p>
+						</div>
+						<span class="line"></span>
+						<h3>'.esc_html__('Author archives', 'siteseo').'</h3>
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Title template', 'siteseo').'</p></div>
+						<input type="text" name="siteseo_options[author_title]" value="'. esc_attr($option_author_title) . '">
+    
+						<div class="wrap-tags">
+							<button class="tag-title-btn" id="btn-author-acrhive-title" data-tag="%%post_author%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('POST AUTHOR','siteseo').'
+							</button>
+							<button class="tag-title-btn" id="btn-author-acrhive-separator" data-tag="%%sep%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
+							</button>
+							<button class="tag-title-btn" id="btn-author-acrhive-sitetitle" data-tag="%%sitetitle%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
+							</button>';
+							siteseo_suggestion_button();
+						echo '</div>
+    
+						<div class="siteseo_wrap_label"><p>Meta description template</p></div>
+						<textarea name="siteseo_options[author_desc]">'.esc_html($option_author_desc) . '</textarea><br>
+						<div class="siteseo_wrap_label">
+							<label>
+							<input name="siteseo_options[author_noindex]" type="checkbox" '.(!empty($option_author_noindex) ? 'checked="yes"' : '').' value="1"/>' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>', 'siteseo') .'
+							</label>
+    
+							<label>
+							<input name="siteseo_options[author_disable]" type="checkbox" '.(!empty($option_author_disabled) ? 'checked="yes"' : '').' value="1"/>
+							' . esc_html__('Disable author archives', 'siteseo') . '
+							</label>
+						</div>
+						<span class="line"><span>
+					</div>
+    
+					<div id="date-archives">
+						<h3>'.esc_html__('Date archives', 'siteseo').'</h3>
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
+							<input type="text" name="siteseo_options[date_title]" value="'. esc_attr($option_date_title) .'">
+							<div class="wrap-tags">
+								<button class="tag-title-btn" id="btn-date-archive" data-tag="%%archive_date%%">
+									<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('DATE ARCHIVES','siteseo').'
+								</button>
+								<button class="tag-title-btn" id="btn-date-separator" data-tag="%%sep%%">
+									<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
+								</button>
+								<button class="tag-title-btn" id="btn-date-sitetitle" data-tag="%%sitetitle%%">
+									<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
+								</button>';
+								siteseo_suggestion_button();
+							echo '</div>
+    
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
+						<textarea name="siteseo_options[date_desc]">'.esc_attr($option_date_desc).'</textarea><br>
+						<div class="siteseo_wrap_label">
+							<label>
+							<input name="siteseo_options[date_noindex]" type="checkbox" '.(!empty($option_date_noindex) ? 'checked="yes"' : '').' value="1"/>' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>', 'siteseo') . '
+							</label>
+
+							<label>
+							<input name="siteseo_options[date_disable]" type="checkbox" '.(!empty($option_date_disabled) ? 'checked="yes"' : '').' value="1"/>
+							' . esc_html__('Disable date archives', 'siteseo') . '
+							</label>
+						</div>
+						<span class="line"><span>
+					</div>
+						
+					<div id="search-archives">
+						<h3>Search archives</h3>
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
+						<input type="text" name="siteseo_options[search_title]" value="'.esc_attr($option_search_title).'">
+
+						<div class="wrap-tags">
+							<button class="tag-title-btn" id="btn-search-keyword" data-tag="%%search_keywords%%">
+							<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEARCH KEYWORDS','siteseo').'
+							</button>
+							<button class="tag-title-btn"  id="btn-search-separator" data-tag="%%sep%%">
+							<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
+							</button>
+							<button class="tag-title-btn" id="btn-search-sitetitle" data-tag="%%sitetitle%%">
+							<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
+							</button>';
+							siteseo_suggestion_button();
+						echo '</div>
+
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
+						<textarea name="siteseo_options[search_desc]">'.esc_attr($option_search_desc).'</textarea><br>
+						<div class="siteseo_wrap_label">
+							<label>
+							<input name="siteseo_options[search_noindex]" type="checkbox" '.(!empty($option_search_noindex) ? 'checked="yes"' : '').' value="1"/>
+							' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>', 'siteseo') . '
+							</label>
+						</div>
+						<span class="line"><span>
+					</div>
+						
+					<div id="404-archives">
+						<h3>404 archives</h3>
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
+						<input type="text" name="siteseo_options[title_404]" value="'.esc_attr($option_404_title).'">
+
+						<div class="wrap-tags">
+							<button class="tag-title-btn" id="btn-404-sitetitle" data-tag="%%sep%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
+							</button>
+							<button class="tag-title-btn" id="btn-404-separator" data-tag="%%sitetitle%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
+							</button>';
+						siteseo_suggestion_button();
+						echo '</div>
+
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
+						<textarea name="siteseo_options[desc_404]">'.esc_attr($option_404_desc).'</textarea><br>
+					</div>
+					<br/><br/>
+					<span class="line"></span>';
+
+				foreach($post_types as $post_name => $post_type){
+					if(empty($post_type->has_archive)){
+						continue;
+					}
+
+					$post_data = isset($options['titles_archive_titles'][$post_name]) ? $options['titles_archive_titles'][$post_name] : '';
+
+					$archive_title = !empty($post_data['archive_title'])? $post_data['archive_title'] : '';
+					$archive_description = !empty($post_data['archive_desc']) ? $post_data['archive_desc'] : '';
+					$archive_noindex = !empty($post_data['archive_noindex']) ? $post_data['archive_noindex'] : '';
+					$archive_nofollow = !empty($post_data['archive_nofollow']) ? $post_data['archive_nofollow'] : '';
+
+					$value_check = !empty($options['titles_archive_titles'][$post_name]['archive_title']) ? $options['titles_archive_titles'][$post_name]['archive_title'] : '';
+
+					echo'<div id="'.esc_attr($post_name).'">
+						<h3>'.esc_html($post_type->label).'</h3>
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Title template','siteseo').'</p></div>
+						<input type="text" name="siteseo_options['.esc_attr($post_name).'][archive_title]" value="'.esc_attr($archive_title).'">
+
+						<div class="wrap-tags">
+							<button class="tag-title-btn" data-tag="%%cpt_plural%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('POST TYPE ARCHIVE NAME','siteseo').'
+							</button>
+							<button class="tag-title-btn" data-tag="%%sep%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SEPARATOR','siteseo').'
+							</button>
+							<button class="tag-title-btn" data-tag="%%sitetitle%%">
+								<span id="icon" class="dashicons dashicons-insert"></span>'.esc_html__('SITE TITLE','siteseo').'
+							</button>';
+						   siteseo_suggestion_button();
+						echo'</div>
+
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Meta description template','siteseo').'</p></div>
+						<textarea name="siteseo_options['.esc_attr($post_name).'][archive_desc]">'.esc_attr($archive_description).'</textarea><div class="wrap-tags">';
+						siteseo_suggestion_button();
+					echo'</div></div><br>
+					<div class="siteseo_wrap_label">
+						<label>
+						<input name="siteseo_options['.esc_attr($post_name).'][archive_noindex]" type="checkbox" '.(!empty($archive_noindex) ? 'checked="yes"' : '').' value="1"/>
+						' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>', 'siteseo') .'
+						</label><br/><br/>
+						<label>
+						<input name="siteseo_options['.esc_attr($post_name).'][archive_nofollow]" type="checkbox" '.(!empty($archive_nofollow) ? 'checked="yes"' : 'value="1"').' />'.wp_kses_post(__('Do not follow links for this taxonomy archive<strong>(nofollow)</strong>', 'siteseo')).'
+						</label>
+					</div><span class="line"><span>';
+				}
+	                    echo'</td>
+	                </tr>
+	            </tbody>
+	        </table>
+	        <input type="hidden" name="siteseo_options[archives_tab]" value="1"/>';
 	}
     
 
@@ -488,34 +544,6 @@ class Titles{
 							<h3>'.esc_html__('Post Types', 'siteseo').'</h3>
 						   <div class="siteseo_wrap_label"><p class="description">'.esc_html__('Personalize your titles and meta descriptions for single custom post types.', 'siteseo').'</p></div>
 						</div>';
-						
-		/* if(empty($option_post_title)){
-			echo '<div class="siteseo_wrap_label">
-					<div class="siteseo-notice is-warning">
-					<span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
-					<div>
-						<p>'.wp_kses_post(__('Some <strong>Custom Post</strong> Types have no <strong>meta title</strong> set! We strongly encourage you to add one by filling in the fields below.', 'siteseo')).'</p>
-						<ol>
-							<li> '.esc_html__('post_tag', 'siteseo').'</li>
-						</ol>
-					</div>
-				</div>
-			</div>';
-		}
-		
-		if(empty($option_page_desc)){
-			echo '<div class="siteseo_wrap_label">
-					<div class="siteseo-notice is-warning">
-					<span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
-					<div>
-						<p>'.wp_kses_post(__('Some <strong>Custom Post</strong> Types have no <strong>meta description</strong> set! We strongly encourage you to add one by filling in the fields below..', 'siteseo')).'</p>
-						<ol>
-							<li>'.esc_html__('post_tag', 'siteseo').'</li>
-						</ol>
-					</div>
-				</div>
-			</div>';	
-		} */
 
 		foreach($post_types as $post_type => $post_arr){
 			// Load array
@@ -633,33 +661,6 @@ class Titles{
 						<div class="siteseo_wrap_label">
                         <p class="description">'.esc_html__('Personalize your meta descriptions for all taxonomy archives.','siteseo').'</p>
 						</div>';
-						
-		// if(empty($option_cat_title)){
-				// echo '<div class="siteseo_wrap_label">
-					// <div class="siteseo-notice is-warning">
-					// <span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
-					// <div>
-						// <p>'.wp_kses_post(__('Some <strong> Custom Taxonomies </strong> have no meta title set! We highly recommend adding one by completing the fields below.', 'siteseo')).'</p>
-						// <ol>
-							// <li>'.esc_html__('post_tag', 'siteseo').'</li>
-						// </ol>
-					// </div>
-				// </div>
-			// </div><div id="categories-types">';
-		// }
-
-		// if(empty($option_tag_desc)){
-			// echo '<div class="siteseo-notice is-warning">
-				// <span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
-				// <div>
-					// <p>'.wp_kses_post(__('Some <strong>Custom Taxonomies</strong> have no <strong> meta description</strong> set! We highly recommend adding one by filling in the fields below.', 'siteseo')).'</p>
-					// <ol>
-						// <li>'.esc_html__('post_tag', 'siteseo').'</li>
-					// </ol>
-				// </div>
-			// </div>';
-		// }
-		
 		
 		foreach($taxonomies as $taxonomy => $_tax){
 			// Load array
@@ -798,7 +799,10 @@ class Titles{
         }
 
         if(isset($_POST['siteseo_options']['archives_tab'])){
-
+			
+			$post_types = siteseo_post_types();
+			$post_types = array_keys($post_types);
+			
             $options['titles_archives_author_title'] = isset($_POST['siteseo_options']['author_title']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['author_title'])) : '';
 			$options['titles_archives_author_desc'] = isset($_POST['siteseo_options']['author_desc']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['author_desc'])) : '';
 			$options['titles_archives_author_noindex'] = isset($_POST['siteseo_options']['author_noindex']);
@@ -815,6 +819,13 @@ class Titles{
             
 			$options['titles_archives_404_title'] = isset($_POST['siteseo_options']['title_404']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['title_404'])) : '';
 			$options['titles_archives_404_desc'] = isset($_POST['siteseo_options']['desc_404'])  ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['desc_404'])) : '';
+			
+			foreach($post_types as $post_type){					
+				$options['titles_archive_titles'][$post_type]['archive_title'] = isset($_POST['siteseo_options'][$post_type]['archive_title']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options'][$post_type]['archive_title'])) : '';
+				$options['titles_archive_titles'][$post_type]['archive_desc'] = isset($_POST['siteseo_options'][$post_type]['archive_desc']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options'][$post_type]['archive_desc'])) : '';
+				$options['titles_archive_titles'][$post_type]['archive_noindex'] = isset($_POST['siteseo_options'][$post_type]['archive_noindex']);
+				$options['titles_archive_titles'][$post_type]['archive_nofollow'] = isset($_POST['siteseo_options'][$post_type]['archive_nofollow']);
+			}
 
         }
 

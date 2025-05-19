@@ -153,7 +153,7 @@ jQuery(document).ready(function($){
 		$input.trigger('input');
 	});
 
-    $(document).on('input', '.siteseo_titles_title_meta, .siteseo_titles_desc_meta', function(e){
+    $(document).on('input paste', '.siteseo_titles_title_meta, .siteseo_titles_desc_meta', function(e){
 		update_char_counter($(e.target));
     });
 
@@ -249,9 +249,7 @@ jQuery(document).ready(function($){
 	
 
 	/**suggestion btn **/
-	$(document).ready(function(){
-		$('.siteseo-suggetion').hide();
-	});
+	$('.siteseo-suggetion').hide();
 
 	$(document).on('click', '.siteseo-tag-select-btn', function(e){
 		e.preventDefault();
@@ -410,16 +408,21 @@ jQuery(document).ready(function($){
 	// Tags
 	const $input = $('#siteseo_analysis_target_kw_meta');
     const $hiddenInput = $('#siteseo_tags_hidden');
-    const $wrapper = $('#siteseo_tags_wrapper');
     let tags = [];
 
-	function createTag(text){
-		if(!text || tags.includes(text)) return;
+  const $realHiddenInput = $('<input>').attr({
+    type: 'hidden',
+    name: 'siteseo_analysis_target_kw',
+    id: 'siteseo_real_tags_hidden'
+  }).insertAfter($hiddenInput);
+
+  $hiddenInput.remove();
+
+  function createTag(text){
+    if(!text || tags.includes(text)) return;
 
 		  const $tag = $('<span>').addClass('siteseo-tag').text(text),
         $removeBtn = $('<span>').addClass('siteseo-remove-tag').text('×');
-
-        let input = $(document).find('.siteseo_analysis_target_kw_meta');
 
         $tag.append($removeBtn);
         $tag.insertBefore($input);
@@ -427,38 +430,40 @@ jQuery(document).ready(function($){
         updateHiddenInput();
     }
 
-    $(document).on('click', '.siteseo-remove-tag', function(e){
-			let tag = $(e.target).closest('.siteseo-tag'),
-			tag_text = tag[0].innerText.substring(0, tag[0].innerText.length - 1);
-			tags = tags.filter(item => item !== tag_text);
-			tag.remove();
-			updateHiddenInput();
-		});
-  
+    $(document).on('click', '.siteseo-remove-tag', function(e) {
+  		e.preventDefault();
+  		e.stopImmediatePropagation();
+		
+  		const tag = $(this).parent(),
+  		tagText = tag.text().slice(0, -1);
+		
+		  tags = tags.filter(item => item !== tagText);
+      tag.remove();
+		
+	    updateHiddenInput();
+      $realHiddenInput[0].dispatchEvent(new Event('change', {bubbles: true}));
+		
+      return false;
+	});
     function updateHiddenInput(){
-        $('[name="siteseo_analysis_target_kw"]').val(tags.join(','));
-    }
+        $realHiddenInput.val(tags.join(','));
+	  }
 
-    const existingTags = $input.data('existing-tags');
-    if(existingTags){
-        const initialTags = existingTags.split(',');
-        initialTags.forEach(tag =>{
-            if(tag.trim()){
-                createTag(tag.trim());
-            }
-        });
-    }
+	// Initialize with existing tags
+	const existingTags = $input.data('existing-tags');
+	if(existingTags){
+    existingTags.split(',').forEach(tag => {
+    if(tag.trim())createTag(tag.trim());
+		});
+	}
 
-      
       $input.on('blur keypress', function(e){
         if(e.type === 'blur' || (e.type === 'keypress' && e.key === 'Enter')){
-            let jEle = $(this);
-            const text = jEle.val().trim();
-            if(text){
-                createTag(text);
-                jEle.val('');
-            }
-			
+        const text = $(this).val().trim();
+        if(text){
+        	createTag(text);
+        	$(this).val('');
+        }
 			e.preventDefault();
         }
     });

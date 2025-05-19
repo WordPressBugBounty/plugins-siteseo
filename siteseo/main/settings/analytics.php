@@ -165,6 +165,15 @@ class Analytics{
 		<table>
 			<tbody class="form-table">
 				<tr>
+					<div class="siteseo-notice" id="custom-dimensions">
+						<span class="dashicons dashicons-info"></span>
+						<p>'.
+						/* translators: placeholders are just <strong> tag */ 
+						wp_kses_post(sprintf(__('%1$s Note : %2$s This feature applies only to cookies added through SiteSEO analytics and tracking.', 'siteseo'), '<strong>', '</strong>')).'</p>
+					</div>
+				</tr>
+				
+				<tr>
 					<th scope="row" style="user-select:auto;">'.esc_html__('Where to load the cookie bar?','siteseo').'</th>
 					<td>
 						<select name="siteseo_options[cookie_pos]">
@@ -184,7 +193,7 @@ class Analytics{
                         </label><br/><br/>
 						<label>
 						<input type="checkbox" name="siteseo_options[half_disable]" '.(!empty($option_half_disable) ? 'checked="yes"' : 'value="1"').' />
-							'.esc_html__('Display and automatically accept user consent on page load (not fully GDPR compliant).','siteseo').'
+							'.esc_html__('Display and automatically accept if user does not accept or reject within 10 seconds.','siteseo').'
 						</label>
 					</td>
 				</tr>
@@ -1029,7 +1038,7 @@ class Analytics{
 			$options['google_analytics_disable'] = isset($_POST['siteseo_options']['opt_tracking']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['opt_tracking'])) : '';
 			$options['google_analytics_half_disable'] = isset($_POST['siteseo_options']['half_disable']);
 			$options['google_analytics_opt_out_edit_choice'] = isset($_POST['siteseo_options']['opt_edit_choices']);
-			$options['google_analytics_opt_out_msg'] = isset($_POST['siteseo_options']['opt_msg']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['opt_msg'])) : 'We use cookies to enhance your experience.';
+			$options['google_analytics_opt_out_msg'] = isset($_POST['siteseo_options']['opt_msg']) ? wp_kses_post(wp_unslash($_POST['siteseo_options']['opt_msg'])) : 'We use cookies to enhance your experience.';
 			$options['google_analytics_opt_out_msg_ok'] = isset($_POST['siteseo_options']['opt_msg_ok']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['opt_msg_ok'])) : 'Accept';
 			$options['google_analytics_opt_out_msg_edit'] = isset($_POST['siteseo_options']['opt_edit_btn']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['opt_edit_btn'])) : 'Manage cookies';
 			$options['google_analytics_opt_out_msg_close'] = isset($_POST['siteseo_options']['opt_close']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['opt_close'])) : 'X';

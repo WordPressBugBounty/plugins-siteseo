@@ -1,4 +1,9 @@
 <?php
+/*
+* SITESEO
+* https://siteseo.io
+* (c) SiteSEO Team
+*/
 
 namespace SiteSEO;
 
@@ -153,6 +158,13 @@ class Advanced{
 		add_rewrite_rule(
 			'^'.$category_pattern.'/?$',
 			'index.php?category_name=$matches[1]',
+			'top'
+		);
+		
+		// Add rule for handle pagination  
+		add_rewrite_rule(
+			'^'.$category_pattern.'/page/([0-9]+)/?$',
+			'index.php?category_name=$matches[1]&paged=$matches[2]',
 			'top'
 		);
 	}
