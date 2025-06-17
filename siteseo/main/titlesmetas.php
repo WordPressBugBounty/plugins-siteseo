@@ -206,9 +206,9 @@ class TitlesMetas{
 				$robots = array_merge($robots, $index_extras);
 			}
 		}
-    
-		// front page
-		if(is_front_page()){
+
+		// default home page
+		if(is_front_page() && is_home()){
 
 			$robots = [
 				'index' => true,
@@ -239,9 +239,62 @@ class TitlesMetas{
 
 			$robots = array_merge($robots, $index_extras);
 		}
-    
+		
+		// static set posts page
+		if(is_home() && !is_front_page()){
+			$blog_page_id = get_option('page_for_posts');
+			
+			$robots = [
+				'index' => true,
+				'follow' => true
+			];
+			
+			if($blog_page_id){
+				// Check blog page specific meta settings
+				$robots['noindex'] = !empty(get_post_meta($blog_page_id, '_siteseo_robots_index', true));
+				$robots['nofollow'] = !empty(get_post_meta($blog_page_id, '_siteseo_robots_follow', true));
+				$robots['nosnippet'] = !empty(get_post_meta($blog_page_id, '_siteseo_robots_snippet', true));
+				$robots['noarchive'] = !empty(get_post_meta($blog_page_id, '_siteseo_robots_archive', true));
+				$robots['noimageindex'] = !empty(get_post_meta($blog_page_id, '_siteseo_robots_imageindex', true));
+			}
+			
+			// Apply global settings as fallback
+			if(!empty($settings['titles_noindex'])){
+				$robots['noindex'] = true;
+			}
+
+			if(!empty($settings['titles_nofollow'])){
+				$robots['nofollow'] = true;
+			}
+
+			if(!empty($settings['titles_nosnippet'])){
+				$robots['nosnippet'] = true;
+			}
+
+			if(!empty($settings['titles_noarchive'])){
+				$robots['noarchive'] = true;
+			}
+
+			if(!empty($settings['titles_noimageindex'])){
+				$robots['noimageindex'] = true;
+			}
+			
+			// Clean up conflicting directives
+			if($robots['noindex']){
+				unset($robots['index']);
+			}
+			
+			if($robots['nofollow']){
+				unset($robots['follow']);
+			}
+			
+			if(!$robots['noindex']){
+				$robots = array_merge($robots, $index_extras);
+			}
+		}
+		
 		return array_filter($robots);
-    }
+	}
 	
 	static function add_nositelinkssearchbox(){
 		global $siteseo;
@@ -301,11 +354,28 @@ class TitlesMetas{
 			}
 		}
 		
+		// default home page
 		if(is_front_page() && is_home()){
 			$canonical = trailingslashit(home_url());
 			echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";				
 		}
 		
+		// if static posts set
+		if(is_home() && !is_front_page()){ 
+			$blog_page_id = get_option('page_for_posts');
+			if($blog_page_id){
+				$canonical_meta = get_post_meta($blog_page_id, '_siteseo_robots_canonical', true);
+				$canonical = !empty($canonical_meta) ? $canonical_meta : urldecode(get_permalink($blog_page_id));
+				
+				if($canonical){
+					echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+				}
+			} else{
+				$canonical = trailingslashit(home_url());
+				echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+			}
+		}
+		 
 	}
 	
 	static function replace_variables($content, $in_editor = false){
@@ -354,7 +424,7 @@ class TitlesMetas{
 			'%%sep%%' => $site_sep,
 			'%%sitetitle%%' => $site_title,
 			'%%tagline%%' => $site_tagline,
-			'%%post_title%%' => (is_singular() || $in_editor === TRUE) ? get_the_title() : '',
+			'%%post_title%%' => (is_singular() || $in_editor === TRUE) ? get_the_title() : (is_home() ? get_the_title(get_option('page_for_posts')) : ''),
 			'%%post_excerpt%%' => (is_singular() || $in_editor === TRUE) ? get_the_excerpt() : '',
 			'%%post_content%%' => (is_singular() || $in_editor === TRUE) ? wp_strip_all_tags(get_the_content()) : '',
 			'%%post_thumbnail_url%%' => get_the_post_thumbnail_url($post),
@@ -457,15 +527,45 @@ class TitlesMetas{
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
 		$post_meta_title = !empty(get_post_meta($post_id, '_siteseo_titles_title', true)) ? get_post_meta($post_id, '_siteseo_titles_title', true) : '';
 		
-		// front page
-		if(is_front_page() && !empty($settings['titles_home_site_title'])){
-			$new_title = esc_attr(self::replace_variables($settings['titles_home_site_title']));
-
-			if(!empty($sep)){
-				$new_title .= " $sep " . get_bloginfo('name');
+		// default home page
+		if(is_front_page() && is_home()){
+			
+			$new_title = get_post_meta($post_id, '_siteseo_titles_title', true);
+			
+			if(empty($new_title) && !empty($settings['titles_home_site_title'])){
+				$new_title = $settings['titles_home_site_title'];
 			}
+			
+			if(!empty($new_title)){
+				$new_title = esc_attr(self::replace_variables($new_title));
+				if(!empty($sep)){
+					$new_title .= " $sep " . get_bloginfo('name');
+				}
+				
+				return $new_title;
+			}
+		}
+		
+		// static posts pages
+		if(is_home() && !is_front_page()){
+			$blog_page_id = get_option('page_for_posts');
+			
+			if($blog_page_id){
+				$blog_meta_title = get_post_meta($blog_page_id, '_siteseo_titles_title', true);
+				$default_title = !empty($settings['titles_single_titles']['page']['title']) ? $settings['titles_single_titles']['page']['title'] : '';
+				
+				$new_title = !empty($blog_meta_title) ? $blog_meta_title : $default_title;
+				
+				if(!empty($new_title)){
+					$new_title = esc_attr(self::replace_variables($new_title));
 
-			return $new_title;
+					if(!empty($sep)){
+						$new_title .= " $sep " . get_bloginfo('name');
+					}
+
+					return $new_title;
+				}
+			}
 		}
 
 		// single post types
@@ -612,7 +712,7 @@ class TitlesMetas{
 		}
 
 		return $title;
-    }
+	}
 	
 	static function add_meta_description(){
 		global $siteseo, $post;
@@ -629,10 +729,16 @@ class TitlesMetas{
 
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
 		
-		//front page
+		// default home page
 		if(is_front_page() && is_home()){
-			if(!empty($settings['titles_home_site_desc'])){
-				echo '<meta name="description" content="' . esc_attr(self::replace_variables($settings['titles_home_site_desc'])) . '">';
+			$meta_desc = get_post_meta($post_id, '_siteseo_titles_desc', true);
+			if(!empty($meta_desc)){
+				$processed_desc = self::replace_variables($meta_desc);
+				echo '<meta name="description" content="' . esc_attr(self::truncate_desc($processed_desc)) . '">';
+			}
+			elseif(!empty($settings['titles_home_site_desc'])){
+				$processed_desc = self::replace_variables($settings['titles_home_site_desc']);
+				echo '<meta name="description" content="' . esc_attr(self::truncate_desc($processed_desc)) . '">';
 			} else{
 				$description = get_bloginfo('description');
 				if(!empty($description)){
@@ -640,7 +746,28 @@ class TitlesMetas{
 				}
 			}
 		}
-
+		
+		// if set static posts page
+		if(is_home() && !is_front_page()){
+			$blog_page_id = get_option('page_for_posts');
+			if($blog_page_id){
+				$meta_desc = get_post_meta($blog_page_id, '_siteseo_titles_desc', true);
+				if(!empty($meta_desc)){
+					$processed_desc = esc_attr(self::replace_variables($meta_desc));
+					echo '<meta name="description" content="' . esc_attr(self::truncate_desc($processed_desc)) . '">';
+				} elseif(!empty($settings['titles_single_titles']['page']['description'])){
+					$processed_desc = self::replace_variables($settings['titles_single_titles']['page']['description']);
+				
+					echo '<meta name="description" content="' . esc_attr(self::truncate_desc($processed_desc)) . '">';
+				} else{
+					$description = get_bloginfo('description'); 
+					if(!empty($description)){ 
+						echo '<meta name="description" content="' . esc_attr(self::truncate_desc($description)) . '">'; 
+					} 
+				}
+			}
+		}
+		
 		// single post types
 		foreach($post_types as $post_type){
 			
@@ -652,7 +779,8 @@ class TitlesMetas{
 				$description = !empty($meta_desc) ? $meta_desc : $default_desc;
 
 				if(!empty($description)){
-					echo '<meta name="description" content="' . esc_attr(self::replace_variables($description)) . '">';
+					$description = self::replace_variables($description);
+					echo '<meta name="description" content="' . esc_attr(self::truncate_desc($description)) . '">';
 				}
 				
 			}
@@ -664,7 +792,8 @@ class TitlesMetas{
 				$description = !empty($meta_desc) ? $meta_desc : $default_desc;
 
 				if(!empty($description)){
-					echo '<meta name="description" content="' . esc_attr(self::replace_variables($description)) . '">';
+					$description = self::replace_variables($description);
+					echo '<meta name="description" content="' . esc_attr(self::truncate_desc($description)) . '">';
 				}
 			}
 		}
@@ -693,31 +822,36 @@ class TitlesMetas{
 				$description = !empty($term_meta_desc) ? $term_meta_desc : $default_desc;
 
 				if(!empty($disabled)){
-					echo '<meta name="description" content="' . esc_attr(self::replace_variables($description)) . '">';
+					$description = self::replace_variables($description);
+					echo '<meta name="description" content="' . esc_attr(self::truncate_desc($description)) . '">';
 				}
 			}
 		}
 		
 		// Author archive
 		if(is_author() && !empty($settings['titles_archives_author_desc']) && empty($settings['titles_archives_author_disable'])){
-			echo '<meta name="description" content="'.esc_attr(self::replace_variables($settings['titles_archives_author_desc'])).'" >';
+			$description = self::replace_variables($settings['titles_archives_author_desc']);
+			echo '<meta name="description" content="'.esc_attr(self::truncate_desc($description)).'" >';
 		}
 		
 		// Date archive
 		if(is_date() && !empty($settings['titles_archives_date_desc']) && empty($settings['titles_archives_date_disable'])){
-			echo '<meta name="description" content="'.esc_attr(self::replace_variables($settings['titles_archives_date_desc'])).'" >';
+			$description = self::replace_variables($settings['titles_archives_date_desc']);
+			echo '<meta name="description" content="'.esc_attr(self::truncate_desc($description)).'" >';
 		}
 		
 		// Search archive
 		if(is_search() && !empty($settings['titles_archives_search_desc'])){
-			echo '<meta name="description" content="'.esc_attr(self::replace_variables($settings['titles_archives_search_desc'])).'" >';
+			$description = self::replace_variables($settings['titles_archives_search_desc']);
+			echo '<meta name="description" content="'.esc_attr(self::truncate_desc($description)).'" >';
 		}
 		
 		// 404 archives
 		if(is_404() && !empty($settings['titles_archives_404_desc'])){
-			echo '<meta name="description" content="'.esc_attr(self::replace_variables($settings['titles_archives_404_desc'])).'" >';
+			$description = self::replace_variables($settings['titles_archives_404_desc']);
+			echo '<meta name="description" content="'.esc_attr(self::truncate_desc($description)).'" >';
 		}
-    }
+	}
 	
 	static function add_rel_link_pages(){
 		global $siteseo, $paged;
@@ -770,5 +904,14 @@ class TitlesMetas{
 			}
 		}
 
+	}
+	
+	static function truncate_desc($desc){
+		
+		if(mb_strlen($desc) > 160){
+            		return mb_substr($desc, 0, 160 - 3) . '...';
+		}
+		
+		return $desc;
 	}
 }

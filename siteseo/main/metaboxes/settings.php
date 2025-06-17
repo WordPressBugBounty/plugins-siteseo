@@ -311,7 +311,13 @@ class Settings{
 				$selected_metabox_tab = 'siteseo-metabox-tab-label-active';
 			}			
 			
-			echo'<div class="siteseo-metabox-tab-label '.esc_attr($selected_metabox_tab).'" data-tab="siteseo-metabox-tab-'.esc_attr($siteseo_metabox_tab).'">'.esc_html($siteseo_metabox_tab_title).'</div>';
+			echo'<div class="siteseo-metabox-tab-label '.esc_attr($selected_metabox_tab).'" data-tab="siteseo-metabox-tab-'.esc_attr($siteseo_metabox_tab).'">';
+			
+			if($siteseo_metabox_tab === 'advanced-settings' && !empty($metabox_data['robots_index'])){
+				echo'<span class="siteseo-noindex-warning"></span>';
+			}
+			
+			echo esc_html($siteseo_metabox_tab_title).'</div>';
 		}
 			
 		$home_url = home_url();
@@ -461,7 +467,7 @@ class Settings{
 					<label for="siteseo_social_fb_title_meta">'.esc_html__('Facebook Title', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<input type="text" id="siteseo_social_fb_title_meta" name="siteseo_social_fb_title" placeholder="'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : '').'" value="'.(!empty($metabox_data['fb_title']) ? esc_attr($metabox_data['fb_title']) : '').'" />
+					<input type="text" id="siteseo_social_fb_title_meta" class="siteseo_social_fb_title_meta" name="siteseo_social_fb_title" placeholder="'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : '').'" value="'.(!empty($metabox_data['fb_title']) ? esc_attr($metabox_data['fb_title']) : '').'" />
 				</div>
 			</div>
 
@@ -470,7 +476,7 @@ class Settings{
 					<label for="siteseo_social_fb_desc_meta">'.esc_html__('Facebook description', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<textarea id="siteseo_social_fb_desc_meta" name="siteseo_social_fb_desc" rows="2" placeholder="'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : '').'</textarea>
+					<textarea id="siteseo_social_fb_desc_meta" class="siteseo_social_fb_desc_meta" name="siteseo_social_fb_desc" rows="2" placeholder="'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : '').'</textarea>
 				</div>
 			</div>
 
@@ -513,7 +519,7 @@ class Settings{
 					<label for="siteseo_social_twitter_title_meta">'.esc_html__('X Title', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<input type="text" id="siteseo_social_twitter_title_meta" name="siteseo_social_twitter_title" placeholder="'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : '').'" value="'.(!empty($metabox_data['x_title']) ? esc_attr($metabox_data['x_title']) : '').'" />
+					<input type="text" id="siteseo_social_twitter_title_meta" class="siteseo_social_twitter_title_meta" name="siteseo_social_twitter_title" placeholder="'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : '').'" value="'.(!empty($metabox_data['x_title']) ? esc_attr($metabox_data['x_title']) : '').'" />
 				</div>
 			</div>
 			
@@ -522,7 +528,7 @@ class Settings{
 					<label for="siteseo_social_twitter_desc_meta">'.esc_html__('X description', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<textarea id="siteseo_social_twitter_desc_meta" name="siteseo_social_twitter_desc" rows="2" placeholder="'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_attr($metabox_data['x_desc']) : '').'</textarea>
+					<textarea id="siteseo_social_twitter_desc_meta" class="siteseo_social_twitter_desc_meta" name="siteseo_social_twitter_desc" rows="2" placeholder="'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : '').'">'.(!empty($metabox_data['x_desc']) ? esc_attr($metabox_data['x_desc']) : '').'</textarea>
 				</div>
 			</div>
 			
@@ -532,7 +538,7 @@ class Settings{
 				</div>
 				<div class="siteseo-metabox-input-wrap">
 					<span style="color:red; font-weight:bold; display:none;"></span>
-					<input type="text" id="siteseo_social_twitter_img_meta" name="siteseo_social_twitter_img" placeholder="'.esc_html__('Enter URL of the Image you want to be shown as the X image', 'siteseo').'" value="'.(!empty($metabox_data['x_img']) ? esc_attr($metabox_data['x_img']) : '').'" />
+					<input type="text" id="siteseo_social_twitter_img_meta" class="siteseo_social_twitter_img_meta" name="siteseo_social_twitter_img" placeholder="'.esc_html__('Enter URL of the Image you want to be shown as the X image', 'siteseo').'" value="'.(!empty($metabox_data['x_img']) ? esc_attr($metabox_data['x_img']) : '').'" />
 					<p class="description">'.esc_html__('Minimum size: 144x144px (300x157px with large card enabled), ideal ratio 1:1 (2:1 with large card), 5Mb max.', 'siteseo').'</p>
 					<input type="hidden" name="siteseo_social_twitter_img_attachment_id" id="siteseo_social_twitter_img_attachment_id" class="siteseo_social_twitter_img_attachment_id" value="">
 					<input type="hidden" name="siteseo_social_twitter_img_width" id="siteseo_social_twitter_img_width" class="siteseo_social_twitter_img_width" value="">
@@ -567,7 +573,14 @@ class Settings{
 			echo'</div>';
 		}
 		
-		echo'<div class="siteseo-sidebar-tabs"><span>'.esc_html__('Advanced', 'siteseo').'</span><span class="siteseo-sidebar-tabs-arrow"><span class="dashicons dashicons-arrow-down-alt2"></span></span></div>
+		echo'<div class="siteseo-sidebar-tabs"><span>';
+
+		if(!empty($metabox_data['robots_index'])){
+			echo'<span class="siteseo-noindex-warning"></span>';
+		}
+		
+		echo esc_html__('Advanced', 'siteseo').'</span><span class="siteseo-sidebar-tabs-arrow"><span class="dashicons dashicons-arrow-down-alt2"></span></span></div>
+		
 		<div class="siteseo-metabox-tab-advanced-settings siteseo-metabox-tab">
 		<div class="siteseo-metabox-option-wrap">
 			<div class="siteseo-metabox-label-wrap">
@@ -851,11 +864,21 @@ class Settings{
 				<label for="siteseo_titles_title_meta">' . esc_html__('Focus Keywords', 'siteseo') . '</label>
 			</div>
 			<div class="siteseo-metabox-input-wrap">
-				<div id="siteseo_tags_wrapper" style="display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">
-					<input id="siteseo_analysis_target_kw_meta" class="siteseo_analysis_target_kw_meta" type="text" data-existing-tags="' . (!empty($metabox_data['analysis_target_kw']) ? esc_attr($metabox_data['analysis_target_kw']) : '') . '" placeholder="' . esc_html__('Enter your target keywords', 'siteseo') . '" style="border: none; outline: none; flex: 1; min-width: 150px;" />
+				<div id="siteseo_tags_wrapper" style="display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; border: 1px solid #ccc; border-radius: 5px;">';
+					if(!empty($metabox_data['analysis_target_kw'])){
+						$tags_arr = explode(',', $metabox_data['analysis_target_kw']);
+						
+						if(!empty($tags_arr) && is_array($tags_arr)){
+							foreach($tags_arr as $tag_name){
+								echo '<span class="siteseo-tag">'.esc_html($tag_name).'<span class="siteseo-remove-tag">×</span></span>';
+							}
+						}
+					}
+
+					echo '<input id="siteseo_analysis_target_kw_meta" class="siteseo_analysis_target_kw_meta" type="text" placeholder="' . esc_html__('Enter your target keywords', 'siteseo') . '" style="border: none; outline: none; flex: 1; min-width: 150px;" />
 					<input type="hidden" id="siteseo_tags_hidden" name="siteseo_analysis_target_kw" value="' . (!empty($metabox_data['analysis_target_kw']) ? esc_attr($metabox_data['analysis_target_kw']) : '') . '" />
 				</div>
-				<p class="description">Press <kbd>Enter</kbd> to add keyword</p>
+				<p class="description">Press <kbd>Enter</kbd> key on your keyboard to add keyword</p>
 				<button id="siteseo_refresh_seo_analysis" type="button" style="margin-top:10px;" class="'.esc_attr(self::btn_secondary_classes()).'" data_id="'.esc_attr(get_the_ID()).'" data_post_type="'.esc_attr(get_current_screen()->post_type).'"> '.esc_html__('Refresh analysis', 'siteseo').'</button>
 				<p class="description">'.esc_html__('Refresh analysis after saving the post to improve the accuracy of the analysis', 'siteseo').'</p>
 			</div>
@@ -1216,7 +1239,7 @@ class Settings{
 					url : "'.esc_url(admin_url('admin-ajax.php')).'",
 					data : formData,
 					success : function(res){
-						console.log(res);
+						//console.log(res);
 					}
 				}).always(function(){
 					spinner.removeClass("siteseo-spinner-active");

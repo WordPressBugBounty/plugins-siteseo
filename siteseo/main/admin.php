@@ -43,6 +43,9 @@ class Admin{
 		}
 		
 		add_filter('plugin_action_links', '\SiteSEO\Install::action_links', 10, 2);
+		
+		add_filter( 'admin_footer_text', '\SiteSEO\Admin::rating_promotion');
+		
 
 		add_action('admin_enqueue_scripts', '\SiteSEO\Admin::enqueue_script');
 		add_action('enqueue_block_editor_assets', '\SiteSEO\Admin::enqueue_metaboxes');
@@ -474,7 +477,7 @@ class Admin{
 		wp_enqueue_style('siteseo-sidebar', SITESEO_ASSETS_URL . '/js/sidebar/build/index.css', [], $assets['version'].time());
 		wp_enqueue_script('siteseo-sidebar', SITESEO_ASSETS_URL . '/js/sidebar/build/index.js', $js_dependencies, $assets['version']);
 
-		wp_localize_script('siteseo-sidebarjs', 'siteseo_sidebar', [
+		wp_localize_script('siteseo-sidebar', 'siteseo_sidebar', [
 			'nonce' => wp_create_nonce('siteseo_sidebar_nonce'),
 			'ajax_url' => admin_url('admin-ajax.php')
 		]);
@@ -554,5 +557,57 @@ class Admin{
 			add_action($key . '_edit_form', '\SiteSEO\Metaboxes\Settings::render_term_metabox', 10, 2);
 			add_action('edit_' . $key, '\SiteSEO\Metaboxes\Settings::save_meta_terms', 10, 2);
 		}
+	}
+	
+	static function rating_promotion(){
+		global $wp_version;
+		
+		$screen = get_current_screen();
+		
+		if(!isset($screen->id) || strpos($screen->id, 'siteseo') === false){
+			return;
+		}
+		
+		$linkText = esc_html__('Give us a 5-star rating!', 'siteseo');
+		$href = 'https://wordpress.org/support/plugin/siteseo/reviews/?filter=5#new-post';
+
+		
+		$link1 = wp_kses_post(sprintf(
+		/* translators: 1: URL to review page, 2: Link title text */
+			__('<a href="%1$s" target="_blank" title="%2$s" id="siteseo-start-promo">&#9733;&#9733;&#9733;&#9733;&#9733;</a>', 'siteseo'),
+			esc_url($href),
+			$linkText
+		));
+		
+		$link2 = wp_kses_post(sprintf(
+			/* translators: 1: URL to review page, 2: Link title text */
+			__('<a href="%1$s" target="_blank" title="%2$s">WordPress.org</a>', 'siteseo'),
+			esc_url($href),
+			$linkText
+		));
+
+		ob_start();
+
+		printf(
+		/* translators: 1: SiteSEO, 2: Star rating link, 3: WordPress.org link */
+			wp_kses_post(__('Please rate %1$s %2$s on %3$s to help us spread the word. Thank you!', 'siteseo')) . '<br>',
+			wp_kses_post(sprintf('<strong>%s</strong>', esc_html__('SiteSEO', 'siteseo'))),
+			wp_kses_post($link1),
+			wp_kses_post($link2)
+		);
+
+		printf(
+			wp_kses_post('<p class="alignright">%1$s</p>'),
+			sprintf(
+				/* translators: 1: WordPress version, 2: SiteSEO version */
+				esc_html__('WordPress %1$s | SiteSEO %2$s', 'siteseo'),
+				esc_html($wp_version),
+				esc_html(SITESEO_VERSION)
+			)
+		);
+		
+		remove_filter('update_footer', 'core_update_footer');
+
+		return ob_get_clean();
 	}
 }

@@ -30,6 +30,7 @@ class Ajax{
 		add_action('wp_ajax_siteseo_dismiss_intro', '\SiteSEO\Ajax::dismiss_intro');
 		add_action('wp_ajax_siteseo_save_universal_metabox', '\SiteSEO\Ajax::save_universal_metabox');
 		add_action('wp_ajax_siteseo_resolve_variables', '\SiteSEO\Ajax::resolve_variables');
+		add_action('wp_ajax_siteseo_clear_indexing_history', '\SiteSEO\Ajax::clear_indexing_history');
 		
 		// Onboarding Actions
 		add_action('wp_ajax_siteseo_save_onboarding_settings', '\SiteSEO\Ajax::save_onboarding_settings');
@@ -59,6 +60,9 @@ class Ajax{
 				break;
 			case 'seo-by-rank-math':
 				$result = \SiteSEO\Import::rank_math();
+				break;
+			case 'slim-seo':
+				$result = \SiteSEO\Import::slim_seo();
 				break;
 			default:
 				throw new Exception('Invalid plugin selected');
@@ -284,7 +288,9 @@ class Ajax{
 			if(empty($response)){
 				wp_send_json_error(['message' => 'No search engines configured or missing API keys']);
 			}
-
+			
+			\SiteSEO\InstantIndexing::save_index_history($url_list, $response['google'] ?? null, $response['bing'] ?? null);
+			
 			wp_send_json_success([
 				'message' => 'URLs submitted successfully', 
 				'details' => $response
@@ -546,5 +552,24 @@ class Ajax{
 		$post = $tmp_post;
 
 		wp_send_json_success($replaced_content);
+	}
+	
+	static function clear_indexing_history(){
+		check_ajax_referer('siteseo_admin_nonce', 'nonce');
+		
+		if(!current_user_can('siteseo_manage')){
+			wp_send_json_error(__('You do not have required permission to edit this file.', 'siteseo'));
+		}
+		
+		global $siteseo;
+		
+		$indexing_history = $siteseo->instant_settings;
+    
+		if(is_array($indexing_history) && isset($indexing_history['indexing_history'])){
+			unset($indexing_history['indexing_history']);
+			update_option('siteseo_instant_indexing_option_name', $indexing_history);
+		}
+    
+		wp_send_json_success();
 	}
 }

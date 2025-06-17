@@ -312,6 +312,20 @@ class Dashboard{
 			<a href="https://softaculous.deskuss.com/open.php?topicId=22" class="siteseo-button siteseo-btn-transparent siteseo-100" target="_blank">'.esc_html__('Contact Support', 'siteseo').'</a>
 			</div>
 		</div>
+		
+		<div class="siteseo-rating-tab">
+			<div class="siteseo-rating">
+				<a class="siteseo-stars" href="https://wordpress.org/support/plugin/siteseo/reviews/?filter=5#new-post" target="_blank">
+				<span class="dashicons dashicons-star-filled"></span>
+				<span class="dashicons dashicons-star-filled"></span>
+				<span class="dashicons dashicons-star-filled"></span>
+				<span class="dashicons dashicons-star-filled"></span>
+				<span class="dashicons dashicons-star-filled"></span>
+				</a>
+			</div>
+			<p>'.esc_html__('Please take a moment to rate us —it really helps us a lot!', 'siteseo').'</p>
+		</div>
+		
 	</section>
 	</div>
 	</div>

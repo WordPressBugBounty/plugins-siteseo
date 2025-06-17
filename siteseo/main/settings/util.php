@@ -71,6 +71,7 @@ class Util{
 			'autodescription/autodescription.php' => 'The SEO Framework',
 			'seo-by-rank-math/rank-math.php' => 'Rank Math',
 			'wp-seopress/seopress.php' => 'SEOPress',
+			'slim-seo/slim-seo.php' => 'Slim SEO',
 		];
 	}
 

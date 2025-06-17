@@ -284,7 +284,31 @@ class InstantIndexing{
 			return;
 		}
 
-		self::submit_urls_to_bing($url, $api_key);
+		$url_list = [$url];
+		$res = self::submit_urls_to_bing($url_list, $api_key);
+		self::save_index_history($url_list, null, $res, 'auto');
+				
 	}
 	
+	static function save_index_history($urls, $google_response = null, $bing_response = null, $source = 'manual'){
+		global $siteseo;
+		
+		$history = $siteseo->instant_settings;
+
+		if(!isset($history['indexing_history'])){
+			$history['indexing_history'] = [];
+		}
+
+		array_unshift($history['indexing_history'], [
+			'time' => time(),
+			'urls' => $urls,
+			'google_status_code' => $google_response['status_code'] ?? null,
+			'bing_status_code' => $bing_response['status_code'] ?? null,
+			'source' => $source // 'manual' or 'auto'
+		]);
+		
+		$history['indexing_history'] = array_slice($history['indexing_history'], 0, 10);
+
+		update_option('siteseo_instant_indexing_option_name', $history);
+	}	
 }

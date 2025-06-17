@@ -101,10 +101,13 @@ class Tools{
 			<li>'. esc_html__('Facebook Open Graph tags (title, description and image thumbnail)', 'siteseo') .'</li>
 			<li>'. esc_html__('Twitter tags (title, description and image thumbnail)', 'siteseo') .'</li>
 			<li>'. esc_html__('Meta Robots (noindex, nofollow...)', 'siteseo') .'</li>
-			<li>'. esc_html__('Canonical URL', 'siteseo').'</li>
-			<li>'. esc_html__('Focus / target keywords', 'siteseo') .'</li>';
+			<li>'.esc_html__('Canonical URL', 'siteseo').'</li>';
 			
-			if('all-in-one-seo-pack' != $plugin){
+			if($plugin !='slim-seo'){
+				echo '<li>'. esc_html__('Focus / target keywords', 'siteseo') .'<li>';
+			}
+			
+			if($plugin != 'all-in-one-seo-pack' && $plugin !='slim-seo'){
 				echo '<li>'. esc_html__('Primary category', 'siteseo') .'</li>';
 			}
 			

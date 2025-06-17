@@ -748,4 +748,39 @@ jQuery(document).ready(function($){
             }
         });
     });
+    
+  // Clean indexing history
+  $('#siteseo-clear-history').on('click', function(e){
+    e.preventDefault();
+    $.ajax({
+      url: siteseoAdminAjax.url,
+      type: 'POST',
+      data: {
+				action: 'siteseo_clear_indexing_history',
+				nonce: siteseoAdminAjax.nonce
+			},
+      
+      success: function(response){
+        location.reload();
+      }
+    });
+  });
+  
+  // Response code table guilde
+  $('.siteseo-show-details').next('.siteseo-response-code-table').hide();
+	
+  $('.siteseo-show-details').on('click', function(e){
+	
+    var description = $(this).next('.siteseo-response-code-table');
+    var icon = $(this).find('.dash-icon'); 
+
+    if(description.is(':visible')){
+      description.hide();
+      icon.removeClass('dashicons-arrow-up-alt2').addClass('dashicons-arrow-down-alt2');
+    } else{
+      description.show();
+      icon.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+    }
+  });
+  
 });

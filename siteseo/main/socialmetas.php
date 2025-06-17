@@ -253,7 +253,7 @@ class SocialMetas{
 		}
 
 		if(!empty($og_description)){
-			echo '<meta property="og:description" content="'.esc_html($og_description).'" />';
+			echo '<meta property="og:description" content="'.esc_html(\SiteSEO\TitlesMetas::truncate_desc($og_description)).'" />';
 		}
 
 		if(!empty($og_img)){
@@ -424,7 +424,7 @@ class SocialMetas{
 		}
 		
 		if(!empty($site_description)){
-			echo '<meta name="twitter:description" content="'.esc_html($site_description).'"/>';
+			echo '<meta name="twitter:description" content="'.esc_html(\SiteSEO\TitlesMetas::truncate_desc($site_description)).'"/>';
 		}
 		
 		if(!empty($site_url)){

@@ -1118,6 +1118,96 @@ line-height: 1.6rem;
 cursor:pointer;
 }
 
+/*indexing history-table */
+.siteseo-history-table{
+margin-top: 20px;
+border: 1px solid #ccd0d4;
+box-shadow: 0 1px 1px rgba(0,0,0,.04);
+background: #fff;
+}
+
+.siteseo-history-table th{
+background: #f1f1f1;
+font-weight: 600;
+padding: 10px;
+border-bottom: 1px solid #ddd;
+height:50px;
+}
+
+.siteseo-history-table td{
+padding: 10px;
+vertical-align: top;
+font-weight:450;
+border-bottom: 1px solid #eee;
+height:50px;
+}
+
+.siteseo_wrap_label{
+margin-bottom: 15px;
+}
+
+.siteseo-clear-history-btn{
+margin-top: 10px;
+}
+
+.siteseo-show-details{
+display: inline-block;
+margin-top: 20px;
+cursor: pointer;
+font-weight: 600;
+}
+
+.siteseo-response-code-table{
+display: none;
+margin-top: 15px;
+}
+
+.siteseo-response-code-table.visible{
+display: block;
+}
+
+/* promo for rating */
+#siteseo-start-promo{
+color: #FDCC0D;
+font-size:20px;
+text-decoration: none;
+}
+
+.siteseo-rating .dashicons{
+font-size: 30px;
+width: 30px;
+height: 30px;
+}
+
+.siteseo-rating .siteseo-stars{
+display: flex;
+gap: 8px;
+color: #FDCC0D;
+text-decoration: none;
+}
+
+.siteseo-rating{
+display: flex;
+justify-content: center;
+}
+
+.siteseo-rating-tab{
+margin-top: 20px;
+display: flex;
+flex-direction: column;
+border-radius: 10px;
+padding: 10px;
+background: linear-gradient(135deg, #022448, #034f84);
+max-width: 400px;
+}
+
+.siteseo-rating-tab p{
+color: #ffffff;
+margin: 10px 0 0 0;
+text-align: center;
+width:100%;
+}
+
 .siteseo-need-help{
 display:flex;
 flex-direction:column;

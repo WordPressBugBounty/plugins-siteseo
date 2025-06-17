@@ -26,8 +26,136 @@ jQuery(document).ready(function($){
 		parent_tab.siblings('.'+target).show();
 		parent_tab.siblings('.'+target).siblings('.siteseo-metabox-tab').hide();
 	});
+	
+	// Facebook title
+	$(document).on('input paste', '.siteseo_social_fb_title_meta', function(){
+		let jEle = $(this),
+		fb_title = jEle.val();
+		
+		$('.siteseo-metabox-fb-title').text(fb_title);
+		$('.siteseo_social_fb_title_meta').not(jEle)?.val(fb_title);
+	});
+	
+	// Facebook description updates
+	$(document).on('input paste', '.siteseo_social_fb_desc_meta', function(){
+		let jEle = $(this),
+		fb_desc = jEle.val();
+		
+		$('.siteseo-metabox-fb-desc').text(fb_desc);		
+		$('.siteseo_social_fb_desc_meta').not(jEle)?.val(fb_desc);
+	});
+	
+	// X description title
+	$(document).on('input paste', '.siteseo_social_twitter_title_meta', function(){
+		let jEle = $(this),
+		x_title = jEle.val();
 
-	function init_media_uploader(buttonId, inputId, previewClass, attachmentIdField, widthField, heightField){
+		$('.siteseo-metabox-x-title').text(x_title);
+		$('.siteseo_social_twitter_title_meta').not(jEle)?.val(x_title);
+	});
+		
+  // X description updates
+  $(document).on('input paste', '.siteseo_social_twitter_desc_meta', function(){
+		let jEle = $(this),
+		x_desc = jEle.val();
+		
+		$('.siteseo-metabox-x-desc').text(x_desc);		
+		$('.siteseo_social_twitter_desc_meta').not(jEle)?.val(x_desc);
+	});
+
+	// We only need to do this sync if we are in gutenberg
+	if(typeof siteseo_sidebar != 'undefined' && siteseo_sidebar){
+		
+		// Facebook image updates
+		$(document).on('input paste', '.siteseo_social_fb_img_meta', function(){
+			let jEle = $(this);
+			$('.siteseo_social_fb_img_meta').not(jEle).val(jEle.val());
+		});
+		
+		// X image updates
+		$(document).on('input paste', '.siteseo_social_twitter_img_meta', function(){
+			let jEle = $(this);
+			$('.siteseo_social_twitter_img_meta').not(jEle)?.val(jEle.val());
+		});
+		
+		// Input fields in Advanced tab
+		$(document).on('input paste', '.siteseo-metabox-tab-advanced-settings input', function(){
+			sync_inputs($(this), 'siteseo-metabox-tab-advanced-settings');
+		})
+
+		// Select field in advanced settings tab
+		$(document).on('change', '.siteseo-metabox-tab-advanced-settings select', function(){
+			sync_select($(this), 'siteseo-metabox-tab-advanced-settings');
+		});
+		
+		// Input fields in Redirects tab
+		$(document).on('input paste', '.siteseo-metabox-tab-redirect input', function(){
+			sync_inputs($(this), 'siteseo-metabox-tab-redirect');
+		});
+		
+		// Select field in advanced settings tab
+		$(document).on('change', '.siteseo-metabox-tab-redirect select', function(){
+			sync_select($(this), 'siteseo-metabox-tab-redirect');
+		});
+		
+		// Input fields in structured data tab
+		$(document).on('input paste', '.siteseo-metabox-tab-structured-data-types input', function(){
+			sync_inputs($(this), 'siteseo-metabox-tab-structured-data-types');
+		});
+		
+		// Select field in structured data tab
+		$(document).on('change', '.siteseo-metabox-tab-structured-data-types select', function(){
+			sync_select($(this), 'siteseo-metabox-tab-structured-data-types');
+		});
+		
+		// textarea fields in structured data tab
+		$(document).on('input paste', '.siteseo-metabox-tab-structured-data-types textarea', function(){
+			let jEle = $(this),
+			name = jEle.attr('name');
+			$(`.siteseo-metabox-tab-structured-data-types textarea[name="${name}"]`).not(jEle)?.val(jEle.val());
+		});
+		
+		// Input fields in Video sitemap tab
+		$(document).on('input paste', '.siteseo-metabox-tab-video-sitemap input', function(){
+			sync_inputs($(this), 'siteseo-metabox-tab-video-sitemap');
+		});
+
+		// Textarea fields in Video sitemap tab
+		$(document).on('input paste', '.siteseo-metabox-tab-video-sitemap textarea', function(){
+			let jEle = $(this),
+			name = jEle.attr('name');
+			$(`.siteseo-metabox-tab-video-sitemap textarea[name="${name}"]`).not(jEle)?.val(jEle.val());
+		});
+		
+		// Input fields in Google news tab
+		$(document).on('input paste', '.siteseo-metabox-tab-google-news input', function(){
+			sync_inputs($(this), 'siteseo-metabox-tab-google-news');
+		});
+	}
+	
+	function sync_select(jEle, wrapperClass){
+		let name = jEle.attr('name');
+		$(`.${wrapperClass} select[name="${name}"]`).not(jEle)?.val(jEle.val());
+	}
+
+	function sync_inputs(jEle, wrapperClass){
+		let name = jEle.attr('name'),
+        type = jEle.attr('type');
+
+        // Find all inputs with the same name, but not the one being edited
+        let $targets = $(`.${wrapperClass} input[name="${name}"]`).not(jEle);
+        
+        // Handle checkboxes differently from text inputs
+        if(type === 'checkbox'){
+            let is_checked = jEle.prop('checked');
+            $targets.prop('checked', is_checked);
+        } else {
+            let value = jEle.val();
+            $targets.val(value);
+        }
+	}
+
+	function init_media_uploader(buttonId, inputClass, previewClass, attachmentIdField, widthField, heightField){
         var mediaUploader;
         
         $(document).on('click', '#' + buttonId, function(e){
@@ -54,18 +182,18 @@ jQuery(document).ready(function($){
                 );
 
                 if(!isValid.valid){
-                    var errorSpan = $('#' + inputId).siblings('span');
+                    var errorSpan = $('.' + inputClass).siblings('span');
                     if(errorSpan.length === 0){
 						
-                        $('#' + inputId).after('<span class="error-message" style="color: red;"></span>');
-                        errorSpan = $('#' + inputId).siblings('span');
+                        $('.' + inputClass).after('<span class="error-message" style="color: red;"></span>');
+                        errorSpan = $('.' + inputClass).siblings('span');
                     }
                     errorSpan.text(isValid.message).show();
                     return;
                 }
 				
-                $('#' + inputId).siblings('span').hide();
-                $('#' + inputId).val(attachment.url);
+                $('.' + inputClass).siblings('span').hide();
+                $('.' + inputClass).val(attachment.url);
                 $('#' + attachmentIdField).val(attachment.id);
                 $('#' + widthField).val(attachment.width);
                 $('#' + heightField).val(attachment.height);
@@ -158,17 +286,26 @@ jQuery(document).ready(function($){
     });
 
     function update_char_counter($input){
-		let max_chars = $input.hasClass('siteseo_titles_title_meta') ? 60 : 160,
-		current_length = $input.val().length,
+		let max_chars = $input.hasClass('siteseo_titles_title_meta') ? 60 : 160;
+		
+		if(max_chars == 60){
+			var jEle = $('.siteseo_titles_title_meta');
+		} else {
+			var jEle = $('.siteseo_titles_desc_meta');
+		}
+
+		let current_length = $input.val().length,
 		percentage = Math.min((current_length/max_chars) * 100, 100),
-		$wrapper = $input.closest('.siteseo-metabox-input-wrap'),
+		$wrapper = jEle.closest('.siteseo-metabox-input-wrap'),
 		$meter = $wrapper.find('.siteseo-metabox-limits-meter span'),
 		$counter = $wrapper.find('.siteseo-metabox-limits-numbers em');
 		
 		if(max_chars == 60){
 			update_title_placeholder($input.val());
+			$('.siteseo_titles_title_meta').not($input)?.val($input.val()); // Syncing inputs
 		} else {
 			update_desc_placeholder($input.val());
+			$('.siteseo_titles_desc_meta').not($input)?.val($input.val()); // Syncing inputs
 		}
 
 		$meter.css('width', percentage + '%');
@@ -290,8 +427,8 @@ jQuery(document).ready(function($){
 			$('.siteseo-suggetion').hide();
 		}
 	});
-
-  //search
+	
+	//search
 	$(document).on('input', '.search-box', function(){
 		var searchText = $(this).val().toLowerCase().trim();
 		var $sections = $(this).closest('.siteseo-suggetion').find('.section');
@@ -406,64 +543,53 @@ jQuery(document).ready(function($){
 	});
 	
 	// Tags
-	const $input = $('#siteseo_analysis_target_kw_meta');
-    const $hiddenInput = $('#siteseo_tags_hidden');
-    let tags = [];
+    let $tagsValue = $('#siteseo_tags_hidden'),
+    tags = [];
+	
+	if($tagsValue.val()){
+		tags = $tagsValue.val().split(',');
+	}
 
-  const $realHiddenInput = $('<input>').attr({
-    type: 'hidden',
-    name: 'siteseo_analysis_target_kw',
-    id: 'siteseo_real_tags_hidden'
-  }).insertAfter($hiddenInput);
+	function createTag(tag){
+		if(!tag || tags.includes(tag)){
+			return;
+		}
 
-  $hiddenInput.remove();
+		let $input = $('.siteseo_analysis_target_kw_meta'),
+		$tag = $('<span>').addClass('siteseo-tag').text(tag),
+		$removeBtn = $('<span>').addClass('siteseo-remove-tag').text('×');
 
-  function createTag(text){
-    if(!text || tags.includes(text)) return;
-
-		  const $tag = $('<span>').addClass('siteseo-tag').text(text),
-        $removeBtn = $('<span>').addClass('siteseo-remove-tag').text('×');
-
-        $tag.append($removeBtn);
-        $tag.insertBefore($input);
-        tags.push(text);
-        updateHiddenInput();
+		$tag.append($removeBtn);
+		$tag.insertBefore($input);
+		tags.push(tag);
+		updateHiddenInput();
     }
 
     $(document).on('click', '.siteseo-remove-tag', function(e) {
   		e.preventDefault();
   		e.stopImmediatePropagation();
-		
-  		const tag = $(this).parent(),
-  		tagText = tag.text().slice(0, -1);
-		
-		  tags = tags.filter(item => item !== tagText);
-      tag.remove();
-		
-	    updateHiddenInput();
-      $realHiddenInput[0].dispatchEvent(new Event('change', {bubbles: true}));
-		
-      return false;
-	});
-    function updateHiddenInput(){
-        $realHiddenInput.val(tags.join(','));
-	  }
 
-	// Initialize with existing tags
-	const existingTags = $input.data('existing-tags');
-	if(existingTags){
-    existingTags.split(',').forEach(tag => {
-    if(tag.trim())createTag(tag.trim());
-		});
+		const tag = $(this).parent(),
+		tagText = tag.text().slice(0, -1);
+
+		tags = tags.filter(item => item !== tagText);
+		tag.remove();
+		updateHiddenInput();
+
+		return;
+	});
+
+    function updateHiddenInput(){
+		$('input[name="siteseo_analysis_target_kw"').val(tags.join(','));
 	}
 
-      $input.on('blur keypress', function(e){
-        if(e.type === 'blur' || (e.type === 'keypress' && e.key === 'Enter')){
-        const text = $(this).val().trim();
-        if(text){
-        	createTag(text);
-        	$(this).val('');
-        }
+	$(document).on('blur keypress', '.siteseo_analysis_target_kw_meta', function(e){
+		if(e.type === 'blur' || (e.type === 'keypress' && e.key === 'Enter')){
+			const text = $(this).val().trim();
+			if(text){
+				createTag(text);
+				$(this).val('');
+			}
 			e.preventDefault();
         }
     });
@@ -472,7 +598,7 @@ jQuery(document).ready(function($){
 		$(this).toggleClass('siteseo-sidebar-tabs-opened');
 		$(this).next().slideToggle('fast');
 	});
-	
+
 	function resolve_dynamic_variables(content, type){
 
 		let post_id = jQuery('.siteseo-metabox-tabs').attr('data_id');
