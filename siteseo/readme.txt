@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,17 +109,23 @@ Yes!
 
 == Changelog ==
 
+= 1.2.4 (July 3, 2025) =
+* [Pro-Improvement] Added suggested rules for robots.txt and .htaccess.
+* [Improvement] Added suggested dynamic variables for the social settings in the metabox.
+* [Improvement] Made the universal metabox icon draggable.
+* [Bug-Fix] Fixed title and description issues on archive pages.
+* [Bug-Fix] Resolved title and description issue on non-static homepage.
 
 = 1.2.3 (June 17, 2025) =
-*[Pro-Improvement] Added support for virtual robots.txt.
-*[Improvement] Introduced the Instant Indexing History feature – now you can view indexing submission history.
-*[Improvement] Added support for importing settings from Slim SEO.
-*[Improvement] Added a noindex warning in the metabox.
-*[Bug-Fix] There was a settings sync issue in the Gutenberg sidebar, which has now been resolved.
-*[Bug-Fix] Fixed a problem related to description length limits.
-*[Bug-Fix] Fixed an issue with importing taxonomy settings.
-*[Bug-Fix] There was an issue with static Posts pages, which has now been resolved.
-*[Bug-Fix] There was an issue with the social preview in the metabox, which has been resolved.
+* [Pro-Improvement] Added support for virtual robots.txt.
+* [Improvement] Introduced the Instant Indexing History feature – now you can view indexing submission history.
+* [Improvement] Added support for importing settings from Slim SEO.
+* [Improvement] Added a noindex warning in the metabox.
+* [Bug-Fix] There was a settings sync issue in the Gutenberg sidebar, which has now been resolved.
+* [Bug-Fix] Fixed a problem related to description length limits.
+* [Bug-Fix] Fixed an issue with importing taxonomy settings.
+* [Bug-Fix] There was an issue with static Posts pages, which has now been resolved.
+* [Bug-Fix] There was an issue with the social preview in the metabox, which has been resolved.
 
 = 1.2.2 (May 19, 2025) =
 * [Improvement] Improved content saving for site verification tags.

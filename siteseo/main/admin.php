@@ -350,7 +350,7 @@ class Admin{
 		
 		if(current_user_can('administrator')){
 			$wp_admin_bar->add_node([
-				'id' => $id,
+				'id' => 'siteseo-configuration-wizard',
 				'parent' => 'siteseo',
 				'title' => __('Configuration Wizard', 'siteseo'),
 				'href' => admin_url('admin.php?page=siteseo-onboarding')

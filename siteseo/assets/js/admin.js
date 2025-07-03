@@ -1,12 +1,13 @@
 jQuery(document).ready(function($){
 
-	
 	$('.tag-title-btn').on('click', function(e){
 		e.preventDefault();
 
 		let input_field = $(this).closest('.wrap-tags').prev('input[type="text"], textarea'),
 		current_value = input_field.val(),
 		tag = $(this).data('tag');
+    
+		current_value = current_value || '';
 		
 		// We need to add a space if there is some content
 		if(current_value.length > 0){
@@ -22,8 +23,7 @@ jQuery(document).ready(function($){
         $('.siteseo-container a').removeClass('active');
         $(this).addClass('active');
     });
-	
-	
+
 	$("[id^='siteseo-toggle-meta-']").on('click', function(){
 		$(this).toggleClass('active');
 		if($(this).hasClass('active')){
@@ -34,11 +34,11 @@ jQuery(document).ready(function($){
 			$(this).closest('.siteseo-toggle-cnt').find('.siteseo-suboption-toggle').val(true);
 		}
 	});
-	
+
 	$('#siteseo-dismiss-get-started').on('click', function(e){
 		e.preventDefault();
 		$(this).closest('.siteseo-dashbord-intro').slideUp();
-		
+
 		$.ajax({
 			url : siteseoAdminAjax.url,
 			type : 'POST',
@@ -749,38 +749,36 @@ jQuery(document).ready(function($){
         });
     });
     
-  // Clean indexing history
-  $('#siteseo-clear-history').on('click', function(e){
-    e.preventDefault();
-    $.ajax({
-      url: siteseoAdminAjax.url,
-      type: 'POST',
-      data: {
+	// Clean indexing history
+	$('#siteseo-clear-history').on('click', function(e){
+		e.preventDefault();
+		$.ajax({
+			url: siteseoAdminAjax.url,
+			type: 'POST',
+			data: {
 				action: 'siteseo_clear_indexing_history',
 				nonce: siteseoAdminAjax.nonce
 			},
-      
-      success: function(response){
-        location.reload();
-      }
-    });
-  });
+			success: function(response){
+				location.reload();
+			}
+		});
+	});
   
-  // Response code table guilde
-  $('.siteseo-show-details').next('.siteseo-response-code-table').hide();
-	
-  $('.siteseo-show-details').on('click', function(e){
-	
-    var description = $(this).next('.siteseo-response-code-table');
-    var icon = $(this).find('.dash-icon'); 
+	// Response code table guilde
+	$('.siteseo-show-details').next('.siteseo-response-code-table').hide();
 
-    if(description.is(':visible')){
-      description.hide();
-      icon.removeClass('dashicons-arrow-up-alt2').addClass('dashicons-arrow-down-alt2');
-    } else{
-      description.show();
-      icon.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
-    }
-  });
+	$('.siteseo-show-details').on('click', function(e){
+		let description = $(this).next('.siteseo-response-code-table'),
+		icon = $(this).find('.dash-icon'); 
+
+		if(description.is(':visible')){
+			description.hide();
+			icon.removeClass('dashicons-arrow-up-alt2').addClass('dashicons-arrow-down-alt2');
+		} else{
+			description.show();
+			icon.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+		}
+	});
   
 });

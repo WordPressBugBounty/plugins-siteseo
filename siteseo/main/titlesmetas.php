@@ -97,6 +97,10 @@ class TitlesMetas{
 			
 			if($post_type->has_archive && is_post_type_archive($post_type->name)){
 				
+				if(function_exists('is_shop') && is_shop()){
+					$post_id = wc_get_page_id('shop');
+				}
+				
 				if($post_id){
 					$robots['noindex'] = !empty(get_post_meta($post_id, '_siteseo_robots_index', true)) || $robots['noindex'];
 					$robots['nofollow'] = !empty(get_post_meta($post_id, '_siteseo_robots_follow', true)) || $robots['nofollow'];
@@ -530,9 +534,7 @@ class TitlesMetas{
 		// default home page
 		if(is_front_page() && is_home()){
 			
-			$new_title = get_post_meta($post_id, '_siteseo_titles_title', true);
-			
-			if(empty($new_title) && !empty($settings['titles_home_site_title'])){
+			if(!empty($settings['titles_home_site_title'])){
 				$new_title = $settings['titles_home_site_title'];
 			}
 			
@@ -573,7 +575,13 @@ class TitlesMetas{
 			
 			if($post_type->has_archive && is_post_type_archive($post_type->name)){
 				
-				$post_meta_title = !empty(get_post_meta($post_id, '_siteseo_titles_title', true)) ? get_post_meta($post_id, '_siteseo_titles_title', true) : '';
+				$post_meta_title = '';
+				
+				if(function_exists('is_shop') && is_shop()){
+					$shop_page_id = wc_get_page_id('shop');
+					$post_meta_title = get_post_meta($shop_page_id, '_siteseo_titles_title', true);
+				}
+				
 				$default_title = isset($settings['titles_archive_titles'][$post_type->name]['archive_title']) ? $settings['titles_archive_titles'][$post_type->name]['archive_title'] : '';
 				
 				$new_title = !empty($post_meta_title) ? $post_meta_title : $default_title;
@@ -731,12 +739,8 @@ class TitlesMetas{
 		
 		// default home page
 		if(is_front_page() && is_home()){
-			$meta_desc = get_post_meta($post_id, '_siteseo_titles_desc', true);
-			if(!empty($meta_desc)){
-				$processed_desc = self::replace_variables($meta_desc);
-				echo '<meta name="description" content="' . esc_attr(self::truncate_desc($processed_desc)) . '">';
-			}
-			elseif(!empty($settings['titles_home_site_desc'])){
+			
+			if(!empty($settings['titles_home_site_desc'])){
 				$processed_desc = self::replace_variables($settings['titles_home_site_desc']);
 				echo '<meta name="description" content="' . esc_attr(self::truncate_desc($processed_desc)) . '">';
 			} else{
@@ -773,10 +777,25 @@ class TitlesMetas{
 			
 			if($post_type->has_archive && is_post_type_archive($post_type->name)){
 				
-				$meta_desc = !empty(get_post_meta($post_id, '_siteseo_titles_desc', true)) ? get_post_meta($post_id, '_siteseo_titles_desc', true) : '';
-				$default_desc = isset($settings['titles_archive_titles'][$post_type->name]['archive_desc']) ? $settings['titles_archive_titles'][$post_type->name]['archive_desc'] : '';
+				$archive_desc = '';
+				if(is_post_type_archive()){
+					$obj = get_queried_object();
+					
+					if(!empty($obj) && isset($obj->name)){
+						$archive_desc  = !empty($obj->description) ? $obj->description : '';
+					}
+				}
 				
-				$description = !empty($meta_desc) ? $meta_desc : $default_desc;
+				$meta_desc = '';
+				
+				if(function_exists('is_shop') && is_shop()){
+					$shop_page_id = wc_get_page_id('shop');
+					$meta_desc = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
+				}
+				
+				$description = !empty($settings['titles_archive_titles'][$post_type->name]['archive_desc']) ? $settings['titles_archive_titles'][$post_type->name]['archive_desc'] : $archive_desc;
+				
+				$description = !empty($meta_desc) ? $meta_desc : $description;
 
 				if(!empty($description)){
 					$description = self::replace_variables($description);

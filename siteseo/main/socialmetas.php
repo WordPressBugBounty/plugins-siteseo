@@ -96,41 +96,110 @@ class SocialMetas{
 			$og_description = !empty($siteseo->titles_settings['titles_home_site_desc']) ? $siteseo->titles_settings['titles_home_site_desc'] : $og_description;
 		}
 		
-		// shop page woocommerces
-		if(function_exists('is_shop') && is_shop()){
-			$shop_page_id = wc_get_page_id('shop');
-			
-			$og_meta_title = empty(get_post_meta($shop_page_id, '_siteseo_titles_title', true)) ? get_post_meta($shop_page_id, '_siteseo_titles_title', true) : $og_title;
-			
-			$og_meta_title = esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_meta_title));
-			$og_title = !empty(get_post_meta($shop_page_id, '_siteseo_social_fb_title', true)) ? get_post_meta($shop_page_id, '_siteseo_social_fb_title', true) : $og_meta_title;
-			
-			$og_description = !empty(get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true)) ? get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true) : $og_description;
-						
-			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true))){
-				$og_description = get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true);
-			} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
-				$og_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
-			} elseif(get_the_excerpt($shop_page_id)){
-				$og_description = wp_trim_words(get_the_excerpt($shop_page_id), 50);
-			}
-			
-			$og_description = isset($og_description) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_description)) : '';
-			
-			// OG:IMG
-			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_img', true))){
-				$og_img = get_post_meta($shop_page_id, '_siteseo_social_fb_img', true);
-			} else if(get_the_post_thumbnail_url($post, 'full')){
-				$og_img = get_the_post_thumbnail_url($post, 'full');
-			} else {
-				$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
-			}
-			
-			$og_url = urldecode(get_permalink($shop_page_id));
-		}
-
 		// single post types
 		foreach($post_types as $post_type){
+			
+			// shop page woocommerces
+			if(function_exists('is_shop') && is_shop()){
+				$shop_page_id = wc_get_page_id('shop');
+				
+				$archive_title = '';
+				$archive_desc = '';
+				
+				if(is_post_type_archive()){
+					$obj = get_queried_object();
+					
+					if(!empty($obj) && isset($obj->name)){
+						$archive_title = !empty($obj->labels->name) ? $obj->labels->name : '';
+						$archive_desc  = !empty($obj->description) ? $obj->description : '';
+					}
+				}
+				
+				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_title', true))){
+					$og_title = get_post_meta($shop_page_id, '_siteseo_social_fb_title', true);
+				} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_title', true))){
+					$og_title = get_post_meta($shop_page_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_archive_titles']['product']['archive_title'])){
+					$og_title = $siteseo->titles_settings['titles_archive_titles']['product']['archive_title'];
+				} else {
+					$og_title = $archive_title;
+				}
+				
+				
+				$og_description = !empty(get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true)) ? get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true) : $og_description;
+							
+				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true))){
+					$og_description = get_post_meta($shop_page_id, '_siteseo_social_fb_desc', true);
+				} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
+					$og_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_archive_titles']['product']['archive_desc'])){
+					$og_description = $siteseo->titles_settings['titles_archive_titles']['product']['archive_desc'];
+				} else {
+					$og_description = $archive_desc;
+				}
+				
+				$og_description = isset($og_description) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($og_description)) : '';
+				
+				// OG:IMG
+				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_img', true))){
+					$og_img = get_post_meta($shop_page_id, '_siteseo_social_fb_img', true);
+				} else if(get_the_post_thumbnail_url($post, 'full')){
+					$og_img = get_the_post_thumbnail_url($post, 'full');
+				} else {
+					$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
+				}
+				
+				$og_url = urldecode(get_permalink($shop_page_id));
+				break;
+			}
+			
+			// archive page
+			if($post_type->has_archive && is_post_type_archive($post_type->name)){
+				
+				$archive_title = '';
+				$archive_desc = '';
+				
+				if(is_post_type_archive()){
+					$obj = get_queried_object();
+					
+					if(!empty($obj) && isset($obj->name)){
+						$archive_title = !empty($obj->labels->name) ? $obj->labels->name : '';
+						$archive_desc  = !empty($obj->description) ? $obj->description : '';
+					}
+				}
+				
+				$og_title = !empty($siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_title']) ? $siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_title'] : $archive_title;
+				$og_description = !empty($siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_desc']) ? $siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_desc'] : $archive_desc;
+				
+			}
+			
+			// blog page
+			if(is_home() && !is_front_page()){
+				$post_id = get_option('page_for_posts');
+				
+				//OG:title
+				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_title', true))){
+					$og_title = get_post_meta($post_id, '_siteseo_social_fb_title', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_title', true))){
+					$og_title = get_post_meta($post_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'])){
+					$og_title = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'];
+				} else{
+					$og_title = $og_title;
+				}
+
+				// og:description
+				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_desc', true))){
+					$og_description = get_post_meta($post_id, '_siteseo_social_fb_desc', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_desc', true))){
+					$og_description = get_post_meta($post_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'])){
+					$og_description = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'];
+				} elseif(get_the_excerpt($post_id)){
+					$og_description = wp_trim_words(get_the_excerpt($post_id), 50);
+				}
+			}
+			
 			if(is_singular($post_type->name)){
 				
 				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_title', true))){
@@ -305,39 +374,108 @@ class SocialMetas{
 		// types and taxonomies
 		$post_types = siteseo_post_types();
 		$taxonomies = get_taxonomies(array('public' => true), 'objects');
-		
-		if(function_exists('is_shop') && is_shop()){
-			$shop_page_id = wc_get_page_id('shop');
-			$meta_title = !empty(get_post_meta($shop_page_id, '_siteseo_titles_title', true)) ? get_post_meta($shop_page_id, '_siteseo_titles_title', true) : $site_title;
-			
-			$meta_title = esc_attr(\SiteSEO\TitlesMetas::replace_variables($meta_title));
-			
-			$site_title = !empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_title', true)) ? get_post_meta($shop_page_id, '_siteseo_social_twitter_title', true) : $meta_title;
-				
-			// twitter:description
-			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_desc', true))){
-				$site_description = get_post_meta($shop_page_id, '_siteseo_social_twitter_desc', true);
-			} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
-				$site_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
-			} elseif(get_the_excerpt($shop_page_id)){
-				$site_description = wp_trim_words(get_the_excerpt($shop_page_id), 50);
-			}
-			
-			// twitter:image
-			if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_img', true))){
-				$twitter_img = get_post_meta($shop_page_id, '_siteseo_social_twitter_img', true);
-			} else if(get_the_post_thumbnail_url($post, 'full')){
-				$twitter_img = get_the_post_thumbnail_url($post, 'full');
-			} else {
-				$twitter_img = isset($siteseo->social_settings['social_twitter_card_img']) ? $siteseo->social_settings['social_twitter_card_img'] : '';
-			}
-
-			$site_url = urldecode(get_permalink($shop_page_id));
-			
-		}
-
 		// single post types
 		foreach($post_types as $post_type){
+			
+			// woocommerce
+			if(function_exists('is_shop') && is_shop()){
+				$shop_page_id = wc_get_page_id('shop');
+				
+				$archive_title = '';
+				$archive_desc = '';
+				
+				if(is_post_type_archive()){
+					$obj = get_queried_object();
+					
+					if(!empty($obj) && isset($obj->name)){
+						$archive_title = !empty($obj->labels->name) ? $obj->labels->name : '';
+						$archive_desc  = !empty($obj->description) ? $obj->description : '';
+					}
+				}
+				
+				// twitter:title
+				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_title', true))){
+					$site_title = get_post_meta($shop_page_id, '_siteseo_social_twitter_title', true);
+				} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_title', true))){
+					$site_title = get_post_meta($shop_page_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_archive_titles']['product']['archive_title'])){
+					$site_title = $siteseo->titles_settings['titles_archive_titles']['product']['archive_title'];
+				} else {
+					$site_title = $archive_title;
+				}
+							
+				
+				// twitter:description
+				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_desc', true))){
+					$site_description = get_post_meta($shop_page_id, '_siteseo_social_twitter_desc', true);
+				} elseif(!empty(get_post_meta($shop_page_id, '_siteseo_titles_desc', true))){
+					$site_description = get_post_meta($shop_page_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_archive_titles']['product']['archive_desc'])){
+					$site_description = $siteseo->titles_settings['titles_archive_titles']['product']['archive_desc'];
+				} else {
+					$site_description = $archive_desc;
+				}
+				
+				// twitter:image
+				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_twitter_img', true))){
+					$twitter_img = get_post_meta($shop_page_id, '_siteseo_social_twitter_img', true);
+				} else if(get_the_post_thumbnail_url($post, 'full')){
+					$twitter_img = get_the_post_thumbnail_url($post, 'full');
+				} else {
+					$twitter_img = isset($siteseo->social_settings['social_twitter_card_img']) ? $siteseo->social_settings['social_twitter_card_img'] : '';
+				}
+
+				$site_url = urldecode(get_permalink($shop_page_id));
+				break;
+			}
+			
+			// archive page
+			if($post_type->has_archive && is_post_type_archive($post_type->name)){
+				
+				$archive_title = '';
+				$archive_desc = '';
+				
+				if(is_post_type_archive()){
+					$obj = get_queried_object();
+					
+					if(!empty($obj) && isset($obj->name)){
+						$archive_title = !empty($obj->labels->name) ? $obj->labels->name : '';
+						$archive_desc  = !empty($obj->description) ? $obj->description : '';
+					}
+				}
+				
+				$site_title = !empty($siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_title']) ? $siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_title'] : $archive_title;
+				$site_description = !empty($siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_desc']) ? $siteseo->titles_settings['titles_archive_titles'][$post_type->name]['archive_desc'] : $archive_desc;
+				
+			}
+			
+			// blog page
+			if(is_home() && !is_front_page()){
+				$post_id = get_option('page_for_posts');
+				
+				// twitter:title
+				if(!empty(get_post_meta($post_id, '_siteseo_social_twitter_title', true))){
+					$site_title = get_post_meta($post_id, '_siteseo_social_twitter_title', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_title', true))){
+					$site_title = get_post_meta($post_id, '_siteseo_titles_title', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'])){
+					$site_title = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['title'];
+				} else{
+					$site_title = $site_title;
+				}
+				
+				// twitter:description
+				if(!empty(get_post_meta($post_id, '_siteseo_social_twitter_desc', true))){
+					$site_description = get_post_meta($post_id, '_siteseo_social_twitter_desc', true);
+				} elseif(!empty(get_post_meta($post_id, '_siteseo_titles_desc', true))){
+					$site_description = get_post_meta($post_id, '_siteseo_titles_desc', true);
+				} elseif(!empty($siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'])){
+					$site_description = $siteseo->titles_settings['titles_single_titles'][$post_type->name]['description'];
+				} elseif(!empty(get_the_excerpt($post_id))){
+					$site_description = wp_trim_words(get_the_excerpt($post_id), 50);
+				}
+			}
+			
 			if(is_singular($post_type->name)){
 				
 				// twitter:title

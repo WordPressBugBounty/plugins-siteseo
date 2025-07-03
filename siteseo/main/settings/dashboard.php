@@ -53,7 +53,7 @@ class Dashboard{
 			echo '<div class="siteseo-dashbord-intro">
 			   <div class="siteseo-text-content">
 					<h2>'.esc_html__('HOW-TO GET STARTED', 'siteseo').'</h2><h1>'.esc_html__('Welcome to SiteSEO!', 'siteseo').'</h1>
-					<p>'.esc_html__('Launch our installation wizard to quickly and easily configure the basic SEO settings for your site. Browse our video guides to go further. Cant find the answers to your questions? Open a ticket from your customer area. A happiness engineer will be happy to help you', 'siteseo').'</p>
+					<p>'.esc_html__('Launch our installation wizard to quickly and easily configure the basic SEO settings for your site. Cant find the answers to your questions? Write us at support@siteseo.io. A happiness engineer will be happy to help you.', 'siteseo').'</p>
 					<div class="siteseo-buttons">
 					<a class="get-started" href="?page=siteseo-onboarding">'.esc_html__('Get started', 'siteseo').'</a>
 					<a class="dismiss" id="siteseo-dismiss-get-started" href="#">'.esc_html__('Dismiss', 'siteseo').'</a>

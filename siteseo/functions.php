@@ -174,7 +174,7 @@ function siteseo_universal_assets(){
 		isset($_GET['brizy_edit']) ||
 		isset($_GET['tve']) ||
 		isset($_GET['pagelayer-live']) ||
-		is_admin_bar_showing() // To show when user is viewing the page as a admin
+		(!empty(get_queried_object_id()) && is_admin_bar_showing()) // To show when user is viewing the page as a admin
     ) {
 		wp_enqueue_script('siteseo-universal-metabox', SITESEO_ASSETS_URL . '/js/universal-metabox.js', ['jquery'], SITESEO_VERSION);
 		wp_localize_script('siteseo-universal-metabox', 'siteseo_universal', [

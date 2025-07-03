@@ -271,6 +271,40 @@ class Settings{
 			]
 		];
 		
+		// Preview of social title and description
+		$current_screen = get_current_screen();
+
+		if(!empty($current_screen) && $current_screen->base === 'term'){
+			$term_id = isset($_GET['tag_ID']) ? (int)$_GET['tag_ID'] : 0;
+			$taxonomy = $current_screen->taxonomy;
+		} else{
+			$post_type = $current_screen->post_type;
+		}
+
+		$social_preview_title = '';
+		$social_preview_desc = '';
+
+		if(!empty($metabox_data['meta_title'])){
+			$social_preview_title = $metabox_data['meta_title'];
+		} elseif(!empty($post_type) && !empty($siteseo->titles_settings['titles_single_titles'][$post_type]['title'])){
+			$social_preview_title = $siteseo->titles_settings['titles_single_titles'][$post_type]['title'];
+		} elseif(!empty($taxonomy) && !empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy]['title'])){
+			$social_preview_title = $siteseo->titles_settings['titles_tax_titles'][$taxonomy]['title'];
+		} else{
+			$social_preview_title = get_the_title();
+		}
+		
+		
+		if(!empty($metabox_data['meta_desc'])){
+			$social_preview_desc = $metabox_data['meta_desc'];
+		} elseif(!empty($post_type) && !empty($siteseo->titles_settings['titles_single_titles'][$post_type]['description'])){
+			$social_preview_desc = $siteseo->titles_settings['titles_single_titles'][$post_type]['description'];
+		} elseif(!empty($taxonomy) && !empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy]['description'])){
+			$social_preview_desc = $siteseo->titles_settings['titles_tax_titles'][$taxonomy]['description'];
+		} else{
+			$social_preview_desc = get_bloginfo('description');
+		}
+		
 		if(empty($siteseo->advanced_settings['appearance_ca_metaboxe']) && !empty($show_content_analysis)){
 			$siteseo_metabox_tabs = [
 				'content-analysis' => __('Content Analysis', 'siteseo')
@@ -314,7 +348,7 @@ class Settings{
 			echo'<div class="siteseo-metabox-tab-label '.esc_attr($selected_metabox_tab).'" data-tab="siteseo-metabox-tab-'.esc_attr($siteseo_metabox_tab).'">';
 			
 			if($siteseo_metabox_tab === 'advanced-settings' && !empty($metabox_data['robots_index'])){
-				echo'<span class="siteseo-noindex-warning"></span>';
+				echo'<span class="dashicons dashicons-hidden siteseo-noindex-warning"></span>';
 			}
 			
 			echo esc_html($siteseo_metabox_tab_title).'</div>';
@@ -457,8 +491,8 @@ class Settings{
 					</div>
 					<div class="siteseo-metabox-fb-data">
 						<div class="siteseo-metabox-fb-host">'.(!empty($host_uri) ? esc_html($host_uri) : '').'</div>
-						<div class="siteseo-metabox-fb-title">'.(!empty($metabox_data['fb_title']) ? esc_html($metabox_data['fb_title']) : esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true))).'</div>
-						<div class="siteseo-metabox-fb-desc">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true))).'</div>
+						<div class="siteseo-metabox-fb-title">'.(!empty($metabox_data['fb_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['fb_title'], true)) : esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_title, true))).'</div>
+						<div class="siteseo-metabox-fb-desc">'.(!empty($metabox_data['fb_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['fb_desc'], true)) : esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true))).'</div>
 					</div>
 				</div>
 			</div>
@@ -467,7 +501,12 @@ class Settings{
 					<label for="siteseo_social_fb_title_meta">'.esc_html__('Facebook Title', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<input type="text" id="siteseo_social_fb_title_meta" class="siteseo_social_fb_title_meta" name="siteseo_social_fb_title" placeholder="'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : '').'" value="'.(!empty($metabox_data['fb_title']) ? esc_attr($metabox_data['fb_title']) : '').'" />
+					<input type="text" id="siteseo_social_fb_title_meta" class="siteseo_social_fb_title_meta" name="siteseo_social_fb_title" placeholder="'.(!empty($social_preview_title) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_title, true)) : '').'" value="'.(!empty($metabox_data['fb_title']) ? esc_attr($metabox_data['fb_title']) : '').'" />
+					<div class="siteseo-metabox-tags">
+						<button type="button" class="siteseo-facebook-title" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
+						<button type="button" class="siteseo-facebook-title" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
+						<button type="button" class="siteseo-facebook-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
+					</div>
 				</div>
 			</div>
 
@@ -476,7 +515,10 @@ class Settings{
 					<label for="siteseo_social_fb_desc_meta">'.esc_html__('Facebook description', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<textarea id="siteseo_social_fb_desc_meta" class="siteseo_social_fb_desc_meta" name="siteseo_social_fb_desc" rows="2" placeholder="'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : '').'</textarea>
+					<textarea id="siteseo_social_fb_desc_meta" class="siteseo_social_fb_desc_meta" name="siteseo_social_fb_desc" rows="2" placeholder="'.(!empty($social_preview_desc) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : '').'</textarea>
+					<div class="siteseo-metabox-tags">
+						<button type="button" class="siteseo-facebook-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
+					</div>
 				</div>
 			</div>
 
@@ -507,7 +549,7 @@ class Settings{
 						<img src="'.(!empty($metabox_data['x_img']) ? esc_url($metabox_data['x_img']) : esc_url($social_placeholder)).'" alt="X preview" load="lazy"/>
 					</div>
 					<div class="siteseo-metabox-x-data">
-						<div class="siteseo-metabox-x-title">'.(!empty($metabox_data['x_title']) ? esc_html($metabox_data['x_title']) : esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true))).'</div>
+						<div class="siteseo-metabox-x-title">'.(!empty($metabox_data['x_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['x_title'], true)) : esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_title, true))).'</div>
 					</div>
 				</div>
 				<div class="siteseo-metabox-x-host">From '.(!empty($host_uri) ? esc_html($host_uri) : '').'</div>
@@ -519,7 +561,12 @@ class Settings{
 					<label for="siteseo_social_twitter_title_meta">'.esc_html__('X Title', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<input type="text" id="siteseo_social_twitter_title_meta" class="siteseo_social_twitter_title_meta" name="siteseo_social_twitter_title" placeholder="'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : '').'" value="'.(!empty($metabox_data['x_title']) ? esc_attr($metabox_data['x_title']) : '').'" />
+					<input type="text" id="siteseo_social_twitter_title_meta" class="siteseo_social_twitter_title_meta" name="siteseo_social_twitter_title" placeholder="'.(!empty($social_preview_title) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_title, true)) : '').'" value="'.(!empty($metabox_data['x_title']) ? esc_attr($metabox_data['x_title']) : '').'" />
+					<div class="siteseo-metabox-tags">
+						<button type="button" class="siteseo-x-title" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
+						<button type="button" class="siteseo-x-title" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
+						<button type="button" class="siteseo-x-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
+					</div>
 				</div>
 			</div>
 			
@@ -528,7 +575,10 @@ class Settings{
 					<label for="siteseo_social_twitter_desc_meta">'.esc_html__('X description', 'siteseo').'</label>
 				</div>
 				<div class="siteseo-metabox-input-wrap">
-					<textarea id="siteseo_social_twitter_desc_meta" class="siteseo_social_twitter_desc_meta" name="siteseo_social_twitter_desc" rows="2" placeholder="'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : '').'">'.(!empty($metabox_data['x_desc']) ? esc_attr($metabox_data['x_desc']) : '').'</textarea>
+					<textarea id="siteseo_social_twitter_desc_meta" class="siteseo_social_twitter_desc_meta" name="siteseo_social_twitter_desc" rows="2" placeholder="'.(!empty($social_preview_desc) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true)) : '').'">'.(!empty($metabox_data['x_desc']) ? esc_attr($metabox_data['x_desc']) : '').'</textarea>
+					<div class="siteseo-metabox-tags">
+						<button type="button" class="siteseo-x-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
+					</div>
 				</div>
 			</div>
 			
@@ -576,7 +626,7 @@ class Settings{
 		echo'<div class="siteseo-sidebar-tabs"><span>';
 
 		if(!empty($metabox_data['robots_index'])){
-			echo'<span class="siteseo-noindex-warning"></span>';
+			echo'<span class="dashicons dashicons-hidden siteseo-noindex-warning"></span>';
 		}
 		
 		echo esc_html__('Advanced', 'siteseo').'</span><span class="siteseo-sidebar-tabs-arrow"><span class="dashicons dashicons-arrow-down-alt2"></span></span></div>

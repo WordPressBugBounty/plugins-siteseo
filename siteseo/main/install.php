@@ -83,6 +83,16 @@ class Install{
 				$titles_metas['titles_single_titles'][$post_type]['description'] = !isset($titles_metas['titles_single_titles'][$post_type]['description']) ? '%%post_excerpt%% ' : $titles_metas['titles_single_titles'][$post_type]['description'];
 			}
 		}
+		
+		$taxonomies = get_taxonomies(array('public' => true), 'objects');
+		if(!empty($taxonomies) && is_array($taxonomies)){
+			$taxonomies = array_keys($taxonomies);
+			
+			foreach($taxonomies as $taxonomy){
+				$titles_metas['titles_tax_titles'][$taxonomy]['title'] = !isset($titles_metas['titles_tax_titles'][$taxonomy]['title']) ? '%%_category_title%% %%sep%% %%sitetitle%%' : $titles_metas['titles_tax_titles'][$taxonomy]['title'];
+				$titles_metas['titles_tax_titles'][$taxonomy]['description'] = !isset($titles_metas['titles_tax_titles'][$taxonomy]['description']) ? '%%_category_description%%' : $titles_metas['titles_tax_titles'][$taxonomy]['description'];	
+			}
+		}
 
 		$titles_metas['titles_archives_author_title'] = !isset($titles_metas['titles_archives_author_title']) ? '%%post_author%% %%sep%% %%sitetitle%%' : $titles_metas['titles_archives_author_title'];
 		$titles_metas['titles_archives_author_noindex'] = !isset($titles_metas['titles_archives_author_noindex']) ?? '';

@@ -34,6 +34,13 @@ jQuery(document).ready(function($){
 		
 		$('.siteseo-metabox-fb-title').text(fb_title);
 		$('.siteseo_social_fb_title_meta').not(jEle)?.val(fb_title);
+		
+		if(fb_title.includes('%%')){
+			siteseo_debounce(() => {
+				fb_title = resolve_dynamic_variables(fb_title, 'title', 'fb');
+			})();
+
+		}
 	});
 	
 	// Facebook description updates
@@ -43,6 +50,12 @@ jQuery(document).ready(function($){
 		
 		$('.siteseo-metabox-fb-desc').text(fb_desc);		
 		$('.siteseo_social_fb_desc_meta').not(jEle)?.val(fb_desc);
+		
+		if(fb_desc.includes('%%')){
+			siteseo_debounce(()	=> {
+				fb_desc = resolve_dynamic_variables(fb_desc, 'desc', 'fb');
+			})();
+		}
 	});
 	
 	// X description title
@@ -52,10 +65,16 @@ jQuery(document).ready(function($){
 
 		$('.siteseo-metabox-x-title').text(x_title);
 		$('.siteseo_social_twitter_title_meta').not(jEle)?.val(x_title);
+		
+		if(x_title.includes('%%')){
+			siteseo_debounce(() => {
+				x_title = resolve_dynamic_variables(x_title, 'title' ,'x');
+			})();
+		}
 	});
 		
-  // X description updates
-  $(document).on('input paste', '.siteseo_social_twitter_desc_meta', function(){
+	// X description updates
+	$(document).on('input paste', '.siteseo_social_twitter_desc_meta', function(){
 		let jEle = $(this),
 		x_desc = jEle.val();
 		
@@ -158,94 +177,93 @@ jQuery(document).ready(function($){
 	function init_media_uploader(buttonId, inputClass, previewClass, attachmentIdField, widthField, heightField){
         var mediaUploader;
         
-        $(document).on('click', '#' + buttonId, function(e){
-            e.preventDefault();
-            
-            mediaUploader = wp.media({
-                title: 'Choose Image',
-                button:{
-                    text: 'Use this image'
-                },
-                multiple: false,
-                library: {
-                    type: 'image'
-                }
-            });
+		$(document).on('click', '#' + buttonId, function(e){
+			e.preventDefault();
 
-            mediaUploader.on('select', function(){
-                var attachment = mediaUploader.state().get('selection').first().toJSON();
-                
-                var isValid = validateImageDimensions(
-                    attachment.width, 
-                    attachment.height, 
-                    buttonId.includes('facebook')
-                );
+			mediaUploader = wp.media({
+				title: 'Choose Image',
+				button:{
+					text: 'Use this image'
+				},
+				multiple: false,
+				library: {
+					type: 'image'
+				}
+			});
 
-                if(!isValid.valid){
-                    var errorSpan = $('.' + inputClass).siblings('span');
-                    if(errorSpan.length === 0){
-						
-                        $('.' + inputClass).after('<span class="error-message" style="color: red;"></span>');
-                        errorSpan = $('.' + inputClass).siblings('span');
-                    }
-                    errorSpan.text(isValid.message).show();
-                    return;
-                }
-				
-                $('.' + inputClass).siblings('span').hide();
-                $('.' + inputClass).val(attachment.url);
-                $('#' + attachmentIdField).val(attachment.id);
-                $('#' + widthField).val(attachment.width);
-                $('#' + heightField).val(attachment.height);
-                
-                var previewImg = $('.' + previewClass + ' img');
-                if (previewImg.length === 0) {
-                    $('.' + previewClass).append('<img src="' + attachment.url + '" />');
-                } else {
-                    previewImg.attr('src', attachment.url);
-                }
-            });
+			mediaUploader.on('select', function(){
+				var attachment = mediaUploader.state().get('selection').first().toJSON();
 
-            mediaUploader.open();
-        });
+				var isValid = validateImageDimensions(
+					attachment.width, 
+					attachment.height, 
+					buttonId.includes('facebook')
+				);
+
+				if(!isValid.valid){
+					var errorSpan = $('.' + inputClass).siblings('span');
+					if(errorSpan.length === 0){	
+						$('.' + inputClass).after('<span class="error-message" style="color: red;"></span>');
+						errorSpan = $('.' + inputClass).siblings('span');
+					}
+					errorSpan.text(isValid.message).show();
+					return;
+                }
+
+				$('.' + inputClass).siblings('span').hide();
+				$('.' + inputClass).val(attachment.url);
+				$('#' + attachmentIdField).val(attachment.id);
+				$('#' + widthField).val(attachment.width);
+				$('#' + heightField).val(attachment.height);
+
+				var previewImg = $('.' + previewClass + ' img');
+				if (previewImg.length === 0) {
+					$('.' + previewClass).append('<img src="' + attachment.url + '" />');
+				} else {
+					previewImg.attr('src', attachment.url);
+				}
+			});
+
+			mediaUploader.open();
+		});
     }
 	
 	function init_uploaders(){
 		init_media_uploader(
-            'siteseo_social_fb_img_upload',
-            'siteseo_social_fb_img_meta',
-            'siteseo-metabox-fb-image',
-            'siteseo_social_fb_img_attachment_id',
-            'siteseo_social_fb_img_width',
-            'siteseo_social_fb_img_height'
-        );
+			'siteseo_social_fb_img_upload',
+			'siteseo_social_fb_img_meta',
+			'siteseo-metabox-fb-image',
+			'siteseo_social_fb_img_attachment_id',
+			'siteseo_social_fb_img_width',
+			'siteseo_social_fb_img_height'
+		);
 
-        init_media_uploader(
-            'siteseo_social_twitter_img_upload',
-            'siteseo_social_twitter_img_meta',
-            'siteseo-metabox-x-image',
-            'siteseo_social_twitter_img_attachment_id',
-            'siteseo_social_twitter_img_width',
-            'siteseo_social_twitter_img_height'
-        );
+		init_media_uploader(
+			'siteseo_social_twitter_img_upload',
+			'siteseo_social_twitter_img_meta',
+			'siteseo-metabox-x-image',
+			'siteseo_social_twitter_img_attachment_id',
+			'siteseo_social_twitter_img_width',
+			'siteseo_social_twitter_img_height'
+		);
 	}
 
-    function validateImageDimensions(width, height, isFacebook){
-        if(isFacebook){
-            if(width < 200 || height < 200){
-                return {
-                    valid: false,
-                    message: 'Image must be at least 200x200 pixels for Facebook'
-                };
-            }
-            
-            if((width * height * 4) / (1024 * 1024) > 8){
-                return {
-                    valid: false,
-                    message: 'Image size exceeds Facebook 8MB limit'
-                };
-            }
-			
+	function validateImageDimensions(width, height, isFacebook){
+		if(isFacebook){
+			if(width < 200 || height < 200){
+				return {
+					valid: false,
+					message: 'Image must be at least 200x200 pixels for Facebook'
+				};
+			}
+
+			if((width * height * 4) / (1024 * 1024) > 8){
+				return {
+					valid: false,
+					message: 'Image size exceeds Facebook 8MB limit'
+				};
+			}
+
 			return { valid: true };
 		}
 
@@ -255,23 +273,82 @@ jQuery(document).ready(function($){
 				message: 'Image must be at least 144x144 pixels for X'
 			};
 		}
-		
+
 		if((width * height * 4) / (1024 * 1024) > 5){
 			return {
 				valid: false,
 				message: 'Image size exceeds X 5MB limit'
 			};
 		}
-        return { valid: true };
+		return { valid: true };
     }
 
-    $(document).on('widget-added widget-updated', init_uploaders);
+	$(document).on('widget-added widget-updated', init_uploaders);
+	
+	// facebook title 
+	$(document).on('click', '.siteseo-facebook-title', function(){
+		let tag = $(this).data('tag'),
+		$wrapper = $(this).closest('.siteseo-metabox-input-wrap'),
+		$input = $wrapper.find('#siteseo_social_fb_title_meta, textarea');
+		
+		let currentValue = $input.val();
+		newValue = currentValue + " " + tag;
+
+		$input.val(newValue);
+    
+		$input.trigger('input');
+	});
+	
+	// facebook description
+	$(document).on('click', '.siteseo-facebook-desc', function(){
+		let tag = $(this).data('tag'),
+		$wrapper = $(this).closest('.siteseo-metabox-input-wrap'),
+		$input = $wrapper.find('#siteseo_social_fb_desc_meta, textarea');
+		
+		let currentValue = $input.val();
+		newValue = currentValue + " " + tag;
+
+		$input.val(newValue);
+		
+		$input.trigger('input');
+	});
+	
+	// x title
+	$(document).on('click', '.siteseo-x-title', function(){
+		
+		let tag = $(this).data('tag'),
+		$wrapper = $(this).closest('.siteseo-metabox-input-wrap'),
+		$input = $wrapper.find('#siteseo_social_twitter_title_meta, textarea');
+		
+		let currentValue = $input.val();
+		newValue = currentValue + " " + tag;
+
+		$input.val(newValue);
+		
+		$input.trigger('input');
+		
+	});
+	
+	// x desc
+	$(document).on('click', '.siteseo-x-desc', function(){
+		
+		let tag = $(this).data('tag'),
+		$wrapper = $(this).closest('.siteseo-metabox-input-wrap'),
+		$input = $wrapper.find('#siteseo_social_twitter_desc_meta, textarea');
+		
+		let currentValue = $input.val();
+		newValue = currentValue + " " + tag;
+
+		$input.val(newValue);
+		
+		$input.trigger('input');
+	});
 	
 	$(document).on('click', '.siteseo-metabox-tag', function(){
 		let tag = $(this).data('tag'),
 		$wrapper = $(this).closest('.siteseo-metabox-input-wrap'),
 		$input = $wrapper.find('#siteseo_titles_title_meta, textarea'),
-		
+
 		currentValue = $input.val(),
 		newValue = currentValue + " " + tag;
 
@@ -283,11 +360,11 @@ jQuery(document).ready(function($){
 
     $(document).on('input paste', '.siteseo_titles_title_meta, .siteseo_titles_desc_meta', function(e){
 		update_char_counter($(e.target));
-    });
+	});
 
-    function update_char_counter($input){
+	function update_char_counter($input){
 		let max_chars = $input.hasClass('siteseo_titles_title_meta') ? 60 : 160;
-		
+
 		if(max_chars == 60){
 			var jEle = $('.siteseo_titles_title_meta');
 		} else {
@@ -299,50 +376,54 @@ jQuery(document).ready(function($){
 		$wrapper = jEle.closest('.siteseo-metabox-input-wrap'),
 		$meter = $wrapper.find('.siteseo-metabox-limits-meter span'),
 		$counter = $wrapper.find('.siteseo-metabox-limits-numbers em');
-		
+
 		if(max_chars == 60){
 			update_title_placeholder($input.val());
-			$('.siteseo_titles_title_meta').not($input)?.val($input.val()); // Syncing inputs
+			if($input.hasClass('siteseo_titles_title_meta')){
+				$('.siteseo_titles_title_meta').not($input)?.val($input.val()); // Syncing inputs
+			}
 		} else {
 			update_desc_placeholder($input.val());
-			$('.siteseo_titles_desc_meta').not($input)?.val($input.val()); // Syncing inputs
+			if($input.hasClass('siteseo_titles_desc_meta')){
+				$('.siteseo_titles_desc_meta').not($input)?.val($input.val()); // Syncing inputs
+			}
 		}
 
 		$meter.css('width', percentage + '%');
 		$counter.text(current_length);
-    }
-	
+	}
+
 	function update_title_placeholder(title){
 		if(title.length > 60){
 			title = title.substring(0, 60) + '...';
 		}
-		
+
 		if(title.includes('%%')){
 			siteseo_debounce(() => resolve_dynamic_variables(title, 'title'));
 			return;
 		}
-		
+
 		$('.siteseo-metabox-search-preview h3').text(title);
 	}
-	
+
 	function update_desc_placeholder(desc){
 		if(desc.length > 160){
 			desc = desc.substring(0, 160) + '...';
 		}
-		
+
 		if(desc.includes('%%')){
 			siteseo_debounce(() => resolve_dynamic_variables(desc, 'desc'));
 			return;
 		}
-		
+
 		$('.siteseo-search-preview-description').text(desc);
 	}
-	
+
 	// seo analysis and readiblity toggle 
 	function loadTabs(selector){
 		$(selector).load(" #siteseo-analysis-tabs-1", "", initializeToggle);
-    }
-	
+	}
+
 	loadTabs("#siteseo-analysis-tabs");
 	loadTabs("#siteseo-metabox-wrapper #siteseo-analysis-tabs");
 
@@ -383,7 +464,6 @@ jQuery(document).ready(function($){
 			$(".siteseo-analysis-block-content").attr('aria-hidden', true);
 		});
 	}
-	
 
 	/**suggestion btn **/
 	$('.siteseo-suggetion').hide();
@@ -412,8 +492,16 @@ jQuery(document).ready(function($){
 			$targetField = $container.find('#siteseo_titles_title_meta, .siteseo-sidebar-title');
 		} else if($container.find('#siteseo_titles_desc_meta, .siteseo-sidebar-desc').length){
 			$targetField = $container.find('#siteseo_titles_desc_meta, .siteseo-sidebar-desc');
-		}
-
+		} else if($container.find('#siteseo_social_fb_title_meta').length){ 
+      $targetField = $container.find('#siteseo_social_fb_title_meta'); 
+		} else if($container.find('#siteseo_social_fb_desc_meta').length){ 
+			$targetField = $container.find('#siteseo_social_fb_desc_meta'); 
+		} else if($container.find('#siteseo_social_twitter_title_meta').length){ 
+			$targetField = $container.find('#siteseo_social_twitter_title_meta'); 
+		} else if($container.find('#siteseo_social_twitter_desc_meta').length){ 
+			$targetField = $container.find('#siteseo_social_twitter_desc_meta'); 
+		} 
+		
 		if($targetField && $targetField.length){
 			append_suggestion_tag($targetField, tag);
 			update_char_counter($targetField);
@@ -457,11 +545,11 @@ jQuery(document).ready(function($){
 	// Refresh SEO analysis
 	$(document).on('click', '#siteseo_refresh_seo_analysis', function(e){
 		e.preventDefault();
-		
+
 		var button = $(this);
 		var post_id = button.attr('data_id');
 		var post_type = button.attr('data_post_type');
-		
+
 		var target_keywords;
 		if(button.closest('.widget-content').length){
 			target_keywords = button.closest('.widget-content').find('.siteseo_analysis_target_kw').val();
@@ -471,7 +559,7 @@ jQuery(document).ready(function($){
 
 		button.prop('disabled', true);
 		button.text('Analyzing...');
-		
+
 		$.ajax({
 			url: siteseoAdminAjax.url,
 			type: 'POST',
@@ -484,7 +572,7 @@ jQuery(document).ready(function($){
 			},
 			success: function(response){
 				if(response.success){
-					
+
 					var container;
 					if(button.closest('.widget-content').length){
 						container = button.closest('.widget-content').find('.siteseo-widget-seo-analysis');
@@ -514,19 +602,19 @@ jQuery(document).ready(function($){
 
 	function initializeTabs(){
 		$('#siteseo-metabox-content-analysis .siteseo-metabox-tab-label').off('click');
-		
+
 		$(document).on('click','#siteseo-metabox-content-analysis .siteseo-metabox-tab-label',function(){
 			var tabId = $(this).data('tab');
 			var $tabsContainer = $(this).closest('#siteseo-metabox-content-analysis');
 
 			$tabsContainer.find('.siteseo-metabox-tab-label').removeClass('siteseo-metabox-tab-label-active');
 			$(this).addClass('siteseo-metabox-tab-label-active');
-			
+
 			$tabsContainer.find('.siteseo-metabox-tab').hide();
 			$tabsContainer.find('.' + tabId).show();
 		});
 	}
-  
+
 	initializeTabs();
 
 	// Toggle Mobile and Desktop view of Google SERP
@@ -535,17 +623,17 @@ jQuery(document).ready(function($){
 		$(this).prev().show();
 		$('.siteseo-search-preview-desktop').css('max-width', '414px');
 	});
-		
+
 	$(document).on('click', '#siteseo-metabox-search-pc', function(){
 		$(this).hide();
 		$(this).next().show();
 		$('.siteseo-search-preview-desktop').css('max-width', '');
 	});
-	
+
 	// Tags
-    let $tagsValue = $('#siteseo_tags_hidden'),
-    tags = [];
-	
+	let $tagsValue = $('#siteseo_tags_hidden'),
+	tags = [];
+
 	if($tagsValue.val()){
 		tags = $tagsValue.val().split(',');
 	}
@@ -563,11 +651,11 @@ jQuery(document).ready(function($){
 		$tag.insertBefore($input);
 		tags.push(tag);
 		updateHiddenInput();
-    }
+	}
 
-    $(document).on('click', '.siteseo-remove-tag', function(e) {
-  		e.preventDefault();
-  		e.stopImmediatePropagation();
+	$(document).on('click', '.siteseo-remove-tag', function(e) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
 
 		const tag = $(this).parent(),
 		tagText = tag.text().slice(0, -1);
@@ -579,7 +667,7 @@ jQuery(document).ready(function($){
 		return;
 	});
 
-    function updateHiddenInput(){
+	function updateHiddenInput(){
 		$('input[name="siteseo_analysis_target_kw"').val(tags.join(','));
 	}
 
@@ -591,15 +679,15 @@ jQuery(document).ready(function($){
 				$(this).val('');
 			}
 			e.preventDefault();
-        }
-    });
+		}
+	});
 
 	$(document).on('click', '#siteseo-sidebar-wrapper .siteseo-sidebar-tabs', function(){
 		$(this).toggleClass('siteseo-sidebar-tabs-opened');
 		$(this).next().slideToggle('fast');
 	});
 
-	function resolve_dynamic_variables(content, type){
+	function resolve_dynamic_variables(content, type, platform){
 
 		let post_id = jQuery('.siteseo-metabox-tabs').attr('data_id');
 
@@ -617,11 +705,26 @@ jQuery(document).ready(function($){
 				}
 
 				if(type == 'title'){
-					update_title_placeholder(res.data);
+					if(platform == 'fb'){
+						$('.siteseo-metabox-fb-title').text(res.data);
+					} else if(platform == 'x'){
+						$('.siteseo-metabox-x-title').text(res.data);					
+					} else{
+						update_title_placeholder(res.data);
+					}
+					
 					return;
 				}
-				
-				update_desc_placeholder(res.data);
+
+				if(type == 'desc'){
+					if(platform == 'fb'){
+						$('.siteseo-metabox-fb-desc').text(res.data);
+					} else if(platform == 'x'){
+						$('.siteseo-metabox-x-desc').text(res.data);
+					} else{
+						update_desc_placeholder(res.data);
+					}
+				}
 			}
 		});
 	}

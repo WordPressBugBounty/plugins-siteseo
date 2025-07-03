@@ -17,15 +17,9 @@ font-size:1.05em;
 }
 
 .siteseo-noindex-warning{
-height:9px;
-width:9px;
-margin-right:5px;
-background-color:#EB0F00;
-border-radius:50%;
-display:inline-block;
+color: #EB0F00;
+margin-right: 5px;
 cursor:pointer;
-box-shadow:0 0 5px #EB0F00;
-border:1px solid #fff;
 }
 
 .siteseo-metabox-tabs input,
@@ -224,7 +218,8 @@ font-size: 14px;
 display: flex;
 flex-wrap: wrap;
 gap: 4px;
-margin-bottom: 5px;
+margin-top:5px;
+margin-bottom:5px;
 }
 
 .siteseo-metabox-tags button{
