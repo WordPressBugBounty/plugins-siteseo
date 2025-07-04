@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -108,6 +108,9 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.2.5 (July 3, 2025) =
+* [Bug Fix] Resolved a minor syntax issue for PHP 7.2 compatibility.
 
 = 1.2.4 (July 3, 2025) =
 * [Pro-Improvement] Added suggested rules for robots.txt and .htaccess.

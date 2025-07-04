@@ -201,7 +201,7 @@ function siteseo_post_types(){
 		$post_types['e-floating-buttons'],
 		$post_types['pagelayer-template'],
 		$post_types['hostim_footer'],
-		$post_types['mega_menu'],
+		$post_types['mega_menu']
 	);
 	
 	return apply_filters('siteseo_post_types', $post_types);
