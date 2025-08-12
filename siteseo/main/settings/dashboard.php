@@ -303,30 +303,31 @@ class Dashboard{
 
 	echo'</div></section>';
 
-	echo'<section class="siteseo-dashboard-extras">
-		<div class="siteseo-need-help">
-			<h3>'.esc_html__('Support', 'siteseo').'</h3>
-			<p>'.esc_html__('If you are facing any issue contact us, our team will help you', 'siteseo').'</p>
-			<div>
-			<a href="https://siteseo.io/docs/" class="siteseo-button siteseo-btn-black siteseo-100" target="_blank">'.esc_html__('Check the Docs', 'siteseo').'</a>
-			<a href="https://softaculous.deskuss.com/open.php?topicId=22" class="siteseo-button siteseo-btn-transparent siteseo-100" target="_blank">'.esc_html__('Contact Support', 'siteseo').'</a>
+	echo'<section class="siteseo-dashboard-extras">';
+		if(defined('SITESEO_PRO_VERSION') && defined('SITESEO_PRO_AI_BUY')){
+			do_action('siteseo_pro_show_ai_tokens_sidebar');
+		}
+		echo '<div class="siteseo-need-help">
+			<p>Quick Access</p>
+			<div class="siteseo-quick-links">
+				<div class="siteseo-quick-access-item">
+					<span class="dashicons dashicons-format-status"></span>
+					<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Support</a>
+				</div>
+				<div class="siteseo-quick-access-item">
+					<span class="dashicons dashicons-media-document"></span>
+					<a href="https://siteseo.io/docs/" target="_blank">Documentation</a>
+				</div>
+				<div class="siteseo-quick-access-item">
+					<span class="dashicons dashicons-feedback"></span>
+					<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Feedback</a>
+				</div>
+				<div class="siteseo-quick-access-item">
+					<span class="dashicons dashicons-star-filled"></span><a href="https://wordpress.org/support/plugin/siteseo/reviews/?rate=5#new-post" target="_blank">Rate Us</a>
+				</div>
 			</div>
 		</div>
-		
-		<div class="siteseo-rating-tab">
-			<div class="siteseo-rating">
-				<a class="siteseo-stars" href="https://wordpress.org/support/plugin/siteseo/reviews/?filter=5#new-post" target="_blank">
-				<span class="dashicons dashicons-star-filled"></span>
-				<span class="dashicons dashicons-star-filled"></span>
-				<span class="dashicons dashicons-star-filled"></span>
-				<span class="dashicons dashicons-star-filled"></span>
-				<span class="dashicons dashicons-star-filled"></span>
-				</a>
-			</div>
-			<p>'.esc_html__('Please take a moment to rate us —it really helps us a lot!', 'siteseo').'</p>
-		</div>
-		
-	</section>
+		</section>
 	</div>
 	</div>
 	</div>';

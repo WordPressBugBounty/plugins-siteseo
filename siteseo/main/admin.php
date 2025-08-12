@@ -21,7 +21,7 @@ class Admin{
 		global $siteseo, $pagenow;
 
 		if(!empty($_GET['page']) && $_GET['page'] == 'siteseo-onboarding'){
-			\SiteSEO\Settings\Onboarding::init();
+			\SiteSEO\Settings\OnBoarding::init();
 		}
 		
 		add_action('admin_menu', '\SiteSEO\Admin::add_menu');
@@ -44,7 +44,7 @@ class Admin{
 		
 		add_filter('plugin_action_links', '\SiteSEO\Install::action_links', 10, 2);
 		
-		add_filter( 'admin_footer_text', '\SiteSEO\Admin::rating_promotion');
+		add_filter('admin_footer_text', '\SiteSEO\Admin::rating_promotion');
 		
 
 		add_action('admin_enqueue_scripts', '\SiteSEO\Admin::enqueue_script');
@@ -150,8 +150,8 @@ class Admin{
 	static function noindex_warning($wp_admin_bar){
 		global $siteseo;
 		
-		$noindex_enabled = !empty($siteseo->titles_settings['titles_noindex']) ?? ''; 
-		$disable_noindex = !empty($siteseo->advanced_settings['appearance_adminbar_noindex']) ?? '';
+		$noindex_enabled = !empty($siteseo->titles_settings['titles_noindex']) ? true : ''; 
+		$disable_noindex = !empty($siteseo->advanced_settings['appearance_adminbar_noindex']) ? true : '';
 
 		if(empty($noindex_enabled) || !empty($disable_noindex)){
 			return $wp_admin_bar;
@@ -264,9 +264,9 @@ class Admin{
 		$current_user = wp_get_current_user();
 		$is_admin = in_array('administrator', $current_user->roles);
 		
-		$disable_admin_bar = !empty($siteseo->advanced_settings['appearance_adminbar']) ?? '';
+		$disable_admin_bar = !empty($siteseo->advanced_settings['appearance_adminbar']) ? true : '';
 
-	    if(!$is_admin && !current_user_can('siteseo_access') || !empty($disable_admin_bar)){
+		if(!$is_admin && !current_user_can('siteseo_access') || !empty($disable_admin_bar)){
 			return;
 		}
 
@@ -391,12 +391,15 @@ class Admin{
 	}
 
 	static function enqueue_metaboxes(){
+		
+		$social_placeholder = SITESEO_ASSETS_URL . '/img/social-placeholder.png';
 		wp_enqueue_media();
 		wp_enqueue_style('siteseo-metabox-pages', SITESEO_ASSETS_URL.'/css/metabox.css');
-		wp_enqueue_script('siteseo-metabox', SITESEO_ASSETS_URL.'/js/metabox.js', ['jquery'], SITESEO_VERSION);
+		wp_enqueue_script('siteseo-metabox', SITESEO_ASSETS_URL.'/js/metabox.js', ['jquery'], SITESEO_VERSION, ['strategy'  => 'defer', 'in_footer' => true]);
 		wp_localize_script('siteseo-metabox', 'siteseoAdminAjax', [
 	            'url'   => admin_url('admin-ajax.php'), 
-	            'nonce' => wp_create_nonce('siteseo_admin_nonce')
+	            'nonce' => wp_create_nonce('siteseo_admin_nonce'),
+		    'social_placeholder'   => esc_url($social_placeholder)
 	        ]);
 			
 		do_action('siteseo_structured_data_types_enqueue');
@@ -528,6 +531,8 @@ class Admin{
 	}
 	
 	static function add_term_metabox(){
+		global $siteseo;
+
 		$metabox_roles = !empty($siteseo->advanced_settings['security_metaboxe_role']) ? $siteseo->advanced_settings['security_metaboxe_role'] : [];
 
 		$allow_user = true; 
@@ -559,13 +564,13 @@ class Admin{
 		}
 	}
 	
-	static function rating_promotion(){
+	static function rating_promotion($text){
 		global $wp_version;
 		
 		$screen = get_current_screen();
 		
 		if(!isset($screen->id) || strpos($screen->id, 'siteseo') === false){
-			return;
+			return $text;
 		}
 		
 		$linkText = esc_html__('Give us a 5-star rating!', 'siteseo');

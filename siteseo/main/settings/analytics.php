@@ -225,14 +225,14 @@ class Analytics{
 				<tr>
 					<th scope="row" style="user-select:auto;">'.esc_html__('Close button','siteseo').'</th>
 					<td>
-						<input type="text" name="siteseo_options[opt_close]" value="'.esc_attr($option_opt_msg_close).'" placeholder="'.esc_attr('default:X','siteseo').'">
+						<input type="text" name="siteseo_options[opt_close]" value="'.esc_attr($option_opt_msg_close).'" placeholder="'.esc_attr__('default:X', 'siteseo').'">
 					</td>
 				</tr>
 
 				<tr>
 					<th scope="row" style="user-select:auto;" >'.esc_html__('Edit cookies button','siteseo').'</th>
 					<td>
-						<input type="text" name="siteseo_options[opt_edit_btn]" value="'.esc_attr($option_opt_msg_edit).'" placeholder="'.esc_attr('default:Manage cookie','siteseo').'">
+						<input type="text" name="siteseo_options[opt_edit_btn]" value="'.esc_attr($option_opt_msg_edit).'" placeholder="'.esc_attr__('default:Manage cookie', 'siteseo').'">
 					</td>
 				</tr>
 				
@@ -420,7 +420,7 @@ class Analytics{
 									<th scope="row">'.esc_html__('Enter your tracking ID', 'siteseo').'</th>
 									<td>
 										<input type="text" placeholder="'.esc_html__('Enter "example" if you Matomo account URL is "example.matomo.cloud', 'siteseo').'" name="siteseo_options[tracking_id]" value="'.esc_attr($option_matomo_id).'"/>
-										'.wp_kses_post('<p class="description">Enter only the host without quotes, such as "example.matomo.cloud" </br> (Cloud) or "matomo.example.com" (self-hosted).</p>', 'siteseo').'
+										'.wp_kses_post('<p class="description">Enter only the host without quotes, such as "example.matomo.cloud" </br> (Cloud) or "matomo.example.com" (self-hosted).</p>').'
 									</td>
 								</tr>
 
@@ -539,7 +539,7 @@ class Analytics{
         }
 
 		if(!isset($wp_roles)){
-			$wp_roles = new WP_Roles();
+			$wp_roles = new \WP_Roles();
 		}
 
 		//$options = $siteseo->analaytics_settings;
@@ -803,7 +803,7 @@ class Analytics{
 									<tr>
 										<th scope="row">'.esc_html__('Enter your measurement ID (GA4)', 'siteseo').'</th>
 										<td>
-											<input type="text" placeholder="'.esc_attr('Enter your measurement ID (G-XXXXXXXXXX)','siteseo').'" name="siteseo_options[anlytics_measurement_id]" value="'.esc_attr($option_anaytics_id).'">
+											<input type="text" placeholder="'.esc_attr__('Enter your measurement ID (G-XXXXXXXXXX)','siteseo').'" name="siteseo_options[anlytics_measurement_id]" value="'.esc_attr($option_anaytics_id).'">
 											<p>
 												<span class="dashicons dashicons-external"></span>
 												<a href="https://support.google.com/analytics/answer/9539598?hl=en&ref_topic=9303319" target="_blank">'.esc_html__('Find your measurement ID', 'siteseo').'</a>
@@ -943,7 +943,7 @@ class Analytics{
 									<td>
 										<input type="checkbox" name="siteseo_options[track_phones]" '.(!empty($option_phone_tracking ) ? 'checked="yes"' : '') . ' value="1"/>
 										'.esc_html__(' Enable tracking of "tel:" links' , 'siteseo'). '
-										<div class="siteseo-styles pre"><pre>'.esc_html('<a href="tel:+33123456789">','siteseo').'</pre></div>
+										<div class="siteseo-styles pre"><pre>'.esc_html('<a href="tel:+33123456789">').'</pre></div>
 									</td>
 								</tr>
 							</tbody>
@@ -968,7 +968,7 @@ class Analytics{
 
 		$options = [];
 		
-		if(!empty($_post['siteseo_options'])){
+		if(empty($_POST['siteseo_options'])){
 			return;
 		}
 		

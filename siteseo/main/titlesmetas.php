@@ -16,7 +16,7 @@ class TitlesMetas{
 	static function advanced_metas($robots){
 		global $siteseo, $post;
 		
-		$disable_noindex = !empty($siteseo->advanced_settings['appearance_adminbar_noindex']) ?? '';
+		$disable_noindex = !empty($siteseo->advanced_settings['appearance_adminbar_noindex']) ? true : '';
 
 		if(empty($siteseo->setting_enabled['toggle-titles']) || !empty($disable_noindex)){
 			return $robots;
@@ -50,7 +50,7 @@ class TitlesMetas{
 			$term_id = 0;
 			if(is_tax() || is_category() || is_tag()){
 				$queried_object = get_queried_object();
-				$term_id = $queried_object->term_id ?? 0;
+				$term_id = $queried_object->term_id ? $queried_object->term_id : 0;
 				
 				if($term_id){
 					$robots['noindex'] = !empty(get_term_meta($term_id, '_siteseo_robots_index', true)) || $robots['noindex'];
@@ -388,7 +388,7 @@ class TitlesMetas{
 		// Site info
 		$site_title = get_bloginfo('name');
 		$site_tagline = get_bloginfo('description');
-		$site_sep = $siteseo->titles_settings['titles_sep'];
+		$site_sep = !empty($siteseo->titles_settings['titles_sep']) ? $siteseo->titles_settings['titles_sep'] : '-';
 
 		$paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
 		$page = get_query_var('page') ? get_query_var('page') : 1;

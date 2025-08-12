@@ -84,6 +84,22 @@ class Titles{
 		$option_site_title_alt = !empty($options['titles_home_site_title_alt']) ? $options['titles_home_site_title_alt'] : '';
 		$option_site_desc = !empty($options['titles_home_site_desc']) ? $options['titles_home_site_desc'] : '';
 
+		if(get_option('show_on_front') === 'page'){
+			$front_page_id = get_option('page_on_front');
+			$edit_link = get_edit_post_link($front_page_id, '');
+			
+			echo'<div class="siteseo_wrap_label">
+				<div class="siteseo-notice is-warning">
+					<span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
+					<p>'.wp_kses_post(__('A static page is set as your site front page <strong>(WP Dashboard > Settings > Reading)</strong>. To add an SEO title, description, and meta tags for the homepage, please click here -', 'siteseo')).'</p>
+					<div>
+						<a href="'.esc_url($edit_link).'" target="_blank">'.esc_html__('Edit Home Page', 'siteseo').'</a>
+					</div>
+				</div>
+			</div>';
+			return;
+		}
+
 		echo '<h3 class="siteseo-tabs">'.esc_html__('HOME','siteseo').'</h3>
 		<div class="siteseo-notice">
 			<span id="siteseo-dash-icon" class="dashicons dashicons-info"></span>&nbsp;
@@ -183,7 +199,7 @@ class Titles{
 						<input name="siteseo_options[noindex]" type="checkbox" '.(!empty($option_noindex) ? 'checked="yes"' : '') . ' value="1"/>' . esc_html__('noindex', 'siteseo') . 
 						'</label>
 						<p class="description">'.esc_attr__('Do not show all pages of the site in Google search results and avoid displaying "Cached" links in search results.','siteseo').'</p>
-						'.wp_kses_post('<p class="description">Check also the<strong>"Search engine visibility"</strong> setting from the <a href="%s">WordPress Reading page</a></p>','siteseo').'
+						'.wp_kses_post('<p class="description">Check also the<strong>"Search engine visibility"</strong> setting from the <a href="%s">WordPress Reading page</a></p>').'
 					</td>
 				</tr>
 
@@ -370,7 +386,7 @@ class Titles{
 						<textarea name="siteseo_options[author_desc]">'.esc_html($option_author_desc) . '</textarea><br>
 						<div class="siteseo_wrap_label">
 							<label>
-							<input name="siteseo_options[author_noindex]" type="checkbox" '.(!empty($option_author_noindex) ? 'checked="yes"' : '').' value="1"/>' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>', 'siteseo') .'
+							<input name="siteseo_options[author_noindex]" type="checkbox" '.(!empty($option_author_noindex) ? 'checked="yes"' : '').' value="1"/>' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>') .'
 							</label>
     
 							<label>
@@ -402,7 +418,7 @@ class Titles{
 						<textarea name="siteseo_options[date_desc]">'.esc_attr($option_date_desc).'</textarea><br>
 						<div class="siteseo_wrap_label">
 							<label>
-							<input name="siteseo_options[date_noindex]" type="checkbox" '.(!empty($option_date_noindex) ? 'checked="yes"' : '').' value="1"/>' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>', 'siteseo') . '
+							<input name="siteseo_options[date_noindex]" type="checkbox" '.(!empty($option_date_noindex) ? 'checked="yes"' : '').' value="1"/>' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>') . '
 							</label>
 
 							<label>
@@ -436,7 +452,7 @@ class Titles{
 						<div class="siteseo_wrap_label">
 							<label>
 							<input name="siteseo_options[search_noindex]" type="checkbox" '.(!empty($option_search_noindex) ? 'checked="yes"' : '').' value="1"/>
-							' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>', 'siteseo') . '
+							' . wp_kses_post('Do not display date archives in search engine results <strong>(noindex)</strong>') . '
 							</label>
 						</div>
 						<span class="line"><span>
@@ -502,7 +518,7 @@ class Titles{
 					<div class="siteseo_wrap_label">
 						<label>
 						<input name="siteseo_options['.esc_attr($post_name).'][archive_noindex]" type="checkbox" '.(!empty($archive_noindex) ? 'checked="yes"' : '').' value="1"/>
-						' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>', 'siteseo') .'
+						' . wp_kses_post('Do not display author archives in search engine results <strong>(noindex)</strong>') .'
 						</label><br/><br/>
 						<label>
 						<input name="siteseo_options['.esc_attr($post_name).'][archive_nofollow]" type="checkbox" '.(!empty($archive_nofollow) ? 'checked="yes"' : 'value="1"').' />'.wp_kses_post(__('Do not follow links for this taxonomy archive<strong>(nofollow)</strong>', 'siteseo')).'

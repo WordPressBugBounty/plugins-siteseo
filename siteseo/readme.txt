@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,7 +109,14 @@ Yes!
 
 == Changelog ==
 
-= 1.2.5 (July 3, 2025) =
+= 1.2.6 (August 12, 2025) =
+* [Pro Feature] Added AI-powered title and description generation in the metabox.
+* [Improvement] Added option to use the same settings as OG for X in the metabox.
+* [Improvement] Added homepage notices when a static page is set.
+* [Improvement] Now also supports Automated URL Submission for Instant Indexing for Google.
+* [Bug Fix] Fixed an issue where the cookies button was displayed in edit mode when using certain page builder plugins.
+
+= 1.2.5 (July 4, 2025) =
 * [Bug Fix] Resolved a minor syntax issue for PHP 7.2 compatibility.
 
 = 1.2.4 (July 3, 2025) =

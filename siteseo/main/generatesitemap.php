@@ -131,9 +131,6 @@ class GenerateSitemap{
 				case 'author':
 					self::generate_author_sitemap();
 					break;
-				case 'media':
-					self::generate_media_sitemap();
-					break;
 				case 'news':
 					self::generate_google_news_sitemap();
 					break;
@@ -444,8 +441,12 @@ class GenerateSitemap{
 
 		$disable_date = !empty($siteseo->sitemap_settings['xml_sitemap_html_date']);
 		$order_by = !empty($siteseo->sitemap_settings['xml_sitemap_html_orderby']) ? $siteseo->sitemap_settings['xml_sitemap_html_orderby']  : 'date';
-		$order = !empty($siteseo->sitemap_settings['xml_sitemap_html_order']) ? $siteseo->sitemap_settings['xml_sitemap_html_order'] : 'DESC';
-		$exclude_pages = array_map('trim', explode(',', $siteseo->sitemap_settings['xml_sitemap_html_exclude'] ?? ''));
+		$order = !empty($siteseo->sitemap_settings['xml_sitemap_html_order']) ? $siteseo->sitemap_settings['xml_sitemap_html_order'] : 'DESC';		
+		$exclude_string = isset($siteseo->sitemap_settings['xml_sitemap_html_exclude']) ? $siteseo->sitemap_settings['xml_sitemap_html_exclude'] : '';
+		$exclude_pages = [];
+		if(!empty($exclude_string)){
+			$exclude_pages = array_map('trim', explode(',', $exclude_string));
+		}
 
 		$output = '';
 
@@ -461,7 +462,7 @@ class GenerateSitemap{
 			'date' => 'date', // Default
 		];
 
-		$orderby = $orderby_map[$order_by] ?? 'date';
+		$orderby = !empty($orderby_map[$order_by]) ? $orderby_map[$order_by] : 'date';
 		$cpt_list = !empty($atts['cpt']) ? explode(',', $atts['cpt']) : [];
 
 		if(!empty($siteseo->sitemap_settings['xml_sitemap_post_types_list'])){ 
@@ -549,7 +550,7 @@ class GenerateSitemap{
 						box-sizing: border-box;
 					}
 					body{
-						font-family: "Roboto", sans-serif;
+						font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 						background-color: #f0f2f5;
 						margin: 0;
 						padding: 0;

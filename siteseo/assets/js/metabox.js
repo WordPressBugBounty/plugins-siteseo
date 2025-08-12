@@ -11,6 +11,29 @@ jQuery(document).ready(function($){
 		}, timeout);
 	}
 	
+	$(document).on('click', '.siteseo-x-toggle-switch input', function(){
+		if($(this).is(':checked')){
+			$('.siteseo-x-settings').hide();
+			let fb_title = $('.siteseo-metabox-fb-title').text(),
+			fb_img = $('.siteseo_social_fb_img_meta').val();
+			
+			$('.siteseo-metabox-x-title').text(fb_title);
+			$('.siteseo-metabox-x-image img').attr('src', fb_img || siteseoAdminAjax.social_placeholder);
+			$('.siteseo_social_twitter_title_meta').val('');
+			$('.siteseo_social_twitter_desc_meta').val('');
+			$('.siteseo_social_twitter_img_meta').val('');
+		} else{
+			
+			$('.siteseo-metabox-x-title').text('');
+			$('.siteseo_social_twitter_title_meta').val('');
+			$('.siteseo_social_twitter_desc_meta').val('');
+			$('.siteseo_social_twitter_img_meta').val('');
+			$('.siteseo-metabox-x-image img').attr('src', siteseoAdminAjax.social_placeholder);
+			$('.siteseo-x-settings').show();
+			
+		}
+	});
+	
 	$(document).on('click', '.siteseo-metabox-tab-label', function(){
 		let jEle = $(this),
 		parent_tab = jEle.closest('.siteseo-metabox-tabs, .siteseo-metabox-subtabs'),
@@ -31,31 +54,41 @@ jQuery(document).ready(function($){
 	$(document).on('input paste', '.siteseo_social_fb_title_meta', function(){
 		let jEle = $(this),
 		fb_title = jEle.val();
-		
-		$('.siteseo-metabox-fb-title').text(fb_title);
+
 		$('.siteseo_social_fb_title_meta').not(jEle)?.val(fb_title);
+		
+		// toogle x use
+		if($('.siteseo-x-toggle-switch input').is(':checked')){
+			$('.siteseo-metabox-x-title').text(fb_title);
+		}
 		
 		if(fb_title.includes('%%')){
 			siteseo_debounce(() => {
 				fb_title = resolve_dynamic_variables(fb_title, 'title', 'fb');
-			})();
-
+			});
+			
+			return;
 		}
+		
+		$('.siteseo-metabox-fb-title').text(fb_title);
 	});
 	
 	// Facebook description updates
 	$(document).on('input paste', '.siteseo_social_fb_desc_meta', function(){
 		let jEle = $(this),
 		fb_desc = jEle.val();
-		
-		$('.siteseo-metabox-fb-desc').text(fb_desc);		
+
 		$('.siteseo_social_fb_desc_meta').not(jEle)?.val(fb_desc);
 		
 		if(fb_desc.includes('%%')){
 			siteseo_debounce(()	=> {
 				fb_desc = resolve_dynamic_variables(fb_desc, 'desc', 'fb');
-			})();
+			});
+			
+			return;
 		}
+		
+		$('.siteseo-metabox-fb-desc').text(fb_desc);
 	});
 	
 	// X description title
@@ -63,14 +96,17 @@ jQuery(document).ready(function($){
 		let jEle = $(this),
 		x_title = jEle.val();
 
-		$('.siteseo-metabox-x-title').text(x_title);
 		$('.siteseo_social_twitter_title_meta').not(jEle)?.val(x_title);
 		
 		if(x_title.includes('%%')){
 			siteseo_debounce(() => {
 				x_title = resolve_dynamic_variables(x_title, 'title' ,'x');
-			})();
+			});
+			
+			return;
 		}
+		
+		$('.siteseo-metabox-x-title').text(x_title);
 	});
 		
 	// X description updates
@@ -216,11 +252,12 @@ jQuery(document).ready(function($){
 				$('#' + widthField).val(attachment.width);
 				$('#' + heightField).val(attachment.height);
 
-				var previewImg = $('.' + previewClass + ' img');
-				if (previewImg.length === 0) {
-					$('.' + previewClass).append('<img src="' + attachment.url + '" />');
-				} else {
-					previewImg.attr('src', attachment.url);
+				// Update preview
+				$('.' + previewClass + ' img').attr('src', attachment.url);
+
+				// If FB upload and toggle is checked, update X image too
+				if($('.siteseo-x-toggle-switch input').is(':checked')){
+					$('.siteseo-metabox-x-image img').attr('src', attachment.url);
 				}
 			});
 
@@ -504,7 +541,6 @@ jQuery(document).ready(function($){
 		
 		if($targetField && $targetField.length){
 			append_suggestion_tag($targetField, tag);
-			update_char_counter($targetField);
 			$(this).closest('.siteseo-suggetion').hide();
 		}
 	});
@@ -707,6 +743,9 @@ jQuery(document).ready(function($){
 				if(type == 'title'){
 					if(platform == 'fb'){
 						$('.siteseo-metabox-fb-title').text(res.data);
+						if($('.siteseo-x-toggle-switch input').is(':checked')){
+							$('.siteseo-metabox-x-title').text(res.data);
+						}
 					} else if(platform == 'x'){
 						$('.siteseo-metabox-x-title').text(res.data);					
 					} else{

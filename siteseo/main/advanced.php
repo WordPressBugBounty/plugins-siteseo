@@ -91,7 +91,7 @@ class Advanced{
 		}
 	}
 	
-	static function add_wp_editor_to_taxonomy_description($tag){
+	static function add_wp_editor_to_taxonomy_description($tag, $tt_id = 0){
 
 		if('edit' !== get_current_screen()->base || 'edit-tags' !== get_current_screen()->id){
 			return;
@@ -130,18 +130,28 @@ class Advanced{
 		return $fields;
 	}
 
-	static function remove_author_link_if_profile_url(){
+	static function remove_author_link_if_profile_url($comment_author_link = '', $comment_author = '', $comment_id = 0){
+		if(empty($comment_id)){
+			return $comment_author;
+		}
+
+		$comment = get_comment($comment_id);
+		
+		if(empty($comment) || !is_object($comment)){
+			return $comment_author;
+		}
+
 		$user_id = $comment->user_id;
 
 		if(!empty($user_id)){
 			$user_website = get_the_author_meta('user_url', $user_id);
 
 			if($user_website){
-				return get_comment_author($comment->comment_ID);
+				return get_comment_author($comment_id);
 			}
 		}
 
-		return $author;
+		return $comment_author;
 	}
 	
 	static function remove_category_base(){

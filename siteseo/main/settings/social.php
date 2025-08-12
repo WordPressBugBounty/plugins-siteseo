@@ -234,9 +234,8 @@ class Social{
 
         //load data
         $option_enable_card = !empty($options['social_twitter_card']) ? $options['social_twitter_card'] : '';
-        $options_og_card = !empty($options['social_twitter_card_og']) ? $options['social_twitter_card_og'] : '';
-		$option_image_size = !empty($options['social_twitter_card_img_size']) ? $options['social_twitter_card_img_size'] : '';
-		$option_twitter_img = !empty($options['social_twitter_card_img']) ? $options['social_twitter_card_img'] : '';
+	$option_image_size = !empty($options['social_twitter_card_img_size']) ? $options['social_twitter_card_img_size'] : '';
+	$option_twitter_img = !empty($options['social_twitter_card_img']) ? $options['social_twitter_card_img'] : '';
 
         echo '<h3 class="siteseo-tabs">'.esc_html__('X Card','siteseo').'</h3>
         <p class="description">'.esc_html__('Manage your X card','siteseo').'</p>
@@ -270,16 +269,7 @@ class Social{
                        <label for="enable_twitter_card"><input id="enable_twitter_card" type="checkbox" name="siteseo_options[enable_twitter_card]" '.(!empty($option_enable_card) ? 'checked="checked"' : 'value="1"') . '>'.esc_html__('Enable X card', 'siteseo') .'</label>
                     </td>
                 </tr>
-
-                <tr>
-                    <th scope="row" style="user:select-auto;">'.esc_html__('Use OG if no X Cards','siteseo').'</th>
-                    <td>
-                        <label>
-                            <input id="enable_twitter_card" type="checkbox" name="siteseo_options[card_og]" '.(!empty($options_og_card) ? 'checked="checked"' : 'value="1"').'>'.esc_html__(' Use OG if no Twitter Cards', 'siteseo').'
-                        </label>
-                    </td>
-                </tr>
-
+				
                 <tr>
                     <th scope="row" style="user:select-auto;">'.esc_html__('Default X Image','siteseo').'</th>
                     <td>
@@ -441,7 +431,6 @@ class Social{
 
 		if(isset($_POST['siteseo_options']['twitter_tab'])){
 			$options['social_twitter_card'] = isset($_POST['siteseo_options']['enable_twitter_card']);
-			$options['social_twitter_card_og'] = isset($_POST['siteseo_options']['card_og']);
 			$options['social_twitter_card_img'] = isset($_POST['siteseo_options']['twitter_img']) ? sanitize_url(wp_unslash($_POST['siteseo_options']['twitter_img'])) : '';
 			$options['social_twitter_card_img_size'] = isset($_POST['siteseo_options']['image_size']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['image_size'])) : '';
 		}

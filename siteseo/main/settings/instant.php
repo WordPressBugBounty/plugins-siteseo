@@ -201,7 +201,7 @@ class Instant{
 		            <input id="siteseo_search_engines" name="siteseo_options[auto_submission]" type="checkbox"'.(!empty($option_auto_url_submission) ? 'checked="yes"' : '').' value="1"/>'.esc_html__('Activate automatic URL submission for the IndexNow API.', 'siteseo') . 
 		        '</label>
 		        <div class="siteseo_wrap_label">
-		            <p class="description">'.esc_html__('Inform search engines via the IndexNow protocol currently Bing  whenever a post is created, updated, or removed.','siteseo').'</p>
+		            <p class="description">'.esc_html__('Inform search engines via the IndexNow protocol whenever a post is created, updated, or removed.','siteseo').'</p>
 		        </div>
 		    </td>
 		</tr>
@@ -242,7 +242,7 @@ class Instant{
 				echo'<tr>
 					<td>'.esc_html(date_i18n('Y-m-d H:i:s', $history['time'])).'</td>
 					<td>'.esc_html(implode(', ', $history['urls'])).'</td>
-					<td>'.(isset($history['google_status_code']) ? esc_html($history['google_status_code']) : 'N/A').'</td>
+					<td>'.(isset($history['google_status_code']) ? esc_html($history['google_status_code']) : 'N/A') . (isset($history['source']) && $history['source'] === 'auto' ? esc_html(' ( Auto )') : '') .'</td>
 					<td>'.(isset($history['bing_status_code']) ? esc_html($history['bing_status_code']) : 'N/A') . (isset($history['source']) && $history['source'] === 'auto' ? esc_html(' ( Auto )') : '') . 
 					'</td>
 

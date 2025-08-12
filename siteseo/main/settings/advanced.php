@@ -176,7 +176,7 @@ class Advanced{
 	}
 	
 	static function advanced(){
-		global $siteseo;
+		global $siteseo, $wp_version;
 
 		if(!empty($_POST['submit'])){
 			self::save_settings();
@@ -221,12 +221,12 @@ class Advanced{
 						<label>
 							<input name="siteseo_options[category_url]" type="checkbox"'.(!empty($option_category_url) ? 'checked="yes"' : '').' value="1"/>'.esc_html__('Remove /category/ in your permalinks', 'siteseo'). 
 			            '</label>
-						<p class="description">'.esc_attr('e.g. "https://example.com/category/my-post-category/" => "https://example.com/my-post-category/"','siteseo').'</p>
+						<p class="description">'.esc_html('e.g. "https://example.com/category/my-post-category/" => "https://example.com/my-post-category/"').'</p>
 					</td>
 				</tr>
 				
 				<tr>
-					<th scope="row">'.esc_html__('Remove category base from product permalinks','siteseo').'</th>
+					<th scope="row">'.esc_html__('Remove category base from product permalinks', 'siteseo').'</th>
 					<td>
 						<label>
 							<input type="checkbox" name="siteseo_options[remove_cate_woocommerce]" '.(!empty($option_remove_wocommerce_cat_url) ? 'checked="yes"' : '').' value="1"/>
@@ -254,7 +254,7 @@ class Advanced{
 						<label>
 							<input name="siteseo_options[wp_generator_meta]" type="checkbox"'.(!empty($option_wp_generator) ? 'checked="yes"' : '').' value="1"/>'.esc_html__('Remove WordPress meta generator in source code', 'siteseo'). 
 						'</label>
-						<div class="siteseo-styles pre"><pre>'.esc_html('<meta name="generator" content="WordPress 6.0.3" />').'</pre></div>
+						<div class="siteseo-styles pre"><pre>'.esc_html('<meta name="generator" content="WordPress '.(!empty($wp_version) ? $wp_version : '6.8.2').'" />').'</pre></div>
 					</td>
 				</tr>
 				

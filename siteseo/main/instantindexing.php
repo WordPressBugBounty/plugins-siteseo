@@ -221,7 +221,7 @@ class InstantIndexing{
 		}
 
 		$body = json_decode(wp_remote_retrieve_body($response), true);
-		return $body['access_token'] ?? false;
+		return isset($body['access_token']) ? $body['access_token'] : false;
 
 	}
 
@@ -277,20 +277,27 @@ class InstantIndexing{
 		
 		$options = get_option('siteseo_instant_indexing_option_name', []);
 
-		$api_key = isset($options['instant_indexing_bing_api_key']) ? $options['instant_indexing_bing_api_key'] : '';
+		$bing_api_key = !empty($options['instant_indexing_bing_api_key']) ? $options['instant_indexing_bing_api_key'] : '';
+		$google_api_key = !empty($options['instant_indexing_google_api_key']) ? $options['instant_indexing_google_api_key'] : '';
 		$url = get_permalink($post);
 
-		if(empty($url) || empty($api_key)){
-			return;
-		}
-
 		$url_list = [$url];
-		$res = self::submit_urls_to_bing($url_list, $api_key);
-		self::save_index_history($url_list, null, $res, 'auto');
+		$res_google = null;
+		$res_bing   = null;
+		
+		if(!empty($bing_api_key)){
+			$res_bing = self::submit_urls_to_bing($url_list, $bing_api_key);
+		}
+		
+		if(!empty($google_api_key)){
+			$res_google = self::submit_urls_to_google($url_list);
+		}
+		
+		self::save_index_history($url_list, $res_google, $res_bing , 'auto');
 				
 	}
 	
-	static function save_index_history($urls, $google_response = null, $bing_response = null, $source = 'manual'){
+	static function save_index_history($urls, $google_response, $bing_response, $source){
 		global $siteseo;
 		
 		$history = $siteseo->instant_settings;
@@ -302,9 +309,9 @@ class InstantIndexing{
 		array_unshift($history['indexing_history'], [
 			'time' => time(),
 			'urls' => $urls,
-			'google_status_code' => $google_response['status_code'] ?? null,
-			'bing_status_code' => $bing_response['status_code'] ?? null,
-			'source' => $source // 'manual' or 'auto'
+			'google_status_code' => !empty($google_response['status_code']) ? $google_response['status_code'] : null,
+			'bing_status_code' => !empty($bing_response['status_code']) ? $bing_response['status_code'] : null,
+			'source' => !empty($source) ? $source : 'manual', // 'manual' or 'auto'
 		]);
 		
 		$history['indexing_history'] = array_slice($history['indexing_history'], 0, 10);

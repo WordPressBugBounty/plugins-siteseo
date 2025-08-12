@@ -95,11 +95,11 @@ class Install{
 		}
 
 		$titles_metas['titles_archives_author_title'] = !isset($titles_metas['titles_archives_author_title']) ? '%%post_author%% %%sep%% %%sitetitle%%' : $titles_metas['titles_archives_author_title'];
-		$titles_metas['titles_archives_author_noindex'] = !isset($titles_metas['titles_archives_author_noindex']) ?? '';
+		$titles_metas['titles_archives_author_noindex'] = !isset($titles_metas['titles_archives_author_noindex']) ? true : '';
 		$titles_metas['titles_archives_date_title'] = !isset($titles_metas['titles_archives_date_title']) ? '%%archive_date%% %%sep%% %%sitetitle%%' : '';
-		$titles_metas['titles_archives_date_noindex'] = !isset($titles_metas['titles_archives_date_noindex']) ?? '';
-		$titles_metas['titles_archives_search_title_noindex'] = !isset($titles_metas['titles_archives_search_title_noindex']) ?? '';
-		$titles_metas['titles_nositelinkssearchbox'] = !isset($titles_metas['titles_nositelinkssearchbox']) ?? '';
+		$titles_metas['titles_archives_date_noindex'] = !isset($titles_metas['titles_archives_date_noindex']) ? true : '';
+		$titles_metas['titles_archives_search_title_noindex'] = !isset($titles_metas['titles_archives_search_title_noindex']) ? true : '';
+		$titles_metas['titles_nositelinkssearchbox'] = !isset($titles_metas['titles_nositelinkssearchbox']) ? true : '';
 		$titles_metas['titles_archives_search_title'] = !isset($titles_metas['titles_archives_search_title']) ? '%%search_keywords%% %%sep%% %%sitetitle%%' : '';
 		$titles_metas['titles_archives_404_title'] = !isset($titles_metas['titles_archives_404_title']) ? '404 - Page not found %%sep%% %%sitetitle%%' : $titles_metas['titles_archives_404_title'];
 

@@ -183,8 +183,8 @@ class Sitemap{
 		$check_taxonomies = apply_filters('siteseo_sitemaps_tax', $get_taxonomies);
 	
 		$options = get_option('siteseo_xml_sitemap_option_name');
-		$option_category = isset($options['xml_sitemap_taxonomies_list']['category']['include']) ?? '';
-		$option_post_tags = isset($options['xml_sitemap_taxonomies_list']['post_tag']['include']) ?? '';
+		$option_category = isset($options['xml_sitemap_taxonomies_list']['category']['include']) ? $options['xml_sitemap_taxonomies_list']['category']['include'] : '';
+		$option_post_tags = isset($options['xml_sitemap_taxonomies_list']['post_tag']['include']) ? $options['xml_sitemap_taxonomies_list']['post_tag']['include'] : '';
 		
 		$get_taxonomies = get_taxonomies();
 		$check_taxomies = apply_filters('siteseo_sitemaps_tax', $get_taxonomies);
@@ -275,9 +275,9 @@ class Sitemap{
 		wp_kses_post(sprintf(__('Insert the HTML sitemap block via the %1$s Block Editor %2$s.', 'siteseo'), '<strong>', '</strong>')).'</p>
             <h4>'.esc_html__('Shortcode', 'siteseo').'</h4>
             <p>'.esc_html__('You can also insert this shortcode into your content (post, page, custom post type, etc.):', 'siteseo').'</p>
-            <div class="siteseo-styles pre"><pre>'.esc_attr('[siteseo_html_sitemap]','siteseo').'</div></pre>
+            <div class="siteseo-styles pre"><pre>'.esc_attr('[siteseo_html_sitemap]').'</div></pre>
             <p>'.esc_html__('To include specific custom post types, use the CPT attribute:', 'siteseo') .'</p>
-            <div class="siteseo-styles pre"><pre>'.esc_attr('[siteseo_html_sitemap cpt="post,product"]','siteseo').'</div></pre>
+            <div class="siteseo-styles pre"><pre>'.esc_attr('[siteseo_html_sitemap cpt="post,product"]').'</div></pre>
             <h4>'.esc_html__('Other', 'siteseo').'</h4>
             <p>'.esc_html__('Display the sitemap dynamically by entering an ID in the first field below.', 'siteseo').'</p>
 			</div>

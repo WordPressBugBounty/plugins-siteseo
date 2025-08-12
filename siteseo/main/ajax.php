@@ -65,7 +65,7 @@ class Ajax{
 				$result = \SiteSEO\Import::slim_seo();
 				break;
 			default:
-				throw new Exception('Invalid plugin selected');
+				throw new \Exception('Invalid plugin selected');
 		}
 		
 		if(empty($result)){
@@ -289,7 +289,10 @@ class Ajax{
 				wp_send_json_error(['message' => 'No search engines configured or missing API keys']);
 			}
 			
-			\SiteSEO\InstantIndexing::save_index_history($url_list, $response['google'] ?? null, $response['bing'] ?? null);
+			$res_google = !empty($response['google']) ? $response['google'] : null;
+			$res_bing = !empty($response['bing']) ? $response['bing'] : null;
+			
+			\SiteSEO\InstantIndexing::save_index_history($url_list, $res_google, $res_bing, null);
 			
 			wp_send_json_success([
 				'message' => 'URLs submitted successfully', 

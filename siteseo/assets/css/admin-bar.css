@@ -47,6 +47,7 @@ color: grey;
 .siteseo-navbar .links{
 display: flex;
 align-items: center;
+gap:20px;
 }
 
 .siteseo-navbar .links a{
@@ -54,7 +55,6 @@ text-decoration: none;
 color: #0033a0;
 font-size: 12px;
 font-weight: bold;
-margin-right: 20px;
 }
 
 .siteseo-navbar .links .support{

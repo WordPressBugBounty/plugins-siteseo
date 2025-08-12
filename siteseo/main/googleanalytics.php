@@ -52,7 +52,7 @@ class GoogleAnalytics{
 			add_action('wp_footer', '\SiteSEO\GoogleAnalytics::add_custom_footer_script');
 		}
 
-		if(!empty($siteseo->analaytics_settings['google_analytics_hook'])){
+		if(!empty($siteseo->analaytics_settings['google_analytics_opt_out_edit_choice'])){
 			$load_cookies_bar = $siteseo->analaytics_settings['google_analytics_hook'];
 			add_action($load_cookies_bar, '\SiteSEO\GoogleAnalytics::render_cookie_bar');
 		}
@@ -61,11 +61,20 @@ class GoogleAnalytics{
 
 	static function render_cookie_bar(){
 		global $siteseo;
-		
+
 		if(empty($siteseo->setting_enabled['toggle-google-analytics']) || empty($siteseo->analaytics_settings['google_analytics_disable'])){
 			return;
 		}
-		
+
+		// Plugin edit pages on which we should not show the cookie notice.
+		$page_builders = ['fl_builder', 'elementor-preview', 'ct_builder', 'vc_editable', 'brizy_edit', 'tve', 'pagelayer-live'];
+
+		foreach($page_builders as $builder){
+			if(isset($_GET[$builder])){
+				return;
+			}
+		}
+
 		// load setting
 		$auto_accept_cookies = !empty($siteseo->analaytics_settings['google_analytics_half_disable']) ? $siteseo->analaytics_settings['google_analytics_half_disable'] : '';
 		$cookies_msg = !empty($siteseo->analaytics_settings['google_analytics_opt_out_msg']) ? $siteseo->analaytics_settings['google_analytics_opt_out_msg'] : 'By visiting our site, you agree to our privacy policy regarding cookies, tracking statistics, etc.';
@@ -75,7 +84,7 @@ class GoogleAnalytics{
 		$cookies_expir = !empty($siteseo->analaytics_settings['google_analytics_cb_exp_date']) ? $siteseo->analaytics_settings['google_analytics_cb_exp_date'] : '';
 		$bar_postion = !empty($siteseo->analaytics_settings['google_analytics_cb_pos']) ? $siteseo->analaytics_settings['google_analytics_cb_pos'] : '' ;
 		$bar_width = !empty($siteseo->analaytics_settings['google_analytics_cb_width']) ? $siteseo->analaytics_settings['google_analytics_cb_width'] : '';
-		$display_backrop = !empty($siteseo->analaytics_settings['google_analytics_cb_backdrop']) ?? '';
+		$display_backrop = !empty($siteseo->analaytics_settings['google_analytics_cb_backdrop']) ? true : '';
 
 		// colors load 
 		$backdrop_bg = !empty($siteseo->analaytics_settings['google_analytics_cb_backdrop_bg']) ? $siteseo->analaytics_settings['google_analytics_cb_backdrop_bg'] : '';
@@ -410,8 +419,8 @@ class GoogleAnalytics{
 			});';
 		}
 
-		if(!empty($siteseo->analaytics_settings['google_analytics_affiliate_tracking_enable']) && ! empty($options['google_analytics_affiliate_tracking'])){
-			$keywords = wp_json_encode( explode( ',', $options['google_analytics_affiliate_tracking']));
+		if(!empty($siteseo->analaytics_settings['google_analytics_affiliate_tracking_enable']) && ! empty($siteseo->analaytics_settings['google_analytics_affiliate_tracking'])){
+			$keywords = wp_json_encode( explode( ',', $siteseo->analaytics_settings['google_analytics_affiliate_tracking']));
 			echo 'const keywords = '.esc_attr($keywords).';
 			document.querySelectorAll("a").forEach(function(link){
 				keywords.forEach(function(keyword){

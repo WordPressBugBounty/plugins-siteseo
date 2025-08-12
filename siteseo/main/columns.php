@@ -113,7 +113,7 @@ class Columns{
 			case 'target_keyword':
 				if(!empty($options['appearance_canonical'])){
 					$keywords = esc_html(get_post_meta($post_id, '_siteseo_analysis_target_kw', true));
-					echo isset($keywords) ? esc_html($keywords) :'';
+					echo !empty($keywords) ? esc_html($keywords) : '';
 				}
 				break;
 				

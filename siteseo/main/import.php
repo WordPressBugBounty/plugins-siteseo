@@ -469,12 +469,12 @@ class Import{
 			}
 			
 			$meta_mapping = [
-				'_siteseo_titles_title' => $post_data['title'] ?? '',
-				'_siteseo_titles_desc' => $post_data['description'] ?? '',
-				'_siteseo_social_fb_img' => $post_data['facebook_image'] ?? '',
-				'_siteseo_social_twitter_img' => $post_data['twitter_image'] ?? '',
-				'_siteseo_robots_index' => ($post_data['noindex'] ?? false) ? '1' : '',
-				'_siteseo_robots_canonical' => $post_data['canonical'] ?? '',
+				'_siteseo_titles_title' => !empty($post_data['title']) ? $post_data['title'] : '',
+				'_siteseo_titles_desc' => !empty($post_data['description']) ? $post_data['description'] : '',
+				'_siteseo_social_fb_img' => !empty($post_data['facebook_image']) ? $post_data['facebook_image'] : '',
+				'_siteseo_social_twitter_img' => !empty($post_data['twitter_image']) ? $post_data['twitter_image'] : '',
+				'_siteseo_robots_index'         => isset($post_data['noindex']) && $post_data['noindex'] ? '1' : '',
+				'_siteseo_robots_canonical' => !empty($post_data['canonical']) ? $post_data['canonical'] : '',
 			];
 			
 			foreach($meta_mapping as $siteseo_key => $value){

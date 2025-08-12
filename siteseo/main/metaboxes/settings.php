@@ -216,6 +216,9 @@ class Settings{
 		
 		$pro_settings = isset($siteseo->pro) ? $siteseo->pro : '';
 		
+		// Checked x is enabled global settings
+		$enable_x_card = !empty($siteseo->social_settings['social_twitter_card']);
+		
 		$data_attr = [];
 		$data_attr['data_tax'] = '';
 		$data_attr['termId'] = '';
@@ -356,7 +359,9 @@ class Settings{
 			
 		$home_url = home_url();
 		$parsed_home_url = wp_parse_url($home_url);
-
+		
+		$ai_logo = SITESEO_ASSETS_URL . '/img/siteseo-ai.svg';
+		
 		$meta_desc_percentage = '1';
 		if(!empty($metabox_data['meta_desc'])){
 			$meta_desc_percentage = (strlen($metabox_data['meta_desc'])/160)*100;
@@ -406,7 +411,28 @@ class Settings{
 				'placeholder' => true,
 			)
 		);
-
+		
+		// if all x-settings empty then use same as og option enabled
+		$use_og_settings = (empty($metabox_data['x_title']) && empty($metabox_data['x_desc']) && empty($metabox_data['x_img']));
+		
+		// show image in preview
+		if(!empty($metabox_data['x_img'])){
+			$x_image = $metabox_data['x_img'];
+		} else if(!empty($metabox_data['fb_img']) && !empty($use_og_settings)){ // use og enabled
+			$x_image = $metabox_data['fb_img'];
+		} else{
+			$x_image = $social_placeholder;
+		}
+		
+		// x preview title
+		if(!empty($metabox_data['x_title'])){
+			$x_title_preview = $metabox_data['x_title'];
+		} else if($metabox_data['fb_title'] &&  !empty($use_og_settings)){
+			$x_title_preview = $metabox_data['fb_title'];
+		} else {
+			$x_title_preview = $social_preview_title;
+		}
+		
 		echo'<div class="siteseo-sidebar-tabs '.(empty($siteseo->display_ca_metaboxe) ? 'siteseo-sidebar-tabs-opened' : '').'"><span>'.esc_html__('Title', 'siteseo').'</span><span class="siteseo-sidebar-tabs-arrow"><span class="dashicons dashicons-arrow-down-alt2"></span></span></div>
 		<div class="siteseo-metabox-tab-title-settings siteseo-metabox-tab" style="'.(empty($siteseo->display_ca_metaboxe) ? 'display:block;' : '').'">
 		<div class="siteseo-metabox-option-wrap">
@@ -447,8 +473,11 @@ class Settings{
 				<div class="siteseo-metabox-tags">
 					<button type="button" class="siteseo-metabox-tag" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
 					<button type="button" class="siteseo-metabox-tag" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
-					<button type="button" class="siteseo-metabox-tag" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
-				</div>
+					<button type="button" class="siteseo-metabox-tag" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
+					if(defined('SITESEO_PRO_VERSION')){
+						echo'<span class="siteseo-ai-modal-open" data-context="site-page" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
+					}
+				echo'</div>
 				<input type="text" id="siteseo_titles_title_meta" class="siteseo_titles_title_meta" name="siteseo_titles_title" placeholder="'.(!empty($metabox_data['title']) ? esc_attr($metabox_data['title']) : esc_html__('Enter title for this post', 'siteseo')).'" value="'.(!empty($metabox_data['meta_title']) ? esc_html($metabox_data['meta_title']) : '').'"/>
 				<div class="siteseo-metabox-limits">
 					<span class="siteseo-metabox-limits-meter"><span style="width:'.esc_attr($meta_title_percentage).'%"></span></span>
@@ -462,9 +491,11 @@ class Settings{
 			</div>
 			<div class="siteseo-metabox-input-wrap">
 				<div class="siteseo-metabox-tags">
-					<button type="button" class="siteseo-metabox-tag" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
-					
-				</div>
+					<button type="button" class="siteseo-metabox-tag" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
+					if(defined('SITESEO_PRO_VERSION')){
+						echo'<span class="siteseo-ai-modal-open" data-context="site-page" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
+					}
+				echo'</div>
 				<textarea id="siteseo_titles_desc_meta" class="siteseo_titles_desc_meta" name="siteseo_titles_desc" rows="2" placeholder="'.esc_html__('Enter description for this post', 'siteseo').'">'.(!empty($metabox_data['meta_desc']) ? esc_html($metabox_data['meta_desc']) : '').'</textarea>
 				<div class="siteseo-metabox-limits">
 					<span class="siteseo-metabox-limits-meter"><span style="width:'.esc_attr($meta_desc_percentage).'%"></span></span>
@@ -487,7 +518,7 @@ class Settings{
 				</div>
 				<div class="siteseo-metabox-fb-preview">
 					<div class="siteseo-metabox-fb-image">
-						<img src="'.(!empty($metabox_data['fb_img']) ? esc_url($metabox_data['fb_img']) : esc_url($social_placeholder)).'" alt="Facebook preview" load="lazy"/>
+						<img src="'.(!empty($metabox_data['fb_img']) ? esc_url($metabox_data['fb_img']) : esc_url($social_placeholder)).'" alt="Facebook preview"/>
 					</div>
 					<div class="siteseo-metabox-fb-data">
 						<div class="siteseo-metabox-fb-host">'.(!empty($host_uri) ? esc_html($host_uri) : '').'</div>
@@ -505,8 +536,11 @@ class Settings{
 					<div class="siteseo-metabox-tags">
 						<button type="button" class="siteseo-facebook-title" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
 						<button type="button" class="siteseo-facebook-title" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
-						<button type="button" class="siteseo-facebook-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
-					</div>
+						<button type="button" class="siteseo-facebook-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
+						if(defined('SITESEO_PRO_VERSION')){
+							echo'<span class="siteseo-ai-modal-open" data-context="og" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
+						}
+					echo'</div>
 				</div>
 			</div>
 
@@ -517,8 +551,11 @@ class Settings{
 				<div class="siteseo-metabox-input-wrap">
 					<textarea id="siteseo_social_fb_desc_meta" class="siteseo_social_fb_desc_meta" name="siteseo_social_fb_desc" rows="2" placeholder="'.(!empty($social_preview_desc) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : '').'</textarea>
 					<div class="siteseo-metabox-tags">
-						<button type="button" class="siteseo-facebook-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
-					</div>
+						<button type="button" class="siteseo-facebook-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
+						if(defined('SITESEO_PRO_VERSION')){
+							echo'<span class="siteseo-ai-modal-open" data-context="og" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
+						}
+					echo'</div>
 				</div>
 			</div>
 
@@ -546,17 +583,38 @@ class Settings{
 				<div>
 				<div class="siteseo-metabox-x-preview">
 					<div class="siteseo-metabox-x-image">
-						<img src="'.(!empty($metabox_data['x_img']) ? esc_url($metabox_data['x_img']) : esc_url($social_placeholder)).'" alt="X preview" load="lazy"/>
+						<img src="'.($x_image ? esc_url($x_image) : '').'" alt="X preview"/>
 					</div>
 					<div class="siteseo-metabox-x-data">
-						<div class="siteseo-metabox-x-title">'.(!empty($metabox_data['x_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['x_title'], true)) : esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_title, true))).'</div>
+						<div class="siteseo-metabox-x-title">'.(!empty($x_title_preview) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($x_title_preview, true)) : '').'</div>
 					</div>
 				</div>
 				<div class="siteseo-metabox-x-host">From '.(!empty($host_uri) ? esc_html($host_uri) : '').'</div>
 				</div>
-			</div>
+			</div>';
 			
-			<div class="siteseo-metabox-option-wrap">
+			if(!empty($enable_x_card)){
+				
+				echo'<div class="siteseo-metabox-option-wrap">
+					<div class="siteseo-metabox-label-wrap">
+						<label>'.esc_html__('Use same as Facebook settings', 'siteseo').'</label>
+					</div>
+					<div class="siteseo-metabox-input-wrap">
+						<label class="siteseo-x-toggle-switch">';
+							$checked = !empty($metabox_data['x_title'] || $metabox_data['x_desc'] || $metabox_data['x_img']) ? '' : "checked=checked";
+							
+							echo'<input name="siteseo_social_use_og_settings" type="checkbox" '.esc_html($checked).'/>
+							<span class="siteseo-x-slider"></span>
+						</label>
+					</div>
+				</div>';
+			}
+			
+			if(!empty($enable_x_card)){
+				echo'<div class="siteseo-x-settings" '.(!empty($use_og_settings) ? 'style="display:none;"' : '').'>';
+			}
+			
+			echo'<div class="siteseo-metabox-option-wrap">
 				<div class="siteseo-metabox-label-wrap">
 					<label for="siteseo_social_twitter_title_meta">'.esc_html__('X Title', 'siteseo').'</label>
 				</div>
@@ -565,8 +623,11 @@ class Settings{
 					<div class="siteseo-metabox-tags">
 						<button type="button" class="siteseo-x-title" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
 						<button type="button" class="siteseo-x-title" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
-						<button type="button" class="siteseo-x-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
-					</div>
+						<button type="button" class="siteseo-x-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
+						if(defined('SITESEO_PRO_VERSION')){
+							echo'<span class="siteseo-ai-modal-open" data-context="twitter" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
+						}
+					echo'</div>
 				</div>
 			</div>
 			
@@ -577,8 +638,11 @@ class Settings{
 				<div class="siteseo-metabox-input-wrap">
 					<textarea id="siteseo_social_twitter_desc_meta" class="siteseo_social_twitter_desc_meta" name="siteseo_social_twitter_desc" rows="2" placeholder="'.(!empty($social_preview_desc) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true)) : '').'">'.(!empty($metabox_data['x_desc']) ? esc_attr($metabox_data['x_desc']) : '').'</textarea>
 					<div class="siteseo-metabox-tags">
-						<button type="button" class="siteseo-x-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags).'
-					</div>
+						<button type="button" class="siteseo-x-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
+						if(defined('SITESEO_PRO_VERSION')){
+							echo'<span class="siteseo-ai-modal-open" data-context="twitter" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
+						}
+					echo'</div>
 				</div>
 			</div>
 			
@@ -595,8 +659,13 @@ class Settings{
 					<input type="hidden" name="siteseo_social_twitter_img_height" id="siteseo_social_twitter_img_height" class="siteseo_social_twitter_img_height" value="">
 					<button class="components-button is-secondary" id="siteseo_social_twitter_img_upload">Upload Image</button>
 				</div>
-			</div>
-			</div>
+			</div>';
+
+			if(!empty($enable_x_card)){
+				echo'</div>';
+			}
+			
+			echo'</div>
 		</div>';
 		
 		if(!empty($pro_settings['enable_structured_data']) && !empty($pro_settings['toggle_state_stru_data']) && !empty($show_content_analysis)){
@@ -918,7 +987,7 @@ class Settings{
 					if(!empty($metabox_data['analysis_target_kw'])){
 						$tags_arr = explode(',', $metabox_data['analysis_target_kw']);
 						
-						if(!empty($tags_arr) && is_array($tags_arr)){
+						if(count($tags_arr) > 0){
 							foreach($tags_arr as $tag_name){
 								echo '<span class="siteseo-tag">'.esc_html($tag_name).'<span class="siteseo-remove-tag">×</span></span>';
 							}
@@ -1311,12 +1380,12 @@ class Settings{
 		exit;
 	}
 	
-	static function render_term_metabox($term){
+	static function render_term_metabox($term, $taxonomy_name = ''){
 		$metabox_data = self::metabox_term_data($term);
 		self::metabox_form_html($metabox_data);
 	}
 	
-	static function save_meta_terms($term_id){
+	static function save_meta_terms($term_id, $post_id = 0){
 
 		// Security Check
 		if(!isset($_POST['siteseo_metabox_nonce']) || !wp_verify_nonce(self::clean_post('siteseo_metabox_nonce'), 'siteseo_metabox_nonce') ){

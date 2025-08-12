@@ -37,8 +37,6 @@ function siteseo_suggestions_variable(){
 		'%%tag_title%%' => 'Tag title',
 		'%%tag_description%%' => 'Tag description',
 		'%%term_title%%' => 'Term title',
-		'%%tag_description%%' => 'Tag description',
-		'%%term_title%%' => 'Term title',
 		'%%term_description%%' => 'Term description',
 		'%%search_keywords%%' => 'Search keywords',
 		'%%current_pagination%%' => 'Current number page',
@@ -183,6 +181,10 @@ function siteseo_universal_assets(){
 			'site_url' => site_url(),
 			'metabox_url' => admin_url('admin.php?page=siteseo-metabox-wizard'),
 		]);
+
+		if(defined('SITESEO_PRO_VERSION') && class_exists('\SiteSEOPro\AI')){
+			add_action('wp_footer', '\SiteSEOPro\AI::modal');
+		}
 	}
 }
 

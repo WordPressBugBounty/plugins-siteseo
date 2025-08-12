@@ -530,7 +530,9 @@ class Analysis{
 				preg_match_all($pattern, $content, $matches);
 				$keyword_occurrence = count($matches[0]);
 			} else {
-				$keyword_occurrence = array_count_values($content_words)[$keyword] ?? 0;
+				$word_counts = array_count_values($content_words);
+				$keyword_occurrence = isset($word_counts[$keyword]) ? $word_counts[$keyword] : 0;
+
 			}
 		
 			// Calculate density as percentage
@@ -562,7 +564,7 @@ class Analysis{
 			) . 
 		'</p>';
 
-		if(empty($all_density)){
+		if(count($all_density) === 0){
 			return [
 				'label' => __('Keyword Density', 'siteseo'),
 				'status' => 'Error',
@@ -928,7 +930,7 @@ class Analysis{
 		$total_headings = count($heading_matches[0]);
 
 		
-		$h1_count = $heading_counts[1] ?? 0;
+		$h1_count = isset($heading_counts[1]) ? $heading_counts[1] : 0;
 		if($h1_count > 0){
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
 				/* translators: %d represents the number of h1 tags */
@@ -946,7 +948,7 @@ class Analysis{
 			$status_class = 'warning';
 		}
 		foreach([2, 3] as $level){
-			$level_count = $heading_counts[$level] ?? 0;
+			$level_count = isset($heading_counts[$level]) ? $heading_counts[$level] : 0;
 			$details .= '<p><span class="dashicons dashicons-info"></span>' .
 				/* translators: %d represents the heading */ 
 				sprintf(__('Found %1$d H%2$d heading(s)', 'siteseo'), $level_count, $level) . '</p>';
@@ -1133,12 +1135,13 @@ class Analysis{
 				preg_match_all($pattern, $permalink, $matches);
 				$keyword_occurrence = count($matches[0]);
 			} else {
-				$keyword_occurrence = array_count_values($content_words)[$keyword] ?? 0;
+				$word_counts = array_count_values($content_words);
+				$keyword_occurrence = isset($word_counts[$keyword]) ? $word_counts[$keyword] : 0;
 			}
 		
 			// Calculate density as percentage
 			$kw_density[] = ($keyword_occurrence * str_word_count($keyword) * 100)/$count_words;
-			if(!empty($kw_density)){
+			if(count($kw_density) > 0){
 				$matching_keywords[] = $keyword;
 				break;
 			}
@@ -1332,7 +1335,7 @@ class Analysis{
 			$data['passive_voice']['total_sentences'] = 0;
 		}
 
-		if(empty($sentences)){
+		if(count($sentences) === 0){
 			return;
 		}
 
