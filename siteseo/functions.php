@@ -236,3 +236,8 @@ function siteseo_user_can_metabox(){
 function siteseo_remove_elementor_description_meta_tag(){
 	remove_action('wp_head', 'hello_elementor_add_description_meta_tag');
 }
+
+function siteseo_plugin_update_notice_filter($plugins = []){
+	$plugins['siteseo/siteseo.php'] = 'SiteSEO';
+	return $plugins;
+}

@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,8 +39,8 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 - **Google Indexing API and IndexNow API** for quick content indexing.
 - **Content analysis** with unlimited keywords for optimized content creation.
 - **Google Knowledge Graph** support for better visibility.
-- **Social media previews** for Google, Facebook, and Twitter.
-- **Open Graph and Twitter Cards** integration for enhanced social media sharing.
+- **Social media previews** for Google, Facebook, and X(Twitter).
+- **Open Graph and X Cards** integration for enhanced social media sharing.
 - **Customizable titles and meta** descriptions with dynamic variables.
 - **Installation wizard** for hassle-free site setup.
 
@@ -50,6 +50,18 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 
 - **Enhanced WooCommerce Support:** Optimize e-commerce sites with price and currency meta tags, product XML sitemaps, and more.
 - **Google Page Speed Insights:** Analyze your site's performance on mobile and desktop, including Core Web Vitals.
+- **SitSEO AI:** Our AI integration generates SEO-friendly titles and meta descriptions. This helps improve your click-through rate (CTR) by making your content more appealing and discoverable in search results.
+- **Robots.txt Editor:** Edit the virtual robots.txt directly from SiteSEO, comes with shortcuts for common robots.txt rules.
+- **htaccess Editor:** Edit your htaccess file, comes with common htaccess rules you can use.
+- **Google News Sitemap:** Google news sitemaps are special sitemap, specifically for content, which is time bound, and helps in making content eligible to be shown on Google's News surface.
+- **Structured Data:** Helps search engines understand your website better, as it adds Structured data markup.
+- **Breadcrumbs:** Helps improve the navigation for users.
+- **Video Sitemap:** Helps search engines understand the video content on your website better.
+- **404 Monitoring and Redirection:** Monitor and redirect user who end up on a 404 page.
+- **Dublin Code:** Meta tags for title and description, support by Governments, directories, Bing and Yandex.
+- **Local Business:** Adds schema that helps search engines understand your local business well using data like address, opening hours, website, phone number and more.
+- **RSS Sitemap:** Gives search engines info about your recent feed.
+
 
 = Multi-language Support : =
 
@@ -108,6 +120,9 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.2.7 (August 13, 2025) =
+* [Bug Fix] When enqueuing CSS, the SiteSEO version was not getting added, so the CSS cache was not getting invalidated on new release, which was breaking UI for some users, this has been fixed.
 
 = 1.2.6 (August 12, 2025) =
 * [Pro Feature] Added AI-powered title and description generation in the metabox.

@@ -31,6 +31,12 @@ class Ajax{
 		add_action('wp_ajax_siteseo_save_universal_metabox', '\SiteSEO\Ajax::save_universal_metabox');
 		add_action('wp_ajax_siteseo_resolve_variables', '\SiteSEO\Ajax::resolve_variables');
 		add_action('wp_ajax_siteseo_clear_indexing_history', '\SiteSEO\Ajax::clear_indexing_history');
+		add_action('wp_ajax_siteseo_close_update_notice', '\SiteSEO\Ajax::close_update_notice');
+		
+		// This is just to make sure, close of update notice works.
+		if('siteseo_close_update_notice' === sanitize_text_field(wp_unslash($_GET['action']))){
+			add_filter('softaculous_plugin_update_notice', 'siteseo_plugin_update_notice_filter');
+		}
 		
 		// Onboarding Actions
 		add_action('wp_ajax_siteseo_save_onboarding_settings', '\SiteSEO\Ajax::save_onboarding_settings');
@@ -574,5 +580,29 @@ class Ajax{
 		}
     
 		wp_send_json_success();
+	}
+	
+	static function close_update_notice(){
+		check_ajax_referer('siteseo_promo_nonce', 'security');
+
+		if(!current_user_can('manage_options')){
+			wp_send_json_error('You don\'t have privilege to close this notice!');
+		}
+
+		$plugin_update_notice = get_option('softaculous_plugin_update_notice', []);
+		$available_update_list = get_site_transient('update_plugins');
+		$to_update_plugins = apply_filters('softaculous_plugin_update_notice', []);
+
+		if(empty($available_update_list) || empty($available_update_list->response)){
+			return;
+		}
+
+		foreach($to_update_plugins as $plugin_path => $plugin_name){
+			if(isset($available_update_list->response[$plugin_path])){
+				$plugin_update_notice[$plugin_path] = $available_update_list->response[$plugin_path]->new_version;
+			}
+		}
+
+		update_option('softaculous_plugin_update_notice', $plugin_update_notice);
 	}
 }

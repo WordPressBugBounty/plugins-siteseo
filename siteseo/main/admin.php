@@ -24,6 +24,26 @@ class Admin{
 			\SiteSEO\Settings\OnBoarding::init();
 		}
 		
+		// === Plugin Update Notice === //
+		if(current_user_can('administrator')){
+			$plugin_update_notice = get_option('softaculous_plugin_update_notice', []);
+			$available_update_list = get_site_transient('update_plugins'); 
+			$plugin_path_slug = 'siteseo/siteseo.php';
+
+			if(
+				!empty($available_update_list) &&
+				is_object($available_update_list) && 
+				!empty($available_update_list->response) &&
+				!empty($available_update_list->response[$plugin_path_slug]) && 
+				(empty($plugin_update_notice) || empty($plugin_update_notice[$plugin_path_slug]) || (!empty($plugin_update_notice[$plugin_path_slug]) &&
+				version_compare($plugin_update_notice[$plugin_path_slug], $available_update_list->response[$plugin_path_slug]->new_version, '<')))
+			){
+				add_action('admin_notices', '\SiteSEO\Admin::update_notice');
+				add_filter('softaculous_plugin_update_notice', 'siteseo_plugin_update_notice_filter');
+			}
+		}
+		// === Plugin Update Notice === //
+		
 		add_action('admin_menu', '\SiteSEO\Admin::add_menu');
 		
 		// We do not anything else after this.
@@ -80,7 +100,7 @@ class Admin{
 			return;
 		}
 
-		wp_enqueue_style('siteseo-admin-columns', SITESEO_ASSETS_URL.'/css/admin-columns.css');
+		wp_enqueue_style('siteseo-admin-columns', SITESEO_ASSETS_URL.'/css/admin-columns.css', [], SITESEO_VERSION);
 	}
 	
 	static function add_capabilities(){
@@ -382,11 +402,11 @@ class Admin{
 	}
 
 	static function header_enqueue($hook){
-		wp_enqueue_style('siteseo-admin', SITESEO_ASSETS_URL.'/css/header.css', SITESEO_VERSION);
+		wp_enqueue_style('siteseo-admin', SITESEO_ASSETS_URL.'/css/header.css', [], SITESEO_VERSION);
 
 		$allowed_pages = ['post.php', 'post-new.php', 'edit.php'];
 		if(in_array($hook, $allowed_pages)){
-			wp_enqueue_style('siteseo-metabox-pages',SITESEO_ASSETS_URL . '/css/header.css',SITESEO_VERSION);
+			wp_enqueue_style('siteseo-metabox-pages',SITESEO_ASSETS_URL . '/css/header.css', [], SITESEO_VERSION);
 		}
 	}
 
@@ -394,7 +414,7 @@ class Admin{
 		
 		$social_placeholder = SITESEO_ASSETS_URL . '/img/social-placeholder.png';
 		wp_enqueue_media();
-		wp_enqueue_style('siteseo-metabox-pages', SITESEO_ASSETS_URL.'/css/metabox.css');
+		wp_enqueue_style('siteseo-metabox-pages', SITESEO_ASSETS_URL.'/css/metabox.css', [], SITESEO_VERSION);
 		wp_enqueue_script('siteseo-metabox', SITESEO_ASSETS_URL.'/js/metabox.js', ['jquery'], SITESEO_VERSION, ['strategy'  => 'defer', 'in_footer' => true]);
 		wp_localize_script('siteseo-metabox', 'siteseoAdminAjax', [
 	            'url'   => admin_url('admin-ajax.php'), 
@@ -413,9 +433,8 @@ class Admin{
 			return;
 		}
 		
-		wp_enqueue_style('siteseo-admin-cookies', SITESEO_ASSETS_URL.'/css/cookies.css');
+		wp_enqueue_style('siteseo-admin-cookies', SITESEO_ASSETS_URL.'/css/cookies.css', [], SITESEO_VERSION);
 		wp_enqueue_script('siteseo-cookies-js', SITESEO_ASSETS_URL.'/js/cookies-bar.js', ['jquery'], SITESEO_VERSION, true);
-			
 	}
 
 	static function enqueue_script(){
@@ -429,8 +448,8 @@ class Admin{
 		if($is_admin || current_user_can('siteseo_manage')){
 			wp_enqueue_media();
 			wp_enqueue_script('siteseo-admin', SITESEO_ASSETS_URL.'/js/admin.js', ['jquery'], SITESEO_VERSION, true);
-			wp_enqueue_style('siteseo-admin-bar', SITESEO_ASSETS_URL .'/css/admin-bar.css');
-			wp_enqueue_style('siteseo-admin-pages', SITESEO_ASSETS_URL.'/css/siteseo.css');
+			wp_enqueue_style('siteseo-admin-bar', SITESEO_ASSETS_URL .'/css/admin-bar.css', [], SITESEO_VERSION);
+			wp_enqueue_style('siteseo-admin-pages', SITESEO_ASSETS_URL.'/css/siteseo.css', [], SITESEO_VERSION);
 
 			wp_localize_script('siteseo-admin', 'siteseoAdminAjax', array( 
 				'url'   => admin_url('admin-ajax.php'), 
@@ -614,5 +633,45 @@ class Admin{
 		remove_filter('update_footer', 'core_update_footer');
 
 		return ob_get_clean();
+	}
+	
+	static function update_notice(){
+		if(defined('SOFTACULOUS_PLUGIN_UPDATE_NOTICE')){
+			return;
+		}
+
+		$to_update_plugins = apply_filters('softaculous_plugin_update_notice', []);
+
+		if(empty($to_update_plugins)){
+			return;
+		}
+
+		/* translators: %1$s is replaced with a "string" of name of plugins, and %2$s is replaced with "string" which can be "is" or "are" based on the count of the plugin */
+		$msg = sprintf(__('New version of %1$s %2$s available. Updating ensures better performance, security, and access to the latest features.', 'siteseo'), '<b>'.esc_html(implode(', ', $to_update_plugins)).'</b>', (count($to_update_plugins) > 1 ? 'are' : 'is')) . ' <a class="button button-primary" href='.esc_url(admin_url('plugins.php?plugin_status=upgrade')).'>Update Now</a>';
+
+		define('SOFTACULOUS_PLUGIN_UPDATE_NOTICE', true); // To make sure other plugins don't return a Notice
+		echo '<div class="notice notice-info is-dismissible" id="siteseo-plugin-update-notice">
+			<p>'.$msg. '</p>
+		</div>';
+
+		wp_register_script('siteseo-update-notice', '', ['jquery'], '', true);
+		wp_enqueue_script('siteseo-update-notice');
+		wp_add_inline_script('siteseo-update-notice', 'jQuery("#siteseo-plugin-update-notice").on("click", function(e){
+			let target = jQuery(e.target);
+
+			if(!target.hasClass("notice-dismiss")){
+				return;
+			}
+
+			var data;
+			
+			// Hide it
+			jQuery("#siteseo-plugin-update-notice").hide();
+			
+			// Save this preference
+			jQuery.post("'.admin_url('admin-ajax.php?action=siteseo_close_update_notice').'&security='.wp_create_nonce('siteseo_promo_nonce').'", data, function(response) {
+				//alert(response);
+			});
+		});');
 	}
 }
