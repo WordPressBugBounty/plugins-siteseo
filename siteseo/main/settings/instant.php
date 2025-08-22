@@ -319,6 +319,10 @@ class Instant{
 		}
 
 		$options = $siteseo->instant_settings;
+		
+		if(!is_array($options)){
+			$options = [];
+		}
 
 		if(empty($_POST['siteseo_options'])){
 			return;

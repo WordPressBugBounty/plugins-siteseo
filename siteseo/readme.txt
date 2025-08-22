@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,12 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.2.8 (August 22, 2025) =
+* [Security-Fix] A Security issue reported by stealthcopter (Wordfence) has been fixed.
+* [Bug-Fix] Fixed an issue caused by a mismatch between the Free and Pro plugin versions.
+* [Bug-Fix] Fixed a minor error with the primary category breadcrumbs in WooCommerce products.
+* [Bug-Fix] Fixed a minor error with Instant Indexing page.
 
 = 1.2.7 (August 13, 2025) =
 * [Bug Fix] When enqueuing CSS, the SiteSEO version was not getting added, so the CSS cache was not getting invalidated on new release, which was breaking UI for some users, this has been fixed.

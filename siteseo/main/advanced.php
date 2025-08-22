@@ -112,8 +112,7 @@ class Advanced{
 	}
 
 	static function remove_noreferrer_from_post_content($content){
-
-		$content = preg_replace('/<a[^>]+rel=["\']?noreferrer["\']?[^>]*>/i', '<a', $content);
+		$content = preg_replace('/(<a\s+[^>]*rel=["\'][^"\']*?)(\s*\bnoreferrer\b\s*)([^"\']*["\'][^>]*>)/i', '$1$3', $content);
 		return $content;
 	}
 

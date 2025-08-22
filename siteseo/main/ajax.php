@@ -34,7 +34,7 @@ class Ajax{
 		add_action('wp_ajax_siteseo_close_update_notice', '\SiteSEO\Ajax::close_update_notice');
 		
 		// This is just to make sure, close of update notice works.
-		if('siteseo_close_update_notice' === sanitize_text_field(wp_unslash($_GET['action']))){
+		if(isset($_GET['action']) && 'siteseo_close_update_notice' === sanitize_text_field(wp_unslash($_GET['action']))){
 			add_filter('softaculous_plugin_update_notice', 'siteseo_plugin_update_notice_filter');
 		}
 		

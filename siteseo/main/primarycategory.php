@@ -65,10 +65,10 @@ class PrimaryCategory{
 		global $post;
 		$primary_cat_id = get_post_meta($post->ID, '_siteseo_robots_primary_cat', true);
 		
-		if($primary_cat_id && $primary_cat_id !== 'none'){
+		if(!empty($primary_cat_id) && $primary_cat_id !== 'none'){
 			$primary_cat = get_term($primary_cat_id, 'product_cat');
 			
-			if(!is_wp_error($primary_cat)){
+			if(!empty($primary_cat) && !is_wp_error($primary_cat)){
 				
 				$new_crumbs = [];
 				foreach($crumbs as $key => $crumb){
@@ -83,16 +83,20 @@ class PrimaryCategory{
 				
 				foreach($ancestors as $ancestor_id){
 					$ancestor = get_term($ancestor_id, 'product_cat');
-					$new_crumbs[] = [
-						$ancestor->name,
-						get_term_link($ancestor)
-					];
+					if(!empty($ancestor) && !is_wp_error($ancestor)){
+						$new_crumbs[] = [
+							$ancestor->name,
+							get_term_link($ancestor)
+						];
+					}
 				}
 				
-				$new_crumbs[] = [
-					$primary_cat->name,
-					get_term_link($primary_cat)
-				];
+				if(!empty($primary_cat) && !is_wp_error($primary_cat)){
+					$new_crumbs[] = [
+						$primary_cat->name,
+						get_term_link($primary_cat)
+					];
+				}
 				
 				if(count($crumbs) > 0){
 					$new_crumbs[] = $crumbs[count($crumbs) - 1];
