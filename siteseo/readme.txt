@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,15 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.2.9 (September 4, 2025) =
+* [Improvement] Added noindex for WooCommerce Cart, Checkout, and Account pages.
+* [Improvement]	Added JSON validator for custom schema.
+* [Improvement] Added lastmod in sitemap when a static page is set as the homepage.
+* [Improvement] Added lastmod in Taxonomies sitemap. 
+* [Bug-Fix] Fixed an issue in custom schema.
+* [Bug-Fix] Fixed issue where image count was not rendering in the sitemap.
+* [Bug-Fix] Fixed issue with the Clean Media Filename feature this has fixed.
 
 = 1.2.8 (August 22, 2025) =
 * [Security-Fix] A Security issue reported by stealthcopter (Wordfence) has been fixed.

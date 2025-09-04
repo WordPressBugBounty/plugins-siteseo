@@ -94,15 +94,8 @@ class ImageSeo{
 	
 	static function clean_media_filename($filename){
 		$filename = strtolower($filename);		
-		$filename = remove_accents($filename);
-		$filename = preg_replace('/[^a-z0-9-.]+/', '-', $filename);
+		$filename = preg_replace('/[^a-z0-9-._]+/', '-', $filename);
 		$filename = trim($filename, '-.');
-
-		$file_info = pathinfo($filename);
-		$name = $file_info['filename'];
-		$extension = isset($file_info['extension']) ? '.' . $file_info['extension'] : '';
-
-		$filename = $name . $extension;
 
 		return $filename;
 	}

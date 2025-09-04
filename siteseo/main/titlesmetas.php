@@ -178,6 +178,24 @@ class TitlesMetas{
 				if(!$robots['nofollow']){
 					$robots['follow'] = true;
 				}
+				
+				// woocommerce pages, cart page
+				if(function_exists('is_cart') && is_cart()){
+					unset($robots['index']);
+					$robots['noindex'] = true;
+				}
+				
+				// checkout page
+				if(function_exists('is_checkout') && is_checkout()){
+					unset($robots['index']);
+					$robots['noindex'] = true;
+				}
+				
+				// account page 
+				if(function_exists('is_account_page') && is_account_page()){
+					unset($robots['index']);
+					$robots['noindex'] = true;
+				}
 
 				return array_filter($robots);
 			}

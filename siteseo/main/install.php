@@ -112,7 +112,7 @@ class Install{
 		$sitemap_settings['xml_sitemap_post_types_list']['post']['include'] = true;
 		$sitemap_settings['xml_sitemap_post_types_list']['page']['include'] = true;
 		$sitemap_settings['xml_sitemap_taxonomies_list']['category']['include'] = true;
-		$sitemap_settings['xml_sitemap_taxonomies_list']['post_tag']['include'] = true;
+		$sitemap_settings['xml_sitemap_img_enable'] = true; 
 
 		// Advanced
 		$advanced_settings['advanced_attachments'] = true;

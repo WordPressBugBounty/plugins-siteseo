@@ -284,8 +284,26 @@ class Settings{
 			$post_type = $current_screen->post_type;
 		}
 
+		$site_title_placeholder = '';
+		$site_desc_placeholder = '';
 		$social_preview_title = '';
 		$social_preview_desc = '';
+		
+		if(!empty($post_type) && !empty($siteseo->titles_settings['titles_single_titles'][$post_type]['title'])){
+			$site_title_placeholder = $siteseo->titles_settings['titles_single_titles'][$post_type]['title'];
+		} elseif(!empty($taxonomy) && !empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy]['title'])){
+			$site_title_placeholder = $siteseo->titles_settings['titles_tax_titles'][$taxonomy]['title'];
+		} else{
+			$site_title_placeholder = $metabox_data['title'];
+		}
+		
+		if(!empty($post_type) && !empty($siteseo->titles_settings['titles_single_titles'][$post_type]['description'])){
+			$site_desc_placeholder = $siteseo->titles_settings['titles_single_titles'][$post_type]['description'];
+		} elseif(!empty($taxonomy) && !empty($siteseo->titles_settings['titles_tax_titles'][$taxonomy]['description'])){
+			$site_desc_placeholder =  $siteseo->titles_settings['titles_tax_titles'][$taxonomy]['description'];
+		} else{
+			$site_desc_placeholder = $metabox_data['excerpt'];
+		}
 
 		if(!empty($metabox_data['meta_title'])){
 			$social_preview_title = $metabox_data['meta_title'];
@@ -457,9 +475,9 @@ class Settings{
 						<svg focusable="false" xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
 						</div>
 					</div>
-					<h3>'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : (get_the_title() ? esc_html(get_the_title()) : 'Post Title here')).'</h3>
+					<h3>'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : (!empty($site_title_placeholder) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($site_title_placeholder, true)) : 'Post Title here')).'</h3>
 					<div class="siteseo-search-preview-description">
-						'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : (!empty($metabox_data['excerpt']) ? esc_html(substr($metabox_data['excerpt'], 0, 160)) : 'Post description')).'
+						'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : (!empty($site_desc_placeholder) ? esc_html(\SiteSEO\TitlesMetas::replace_variables(substr($site_desc_placeholder, 0, 160)),true) : 'Post description')).'
 					</div>
 					
 				</div>
@@ -478,7 +496,7 @@ class Settings{
 						echo'<span class="siteseo-ai-modal-open" data-context="site-page" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 					}
 				echo'</div>
-				<input type="text" id="siteseo_titles_title_meta" class="siteseo_titles_title_meta" name="siteseo_titles_title" placeholder="'.(!empty($metabox_data['title']) ? esc_attr($metabox_data['title']) : esc_html__('Enter title for this post', 'siteseo')).'" value="'.(!empty($metabox_data['meta_title']) ? esc_html($metabox_data['meta_title']) : '').'"/>
+				<input type="text" id="siteseo_titles_title_meta" class="siteseo_titles_title_meta" name="siteseo_titles_title" placeholder="'.(!empty($site_title_placeholder) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_title_placeholder, true)) : esc_html__('Enter title for this post', 'siteseo')).'" value="'.(!empty($metabox_data['meta_title']) ? esc_html($metabox_data['meta_title']) : '').'"/>
 				<div class="siteseo-metabox-limits">
 					<span class="siteseo-metabox-limits-meter"><span style="width:'.esc_attr($meta_title_percentage).'%"></span></span>
 					<span class="siteseo-metabox-limits-numbers"><em>'.esc_html(strlen($metabox_data['meta_title'])).'</em> out of 60 max recommended characters</span>
@@ -496,7 +514,7 @@ class Settings{
 						echo'<span class="siteseo-ai-modal-open" data-context="site-page" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 					}
 				echo'</div>
-				<textarea id="siteseo_titles_desc_meta" class="siteseo_titles_desc_meta" name="siteseo_titles_desc" rows="2" placeholder="'.esc_html__('Enter description for this post', 'siteseo').'">'.(!empty($metabox_data['meta_desc']) ? esc_html($metabox_data['meta_desc']) : '').'</textarea>
+				<textarea id="siteseo_titles_desc_meta" class="siteseo_titles_desc_meta" name="siteseo_titles_desc" rows="2" placeholder="'.(!empty($site_desc_placeholder) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_desc_placeholder, true)) : esc_html__('Enter description for this post', 'siteseo')).'">'.(!empty($metabox_data['meta_desc']) ? esc_html($metabox_data['meta_desc']) : '').'</textarea>
 				<div class="siteseo-metabox-limits">
 					<span class="siteseo-metabox-limits-meter"><span style="width:'.esc_attr($meta_desc_percentage).'%"></span></span>
 					<span class="siteseo-metabox-limits-numbers"><em>'.esc_html(strlen($metabox_data['meta_desc'])).'</em> out of 160 max recommended characters</span>

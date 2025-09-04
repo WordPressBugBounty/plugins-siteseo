@@ -160,6 +160,7 @@ class GenerateSitemap{
 <?xml-stylesheet type="text/xsl" href="' . esc_url($xsl_url) . '" ?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
+		// Post types
 		if(isset($siteseo->sitemap_settings['xml_sitemap_post_types_list'])){
 			foreach($siteseo->sitemap_settings['xml_sitemap_post_types_list'] as $post_type => $settings){
 				$posts = get_posts(
@@ -182,9 +183,21 @@ class GenerateSitemap{
 				$total_pages = (int) ceil(count($posts) / 1000);
 
 				if(!empty($settings['include']) && !empty($total_pages)){
+					$last_post = get_posts([
+						'post_type' => $post_type,
+						'numberposts' => 1,
+						'post_status' => 'publish',
+						'orderby' => 'modified',
+						'order' => 'DESC',
+						'fields' => 'ids',
+					]);
+					
+					$lastmod = !empty($last_post) ? get_post_modified_time('c', true, $last_post[0]) : current_time('c');
+					
 					for($page = 1; $page <= $total_pages; $page++){					
 						echo '<sitemap>
 							<loc>'.esc_url(home_url("/$post_type-sitemap$page.xml")).'</loc>
+							<lastmod>'.esc_xml($lastmod).'</lastmod>
 						</sitemap>';
 					}
 				}
@@ -207,9 +220,20 @@ class GenerateSitemap{
 				$total_pages = (int) ceil($tax_count/2000);
 				
 				if(!empty($settings['include'])){
+					$terms = get_terms([
+						'taxonomy' => $taxonomy,
+						'number' => 1,
+						'orderby' => 'term_order',
+						'order' => 'DESC',
+						'fields' => 'ids',
+					]);
+					
+					$lastmod = !empty($terms) ? current_time('c') : current_time('c'); // taxonomy terms don’t have modified, fallback
+					
 					for($page = 1; $page <= $total_pages; $page++){
 						echo '<sitemap>
 							<loc>'.esc_url(home_url("/$taxonomy-sitemap$page.xml")).'</loc>
+							<lastmod>'.esc_xml($lastmod).'</lastmod>
 						</sitemap>';
 					}
 				}
@@ -220,15 +244,19 @@ class GenerateSitemap{
 		if(!empty($siteseo->sitemap_settings['xml_sitemap_author_enable'])){
 			echo '<sitemap>
 				<loc>'.esc_url(home_url('/author.xml')).'</loc>
+				<lastmod>'.esc_xml(current_time('c')).'</lastmod>
 			</sitemap>';
 		}
 		
+		// Google News
 		if(!empty($pro_settings['google_news']) && !empty($pro_settings['toggle_state_google_news'])){
 			echo '<sitemap>
 				<loc>'.esc_url(home_url('/news.xml')).'</loc>
+				<lastmod>'.esc_xml(current_time('c')).'</lastmod>
 			</sitemap>';
 		}
-			
+		
+		// Video
 		if(!empty($pro_settings['toggle_state_video_sitemap']) && !empty($pro_settings['enable_video_sitemap'])){
 			$video_posts = get_posts([
 				'post_type' => 'any',
@@ -244,10 +272,26 @@ class GenerateSitemap{
 			
 			if(!empty($video_posts)){
 				$total_pages = (int) ceil(count($video_posts) / 1000);
+				$last_video = get_posts([
+					'post_type' => 'any',
+					'numberposts' => 1,
+					'orderby' => 'modified',
+					'order' => 'DESC',
+					'fields' => 'ids',
+					'meta_query' => [
+						[
+							'key' => '_siteseo_video_disabled',
+							'compare' => 'NOT EXISTS'
+						]
+					]
+				]);
 				
+				$lastmod = !empty($last_video) ? get_post_modified_time('c', true, $last_video[0]) : current_time('c');
+			
 				for($page = 1; $page <= $total_pages; $page++){
 					echo '<sitemap>
 						<loc>'.esc_url(home_url("/video-sitemap$page.xml")).'</loc>
+						<lastmod>'.esc_xml($lastmod).'</lastmod>
 					</sitemap>';
 				}
 			}
@@ -331,31 +375,44 @@ class GenerateSitemap{
 <?xml-stylesheet type="text/xsl" href="' . esc_url($xsl_url) . '" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '.((!empty($siteseo->sitemap_settings['xml_sitemap_img_enable'])) ? 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' : '').'>';
 
-		if($post_type == 'post' && self::$paged == 1){
-			echo "\t".'<url>
-		<loc>'.esc_url(home_url()).'</loc>
-	</url>';
+		if(self::$paged == 1){
+			if(get_option('show_on_front') === 'page' && get_option('page_on_front')){
+				echo "\t".'<url>
+				<loc>'.esc_url(trailingslashit(home_url())).'</loc>
+				<lastmod>'.esc_html(get_the_modified_date('c', get_option('page_on_front'))).'</lastmod>
+				</url>';
+			} else{
+				echo "\t".'<url>
+				<loc>'.esc_url(trailingslashit(home_url())).'</loc>
+				</url>';
+			}
 		}
 
 		foreach($posts as $post){
+				
+			if($post->ID == get_option('page_on_front')){
+				continue;
+			}
+			
 			$image_xml = '';
+			$image_count = 0;
 			if(!empty($siteseo->sitemap_settings['xml_sitemap_img_enable'])){
 				$images = self::get_page_images($post);
-
 				if(!empty($images)){
+					$image_count = count($images);
 					foreach($images as $image){
-						$image_xml .= "\t\t".'<image:image>'.PHP_EOL;
-						$image_xml .= "\t\t\t".'<image:loc>'.esc_url($image).'</image:loc>'.PHP_EOL;
-						$image_xml .= "\t\t".'</image:image>'.PHP_EOL;
+						$image_xml .= "\t\t<image:image>\n";
+						$image_xml .= "\t\t\t<image:loc>".esc_url($image)."</image:loc>\n";
+						$image_xml .= "\t\t</image:image>\n";
 					}
 				}
 			}
 
-			echo "\t".'<url>
-		<loc>'.esc_url(urldecode(get_permalink($post->ID))).'</loc>
-		'.esc_xml($image_xml).'
-		<lastmod>'.esc_html(get_the_modified_date('c', $post->ID)).'</lastmod>
-	</url>';
+			echo "\t<url imageCount=\"".esc_attr($image_count)."\">
+				<loc>".esc_url(get_permalink($post->ID))."</loc>
+				".esc_xml($image_xml)."
+				<lastmod>".esc_html(get_the_modified_date('c', $post->ID))."</lastmod>
+			</url>";
 		}
 
 		echo '</urlset>';
@@ -391,9 +448,30 @@ class GenerateSitemap{
 		]);
 
 		foreach($terms as $term){
+			
+			// most recent post in this term to determine lastmod date
+			$recent_posts = get_posts([
+				'tax_query' => [
+					[
+						'taxonomy' => $taxonomy,
+						'field' => 'term_id',
+						'terms' => $term->term_id,
+					]
+				],
+				'numberposts' => 1,
+				'orderby' => 'modified',
+				'order' => 'DESC',
+				'post_status' => 'publish'
+			]);
+			
+			if(empty($recent_posts)){
+				continue;
+			}
+			
 			echo "\t". '<url>
-		<loc>'.esc_url(urldecode(get_term_link($term))).'</loc>
-	</url>';
+			<loc>'.esc_url(get_term_link($term)).'</loc>
+			<lastmod>'.esc_html(get_the_modified_date('c', $recent_posts[0]->ID)).'</lastmod>
+			</url>';
 		}
 
 		echo '</urlset>';
@@ -419,9 +497,27 @@ class GenerateSitemap{
 		);
 
 		foreach($authors as $author){
+			// get the last modified date of the author's most recent post
+			$last_post = get_posts([
+				'author' => $author->ID,
+				'numberposts' => 1,
+				'orderby' => 'modified',
+				'order' => 'DESC',
+				'post_status' => 'publish'
+			]);
+			
+			$lastmod_date = '';
+			if(!empty($last_post)){
+				$lastmod_date = get_the_modified_date('c', $last_post[0]->ID);
+			} else{
+				// user registration date if no posts
+				$lastmod_date = gmdate('c', strtotime($author->user_registered));
+			}
+
 			echo "\t".'<url>
-		<loc>'.esc_url(urldecode(get_author_posts_url($author->ID))).'</loc>
-	</url>';
+			<loc>'.esc_url(get_author_posts_url($author->ID)).'</loc>
+			<lastmod>'.esc_html($lastmod_date).'</lastmod>
+		</url>';
 		}
 
 		echo '</urlset>';
@@ -517,9 +613,11 @@ class GenerateSitemap{
 		$generated_by = __('Generated by SiteSEO', 'siteseo');
 		$sitemap_index_txt = __('This XML Sitemap Index file contains', 'siteseo');
 		$sitemap_count_txt = __('This XML Sitemap contains', 'siteseo');
+		$image_count_txt = __('Images', 'siteseo');
 		$last_modified_txt = __('Last Modified', 'siteseo');
 		$index_sitemap_url = home_url('/sitemaps.xml');
 		
+		$image_sitemap_enabled = !empty($siteseo->sitemap_settings['xml_sitemap_img_enable']) ? true : false; 
 		$video_sitemap_enabled = !empty($pro_settings['toggle_state_video_sitemap']) && !empty($pro_settings['enable_video_sitemap']) ? true : false;
 		
 		header('Content-Type: application/xml; charset=UTF-8');
@@ -582,18 +680,22 @@ class GenerateSitemap{
 					}
 					.siteseo-sitemap-container{
 						width: 60%;
-						padding: 20px;
-						background-color: #ffffff;
-						box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-						border-radius: 8px;
 						margin: 0 auto;
-						overflow: auto;
+						margin-bottom: 10px;
 					}
 					.siteseo-sitemap-container a{
 						color:#007bff;
 						text-decoration: none;
 					}
-					
+
+					.siteseo-sitemap-table-wrap{
+						background-color: #ffffff;
+						box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+						border-radius: 8px;
+						margin-top:10px;
+						overflow:auto;
+					}
+
 					table{
 						width: 100%;
 						border-collapse: collapse;
@@ -605,7 +707,6 @@ class GenerateSitemap{
 					table th, table td{
 						padding: 10px;
 						text-align: left;
-						border: 1px solid #ddd;
 					}
 					table tbody tr:nth-child(even){
 						background-color: #f9f9f9;
@@ -659,63 +760,105 @@ class GenerateSitemap{
 					<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &lt; 1">
 					<a href="'.esc_url($index_sitemap_url).'">Index Sitemap</a>
 					</xsl:if>
-					<table>
-					<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &gt; 0">
-					<thead>
-						<tr><th>URL</th></tr>
-					</thead>
-					<tbody>
-						<xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">
+					<div class="siteseo-sitemap-table-wrap">
+						<table>
+						<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &gt; 0">
+						<thead>
 							<tr>
-								<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a></td>
+								<th>URL</th>
+								<th>Last Modified</th>
 							</tr>
-						</xsl:for-each>
-					</tbody>
-					</xsl:if>
-					
-					<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &lt; 1">';
-					
-					if($video_sitemap_enabled && class_exists('\SiteSEOPro\VideoSitemap') && method_exists('\SiteSEOPro\VideoSitemap', 'render_video_xsl')){
-						 echo'<xsl:if test="sitemap:urlset/sitemap:url/video:video">'
-								. \SiteSEOPro\VideoSitemap::render_video_xsl() .
-							'</xsl:if>
-							<xsl:if test="not(sitemap:urlset/sitemap:url/video:video)">
+						</thead>
+						<tbody>
+							<xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">
+								<tr>
+									<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a></td>
+									<td>
+										<xsl:value-of select="sitemap:lastmod"/>
+										<xsl:if test="not(sitemap:lastmod)">-</xsl:if>
+									</td>
+								</tr>
+							</xsl:for-each>
+						</tbody>
+						</xsl:if>
+						
+						<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &lt; 1">';
+						
+						if($video_sitemap_enabled && class_exists('\SiteSEOPro\VideoSitemap') && method_exists('\SiteSEOPro\VideoSitemap', 'render_video_xsl')){
+							 echo'<xsl:if test="sitemap:urlset/sitemap:url/video:video">'
+									. \SiteSEOPro\VideoSitemap::render_video_xsl() .
+								'</xsl:if>
+								<xsl:if test="not(sitemap:urlset/sitemap:url/video:video)">
+									<thead>
+										<tr>
+											<th>URL</th>';
+											if(!empty($image_sitemap_enabled)){
+												echo'<th>'.esc_xml($image_count_txt).'</th>';
+											}
+											
+										echo'<th>'.esc_xml($last_modified_txt).'</th>
+										</tr>
+									</thead>
+									<tbody>
+										<xsl:for-each select="sitemap:urlset/sitemap:url">
+											<tr>
+												<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a></td>';
+												
+												if(!empty($image_sitemap_enabled)){
+													echo'<td>
+														<xsl:choose>
+														  <xsl:when test="@imageCount">
+															<xsl:value-of select="@imageCount"/>
+														  </xsl:when>
+														  <xsl:otherwise>0</xsl:otherwise>
+														</xsl:choose>
+													</td>';
+												}
+												
+												echo'<td><xsl:value-of select="sitemap:lastmod"/></td>
+											</tr>
+										</xsl:for-each>
+									</tbody>
+								</xsl:if>';
+						} else {
+							echo'<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &lt; 1">
 								<thead>
 									<tr>
-										<th>URL</th>
-										<th>'.esc_xml($last_modified_txt).'</th>
+										<th>URL</th>';
+										
+										if(!empty($image_sitemap_enabled)){
+											echo'<th>'.esc_xml($image_count_txt).'</th>';
+										}
+										
+										echo'<th>'.esc_xml($last_modified_txt).'</th>
 									</tr>
 								</thead>
 								<tbody>
 									<xsl:for-each select="sitemap:urlset/sitemap:url">
 										<tr>
-											<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a></td>
-											<td><xsl:value-of select="sitemap:lastmod"/></td>
+											<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a></td>';
+											
+											if(!empty($image_sitemap_enabled)){
+												echo'<td>
+													<xsl:choose>
+													  <xsl:when test="@imageCount">
+														<xsl:value-of select="@imageCount"/>
+													  </xsl:when>
+													  <xsl:otherwise>0</xsl:otherwise>
+													</xsl:choose>
+												</td>';
+											}
+											
+											echo'<td><xsl:value-of select="sitemap:lastmod"/></td>
 										</tr>
 									</xsl:for-each>
 								</tbody>
-							</xsl:if>';
-					} else {
-						echo'<xsl:if test="count(sitemap:sitemapindex/sitemap:sitemap) &lt; 1">
-							<thead>
-								<tr>
-									<th>URL</th>
-									<th>'.esc_xml($last_modified_txt).'</th>
-								</tr>
-							</thead>
-							<tbody>
-								<xsl:for-each select="sitemap:urlset/sitemap:url">
-									<tr>
-										<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a></td>
-										<td><xsl:value-of select="sitemap:lastmod"/></td>
-									</tr>
-								</xsl:for-each>
-							</tbody>
-						  </xsl:if>';
-					}
-                   	
-					echo'</xsl:if>
-					</table>
+							  </xsl:if>';
+						}
+						
+						echo'</xsl:if>
+						</table>
+					</div>
 				</div>
 			</body>
 		</html>
