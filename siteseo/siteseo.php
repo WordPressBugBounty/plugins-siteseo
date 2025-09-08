@@ -4,7 +4,7 @@ Plugin Name: SiteSEO - SEO Simplified
 Plugin URI: http://wordpress.org/plugins/siteseo/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.2.9
+Version: 1.3.0
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.2.9');
+define('SITESEO_VERSION', '1.3.0');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -141,8 +141,8 @@ function siteseo_load_plugin(){
 		// Titles and Metas
 		add_action('wp_head', '\SiteSEO\TitlesMetas::add_nositelinkssearchbox', 1);
 		add_action('wp_head', '\SiteSEO\TitlesMetas::add_canonical_url', 1);
-		add_filter('wp_title', '\SiteSEO\TitlesMetas::modify_site_title', 10, 2);
-		add_filter('pre_get_document_title', '\SiteSEO\TitlesMetas::modify_site_title', 10);
+		add_filter('wp_title', '\SiteSEO\TitlesMetas::modify_site_title', 15, 2);
+		add_filter('pre_get_document_title', '\SiteSEO\TitlesMetas::modify_site_title', 15);
 		add_action('wp_head', '\SiteSEO\TitlesMetas::add_meta_description', 1);
 		add_filter('wp_robots', '\SiteSEO\TitlesMetas::advanced_metas', 999);
 		add_action('wp_head', '\SiteSEO\TitlesMetas::add_rel_link_pages', 9);

@@ -194,3 +194,10 @@ background-color: #003399;
 left: 27px;
 border-color: #003399;
 }
+
+.siteseo-header-version-badge{
+padding: 3px 10px;
+border-radius:6px;
+background-color:#f1f1f191;
+font-weight:500;
+}

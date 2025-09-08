@@ -323,10 +323,11 @@ class Dashboard{
 					<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Feedback</a>
 				</div>
 				<div class="siteseo-quick-access-item">
-					<span class="dashicons dashicons-star-filled"></span><a href="https://wordpress.org/support/plugin/siteseo/reviews/?rate=5#new-post" target="_blank">Rate Us</a>
+					<span class="dashicons dashicons-star-filled" style="color:#FFD700;"></span><a href="https://wordpress.org/support/plugin/siteseo/reviews/?rate=5#new-post" target="_blank">Rate Us</a>
 				</div>
 			</div>
 		</div>
+		<div class="siteseo-admin-softaculous-branding">SiteSEO - A Softaculous Product</div>
 		</section>
 	</div>
 	</div>

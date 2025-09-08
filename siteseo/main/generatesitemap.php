@@ -395,23 +395,21 @@ class GenerateSitemap{
 			}
 			
 			$image_xml = '';
-			$image_count = 0;
 			if(!empty($siteseo->sitemap_settings['xml_sitemap_img_enable'])){
 				$images = self::get_page_images($post);
 				if(!empty($images)){
-					$image_count = count($images);
 					foreach($images as $image){
-						$image_xml .= "\t\t<image:image>\n";
+						$image_xml .= "<image:image>\n";
 						$image_xml .= "\t\t\t<image:loc>".esc_url($image)."</image:loc>\n";
-						$image_xml .= "\t\t</image:image>\n";
+						$image_xml .= "\t\t</image:image>";
 					}
 				}
 			}
 
-			echo "\t<url imageCount=\"".esc_attr($image_count)."\">
+			echo "\t<url>
 				<loc>".esc_url(get_permalink($post->ID))."</loc>
-				".esc_xml($image_xml)."
 				<lastmod>".esc_html(get_the_modified_date('c', $post->ID))."</lastmod>
+				".$image_xml."
 			</url>";
 		}
 
@@ -463,14 +461,14 @@ class GenerateSitemap{
 				'order' => 'DESC',
 				'post_status' => 'publish'
 			]);
-			
+
+			$last_mod = '';
 			if(empty($recent_posts)){
-				continue;
+				$last_mod = "\n\t\t".'<lastmod>'.esc_html(get_the_modified_date('c', $recent_posts[0]->ID)).'</lastmod>';
 			}
 			
 			echo "\t". '<url>
-			<loc>'.esc_url(get_term_link($term)).'</loc>
-			<lastmod>'.esc_html(get_the_modified_date('c', $recent_posts[0]->ID)).'</lastmod>
+			<loc>'.esc_url(get_term_link($term)).'</loc>'.$last_mod.'
 			</url>';
 		}
 
@@ -806,12 +804,7 @@ class GenerateSitemap{
 												
 												if(!empty($image_sitemap_enabled)){
 													echo'<td>
-														<xsl:choose>
-														  <xsl:when test="@imageCount">
-															<xsl:value-of select="@imageCount"/>
-														  </xsl:when>
-														  <xsl:otherwise>0</xsl:otherwise>
-														</xsl:choose>
+														<xsl:value-of select="count(image:image)"/>
 													</td>';
 												}
 												
@@ -840,12 +833,7 @@ class GenerateSitemap{
 											
 											if(!empty($image_sitemap_enabled)){
 												echo'<td>
-													<xsl:choose>
-													  <xsl:when test="@imageCount">
-														<xsl:value-of select="@imageCount"/>
-													  </xsl:when>
-													  <xsl:otherwise>0</xsl:otherwise>
-													</xsl:choose>
+													<xsl:value-of select="count(image:image)"/>
 												</td>';
 											}
 											

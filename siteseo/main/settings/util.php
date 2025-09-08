@@ -58,6 +58,7 @@ class Util{
 				</div>
 			</div>
 			<div class="links">
+				<span class="siteseo-header-version-badge">v'.esc_html(SITESEO_VERSION).'</span>
 				<a target="_blank" href="https://siteseo.io/docs/">'.esc_html__('Docs', 'siteseo').'</a>
 				<a target="_blank" class="support" href="https://softaculous.deskuss.com/open.php">'.esc_html__('Support', 'siteseo').'</a>
 			</div>

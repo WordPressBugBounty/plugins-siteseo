@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,10 @@ Yes!
 
 == Changelog ==
 
+= 1.3.0 (September 8, 2025) =
+* [Bug-Fix] There was an issue with Title not working in some cases, fixed by increasing the filter priority.
+* [Bug-Fix] Sitemap issue of image sitemaps xml getting escaped and last mod having incorrect position has been fixed.
+
 = 1.2.9 (September 4, 2025) =
 * [Improvement] Added noindex for WooCommerce Cart, Checkout, and Account pages.
 * [Improvement]	Added JSON validator for custom schema.
@@ -128,7 +132,7 @@ Yes!
 * [Improvement] Added lastmod in Taxonomies sitemap. 
 * [Bug-Fix] Fixed an issue in custom schema.
 * [Bug-Fix] Fixed issue where image count was not rendering in the sitemap.
-* [Bug-Fix] Fixed issue with the Clean Media Filename feature this has fixed.
+* [Bug-Fix] Fixed issue with the Clean Media Filename feature.
 
 = 1.2.8 (August 22, 2025) =
 * [Security-Fix] A Security issue reported by stealthcopter (Wordfence) has been fixed.
