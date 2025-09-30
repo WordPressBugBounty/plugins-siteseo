@@ -244,7 +244,18 @@ jQuery(document).ready(function($){
 					}
 					errorSpan.text(isValid.message).show();
 					return;
-                }
+        }
+
+				var isValidImageFormat = validateImageFormat(attachment.url, buttonId.includes('facebook'));
+				if(!isValidImageFormat.valid){
+					var errorSpan = $('.' + inputClass).siblings('span');
+					if(errorSpan.length === 0){
+						$('.' + inputClass).after('<span class="error-message" style="color: yellow;"></span>');
+						errorSpan = $('.' + inputClass).siblings('span');
+					}
+					errorSpan.text(isValidImageFormat.message).show();
+					return;
+        }
 
 				$('.' + inputClass).siblings('span').hide();
 				$('.' + inputClass).val(attachment.url);
@@ -319,6 +330,36 @@ jQuery(document).ready(function($){
 		}
 		return { valid: true };
     }
+
+  function validateImageFormat(url, isFacebook){
+
+		var allowedExtensions = (isFacebook) ? ['jpeg', 'jpg', 'png', 'gif'] : ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+		var imageExtension = url.split('.').pop().toLowerCase();
+
+		if(!allowedExtensions.includes(imageExtension)){
+      return {
+				valid : false,
+				message : 'Only ' + allowedExtensions.join(', ').toUpperCase() + ' images are allowed.'
+			};
+    }
+
+    return {valid : true};
+	}
+
+	$(document).on('input paste', '#siteseo_social_fb_img_meta, #siteseo_social_twitter_img_meta', function(){
+    var errorSpan = $(this).siblings('span');
+    var imageUrl = $(this).val().trim();
+    errorSpan.text('').hide();
+
+    if(imageUrl.trim() !== ''){
+      var isFacebook = $(this).attr('id') === 'siteseo_social_fb_img_meta';
+      var isValidImageFormat = validateImageFormat(imageUrl, isFacebook);
+
+      if(!isValidImageFormat.valid){
+        errorSpan.text(isValidImageFormat.message).show();
+      }
+    }
+	});
 
 	$(document).on('widget-added widget-updated', init_uploaders);
 	

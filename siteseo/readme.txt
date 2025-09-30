@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 7.2
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,6 +120,12 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.3.1 (September 30, 2025) =
+* [Pro-Feature] Added Global Automatic Schema.
+* [Pro-Feature] Added LLMs.txt functionality.
+* [Bug-Fix] Fixed an issue where robots.txt did not display the default settings preview. 
+* [Bug-Fix] Tag sitemap was giving a PHP warning that has been fixed.
 
 = 1.3.0 (September 8, 2025) =
 * [Bug-Fix] There was an issue with Title not working in some cases, fixed by increasing the filter priority.

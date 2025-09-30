@@ -463,7 +463,7 @@ class GenerateSitemap{
 			]);
 
 			$last_mod = '';
-			if(empty($recent_posts)){
+			if(!empty($recent_posts)){
 				$last_mod = "\n\t\t".'<lastmod>'.esc_html(get_the_modified_date('c', $recent_posts[0]->ID)).'</lastmod>';
 			}
 			

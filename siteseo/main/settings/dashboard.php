@@ -34,6 +34,7 @@ class Dashboard{
 		$toggle_state_redirect = isset($pro['toggle_state_redirect_monitoring']) ? $pro['toggle_state_redirect_monitoring'] : '';
 		$toggle_state_google_news = isset($pro['toggle_state_google_news']) ? $pro['toggle_state_google_news'] : '';
 		$toggle_state_video_sitemap = isset($pro['toggle_state_video_sitemap']) ? $pro['toggle_state_video_sitemap'] : '';
+		$toggle_state_llm_txt = isset($pro['toggle_state_llm_txt']) ? $pro['toggle_state_llm_txt'] : '';
 
 		$nonce = wp_create_nonce('siteseo_toggle_nonce');
 
@@ -207,6 +208,7 @@ class Dashboard{
 			</div>
 
 			<div class="siteseo-card">
+				'.((time() < strtotime('30 November 2025')) ? '<span class="siteseo-feature-update-badge">Updated</span>' : '') .'
 				<div class="siteseo-card-body">
 					<span class="dashicons dashicons-list-view siteseo-card-icon"></span>
 					<h3>'.esc_html__('Structured Data','siteseo').'</h3>
@@ -297,6 +299,26 @@ class Dashboard{
 					
 					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
 						\SiteSEOPro\Settings\Util::render_toggle('video_sitemap', $toggle_state_video_sitemap, $pro_nonce, true);
+					}
+				echo'</div>
+			</div>
+
+			<div class="siteseo-card">
+				'.((time() < strtotime('30 November 2025')) ? '<span class="siteseo-feature-new-badge">New</span>' : '') .'
+				<div class="siteseo-card-body">
+					<span class="dashicons dashicons-media-text siteseo-card-icon"></span>
+					<h3>'.esc_html__('LLMs txt', 'siteseo').'</h3>
+					<p>'.esc_html__('Generate an llms.txt file with a single click to help AI crawlers better understand, index, and represent your business accurately.', 'siteseo').'</p>
+				</div>
+				<div class="siteseo-card-footer">';
+					if(defined('SITESEO_PRO_VERSION')){
+						echo'<a href="admin.php?page=siteseo-pro-page">'.esc_html__('Settings', 'siteseo').'</a>';
+					} else{
+						echo'<div class="siteseo-pro-badge">Pro</div>';
+					}
+					
+					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
+						\SiteSEOPro\Settings\Util::render_toggle('llm_txt', $toggle_state_llm_txt, $pro_nonce, true);
 					}
 				echo'</div>
 			</div>';

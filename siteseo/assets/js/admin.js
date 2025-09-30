@@ -134,12 +134,19 @@ jQuery(document).ready(function($){
         $(this).siblings('.siteseo-suggestions-wrapper').find('.siteseo-suggetion').toggle();
     });
 
-    $('.suggestions-container .section').click(function(e){
+    $('.siteseo-suggestions-container .section').click(function(e){
         e.preventDefault();
         e.stopPropagation();
         
-        var tag = $(this).find('.tag').text();
-        var targetField = $(this).closest('.siteseo-suggetion').closest('.wrap-tags').prev('input[type="text"], textarea');
+        let tag = $(this).find('.tag').text();
+    		let $wrapTags = $(this).closest('.siteseo-suggetion').closest('.wrap-tags');
+
+    		let targetField = $wrapTags.prev('input[type="text"], textarea');
+
+    		// for global schema
+    		if(targetField.length === 0){
+    			targetField = $wrapTags.find('input[type="text"], textarea');
+    		}
         
         insertAtCursor(targetField, tag);
         
@@ -152,29 +159,44 @@ jQuery(document).ready(function($){
         }
     });
 
-    $('.search-box').on('input', function(){
+    $('.siteseo-search-box').on('input', function(){
         var searchText = $(this).val().toLowerCase();
         $(this).closest('.siteseo-suggetion').find('.section').each(function() {
             var sectionText = $(this).text().toLowerCase();
             $(this).toggle(sectionText.indexOf(searchText) > -1);
         });
     });
+	
+	function insertAtCursor(field, text){
+		if(!field || field.length === 0) return;
 
-   function insertAtCursor(field, text){
 		field = field[0];
-		var scrollPos = field.scrollTop;
-		var currentValue = field.value;
+		let scroll_pos = field.scrollTop || 0;
+		let current_value = field.value;
 
-		//
-		var newValue = currentValue + text;
+		let caretPos = field.selectionStart,
+			before = current_value.substring(0, caretPos),
+			after = current_value.substring(caretPos);
 
-		field.value = newValue;
+		let hash_index = before.lastIndexOf('#');
 
-		//end point
-		var newPosition = newValue.length;
-		field.setSelectionRange(newPosition, newPosition);
+		if(hash_index !== -1){
+			// If '#' exists before the caret, replace the last '#' with a space and insert the text
+			before = before.substring(0, hash_index) + " ";
+			let new_value = before + text + after;
+			field.value = new_value;
 
-		field.scrollTop = scrollPos;
+			// Set caret after inserted text
+			let new_position = before.length + text.length;
+			field.setSelectionRange(new_position, new_position);
+		} else{
+			// If no '#', insert at the end, normal case
+			field.value = current_value + text;
+			let new_position = field.value.length;
+			field.setSelectionRange(new_position, new_position);
+		}
+
+		field.scrollTop = scroll_pos;
 		field.focus();
 	}
 

@@ -590,8 +590,11 @@ class SocialMetas{
 		
 		$site_title = esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_title));
 		$site_description = esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_description));
-
-		echo '<meta name="twitter:card" content="summary"/>';
+		$x_image_size = 'summary';
+		if(!empty($siteseo->social_settings['social_twitter_card_img_size']) && $siteseo->social_settings['social_twitter_card_img_size'] == 'Large'){
+			$x_image_size = 'summary_large_image';
+		}
+		echo '<meta name="twitter:card" content="'.esc_attr($x_image_size).'"/>';
 		
 		echo '<meta name="twitter:locale" content="'.esc_html(get_locale()).'"/>';
 		

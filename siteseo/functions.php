@@ -84,10 +84,10 @@ function siteseo_suggestion_button(){
 	echo '<button class="tag-select-btn"><span id="icon" class="dashicons dashicons-arrow-down-alt2"></span></button>
 	<div class="siteseo-suggestions-wrapper" style="position:relative;">
 	<div class="siteseo-suggetion">
-		<div class="search-box-container">
-			<input type="text" class="search-box" placeholder="Search a tag...">
+		<div class="siteseo-search-box-container">
+			<input type="text" class="siteseo-search-box" placeholder="Search a tag...">
 		</div>
-		<div class="suggestions-container">';
+		<div class="siteseo-suggestions-container">';
 		foreach($suggest_variable as $key =>$value){
 			echo '<div class="section">'.esc_html($value).'
 				<div class="item">
