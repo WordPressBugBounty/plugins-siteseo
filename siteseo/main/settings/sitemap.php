@@ -38,11 +38,11 @@ class Sitemap{
 		Util::render_toggle('Sitemaps - SiteSEO', 'sitemap_toggle', $sitemap_toggle, $nonce);
 
 		echo '<div id="siteseo-tabs" class="wrap">
-		<div class="nav-tab-wrapper">';
+		<div class="siteseo-nav-tab-wrapper">';
 
 		foreach($titles_meta_subtabs as $tab_key => $tab_caption){
-			$active_class = ($current_tab === $tab_key) ? ' nav-tab-active' : '';
-			echo '<a id="' . esc_attr($tab_key) . '-tab" class="nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
+			$active_class = ($current_tab === $tab_key) ? ' siteseo-nav-tab-active' : '';
+			echo '<a id="' . esc_attr($tab_key) . '-tab" class="siteseo-nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
 		}
 
 		echo '</div>
@@ -103,7 +103,7 @@ class Sitemap{
 	                <tr>
 	                    <th scope="row">'.esc_html__('Enable Image Sitemap','siteseo').'</th>
 	                    <td>
-	                        <label><input id="siteseo_image_sitemap" name="siteseo_options[enable_img_sitemap]" type="checkbox" '.(!empty($img_sitemap) ? 'checked' : '').' value="1"/>'. esc_html__('Enable Image Sitemap for standard images, image galleries, featured images, and WooCommerce product images.)', 'siteseo').'</label>
+	                        <label><input id="siteseo_image_sitemap" name="siteseo_options[enable_img_sitemap]" type="checkbox" '.(!empty($img_sitemap) ? 'checked' : '').' value="1"/>'. esc_html__('Enable Image Sitemap for standard images, image galleries, featured images, and WooCommerce / Kkart product images.)', 'siteseo').'</label>
 	                        <p class="description">'.esc_html__('Images in XML sitemaps are only visible from the source code.', 'siteseo').'</p>
 	                    </td>
 	                </tr>

@@ -275,6 +275,17 @@ class InstantIndexing{
 			return;
 		}
 		
+		if(empty($post) || empty($post->post_type)){
+			return;
+		}
+		
+		$post_type_object = get_post_type_object($post->post_type);
+		
+		// Need to make sure we submit posts whos post type is public
+		if(empty($post_type_object) || empty($post_type_object->public)){
+			return;
+		}
+
 		$options = get_option('siteseo_instant_indexing_option_name', []);
 
 		$bing_api_key = !empty($options['instant_indexing_bing_api_key']) ? $options['instant_indexing_bing_api_key'] : '';

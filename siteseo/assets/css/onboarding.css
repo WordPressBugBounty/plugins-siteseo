@@ -357,3 +357,140 @@ transform: rotate(0deg);
 transform: rotate(360deg);
 }	
 }
+
+.siteseo-notice{
+display: flex;
+align-items: center;
+justify-content: space-between;
+width: auto;
+max-width: 100%;
+padding: 10px 20px;
+margin: 10px 0;
+background-color: #fff;
+border-radius: 6px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+font-family: sans-serif;
+font-size: 14px;
+line-height: 1.5;
+border: 1px solid rgba(0,0,0,0.05);
+border-left-width: 5px;
+box-sizing: border-box;
+}
+
+.siteseo-notice p{
+margin: 0;
+}
+
+.siteseo-notice.is-success{
+border-left-color: #22c55e;
+background-color: #f0fdf4;
+color: #166534;
+}
+
+.siteseo-notice.is-error{
+border-left-color: #ef4444;
+background-color: #fef2f2;
+color: #991b1b;
+}
+
+/* google search console section */
+.siteseo-gsc-section{
+background-color: #141b38;
+padding: 25px;
+margin-top: 20px;
+color: white;
+border-radius: 12px;
+box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.siteseo-gsc-header{
+display: flex;
+align-items: flex-start;
+gap: 15px;
+margin-bottom: 20px;
+position: relative;
+}
+
+.siteseo-gsc-logo .dashicons-google{
+font-size: 40px;
+width: 40px;
+height: 40px;
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+line-height: 1; 
+}
+
+.siteseo-gsc-titles{
+flex: 1;
+}
+
+.siteseo-gsc-section h4{
+margin: 0 0 5px 0;
+font-size: 18px;
+font-weight: 700;
+color: white;
+line-height: 1.2;
+}
+
+.siteseo-gsc-subtitle{
+font-size: 13px;
+color: #aeb4c6;
+margin: 0;
+font-weight: 400;
+}
+
+.siteseo-badge-new{
+background-color: #10b981;
+color: #064e3b;
+font-size: 10px;
+font-weight: 800;
+text-transform: uppercase;
+padding: 4px 10px;
+border-radius: 12px;
+letter-spacing: 0.5px;
+white-space: nowrap;
+}
+
+.siteseo-gsc-list{
+margin-bottom: 25px;
+}
+
+.siteseo-gsc-list-item{
+display: flex;
+align-items: flex-start;
+gap: 10px;
+margin-bottom: 12px;
+font-size: 14px;
+line-height: 1.5;
+color: #f0f0f0;
+}
+
+.siteseo-check-icon{
+color: #10b981;
+flex-shrink: 0;
+margin-top: 3px;
+width: 16px;
+height: 16px;
+}
+
+.siteseo-btn-gsc{
+display: inline-block;
+width: auto;
+background-color: #ffffff;
+color: #141b38;
+border: none;
+padding: 10px 30px;
+border-radius: 6px;
+font-weight: 700;
+font-size: 14px;
+cursor: pointer;
+transition: all 0.2s ease;
+}
+
+.siteseo-btn-gsc:hover{
+background-color: #f0f0f0;
+transform: translateY(-1px);
+}

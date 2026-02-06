@@ -85,7 +85,7 @@ class OnBoarding{
 	}
 	
 	static function add_to_menu(){
-		add_submenu_page('', __('SiteSEO Onboarding', 'siteseo'), 'Onboarding', 'siteseo_manage', 'siteseo-onboarding', 'SiteSEO\Settings\Onboarding::wizard');
+		add_submenu_page('', __('SiteSEO Onboarding', 'siteseo'), 'Onboarding', 'manage_options', 'siteseo-onboarding', 'SiteSEO\Settings\Onboarding::wizard');
 	}
 	
 	static function page(){
@@ -377,8 +377,11 @@ echo '</head>
 					<label><input type="checkbox" name="category_url"/>'.esc_html__('Remove /category/ in your permalinks', 'siteseo').'</label>
 				</div>
 				<p class="siteseo-input-description">'.esc_html__('This reduces the length of the URL.', 'siteseo').'</p>
-			</div>
-			<div class="siteseo-onboarding-content-footer">
+			</div>';
+
+			do_action('siteseo_gsc_onboarding');
+
+			echo '<div class="siteseo-onboarding-content-footer">
 				<button class="siteseo-skip-step siteseo-btn secondary">'.esc_html__('Skip Step', 'siteseo').'</button><button class="siteseo-btn primary siteseo-save-n-continue">'.esc_html__('Save and Continue', 'siteseo').'<span class="siteseo-spinner"></span></button>
 			</div>
 		</form>
@@ -413,3 +416,4 @@ echo '</head>
 		</div>';
 	}
 }
+

@@ -304,16 +304,26 @@ jQuery(document).ready(function($){
 		$('.siteseo-tab').hide();
 
 		// remove classes
-		$('.nav-tab').removeClass('nav-tab-active');
+		$('.siteseo-nav-tab').removeClass('siteseo-nav-tab-active');
 		$('.siteseo-tab').removeClass('active');
 
-		if($('.nav-tab[data-tab="' + tabId + '"]').length){
-			$('[data-tab="' + tabId + '"]').addClass('nav-tab-active');
+		if($('.siteseo-nav-tab[data-tab="' + tabId + '"]').length){
+			$('[data-tab="' + tabId + '"]').addClass('siteseo-nav-tab-active');
 		} else{
-			$('#' + tabId + '-tab').addClass('nav-tab-active');
+			$('#' + tabId + '-tab').addClass('siteseo-nav-tab-active');
 		}
 		$('#' + tabId).addClass('active').show(); // show active tab
-		
+
+		// Hide save button
+		let exclude_tab = ['tab_siteseopro_robots_txt', 'tab_auto_schema', 'tab_siteseopro_htaccess'],
+		is_pro_exits = (typeof siteseo_pro !== 'undefined' && siteseo_pro.schema) ? true : false,
+		$save_btn = $('.siteseo-submit-button');
+
+		if((is_pro_exits && exclude_tab.includes(tabId))){
+			$save_btn.hide();
+		} else {
+			$save_btn.show();
+		}
 		// save ative tab 
 		localStorage.setItem('siteseo_active_tab', tabId);
 	}
@@ -330,7 +340,7 @@ jQuery(document).ready(function($){
 	}
 
 	// Click handler for navigation tabs
-	$('.nav-tab').on('click', function(e){
+	$('.siteseo-nav-tab').on('click', function(e){
 		e.preventDefault();
 		var tabId = $(this).data('tab') || $(this).attr('id').replace('-tab', '');
 		setActiveTab(tabId);

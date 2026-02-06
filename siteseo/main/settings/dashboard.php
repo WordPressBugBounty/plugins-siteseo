@@ -50,7 +50,7 @@ class Dashboard{
 
 		echo'<div id="siteseo-dashbord">';
 		
-		if(empty($dismissed_intro)){
+		if(empty($dismissed_intro) && !defined('SITEPAD')){
 			echo '<div class="siteseo-dashbord-intro">
 			   <div class="siteseo-text-content">
 					<h2>'.esc_html__('HOW-TO GET STARTED', 'siteseo').'</h2><h1>'.esc_html__('Welcome to SiteSEO!', 'siteseo').'</h1>
@@ -153,27 +153,27 @@ class Dashboard{
 					</div>
 				</div>
 			</div>';
+			if(!defined('SITEPAD')){
+				echo'<div class="siteseo-card">
+					<div class="siteseo-card-body">
+						<span class="dashicons dashicons-cart siteseo-card-icon"></span>
+						<h3>'.esc_html__('WooCommerces SEO','siteseo'),'</h3>
+						<p>'.esc_html__('Add meta tags required for WooCommerce SEO','siteseo').'</p>
+					</div>
+					<div class="siteseo-card-footer">';
+						if(defined('SITESEO_PRO_VERSION')){
+							echo'<a href="admin.php?page=siteseo-pro-page">'.esc_html__('Settings','siteseo').'</a>';
+						} else{
+							echo'<div class="siteseo-pro-badge">Pro</div>';
+						}
+						
+						if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
+							\SiteSEOPro\Settings\Util::render_toggle('woocommerce', $toggle_woocommerce, $pro_nonce, true);
+						} 
+					echo'</div></div>';
+			
 
-			echo'<div class="siteseo-card">
-				<div class="siteseo-card-body">
-					<span class="dashicons dashicons-cart siteseo-card-icon"></span>
-					<h3>'.esc_html__('WooCommerces SEO','siteseo'),'</h3>
-					<p>'.esc_html__('Add meta tags required for WooCommerce SEO','siteseo').'</p>
-				</div>
-				<div class="siteseo-card-footer">';
-					if(defined('SITESEO_PRO_VERSION')){
-						echo'<a href="admin.php?page=siteseo-pro-page">'.esc_html__('Settings','siteseo').'</a>';
-					} else{
-						echo'<div class="siteseo-pro-badge">Pro</div>';
-					}
-					
-					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
-						\SiteSEOPro\Settings\Util::render_toggle('woocommerce', $toggle_woocommerce, $pro_nonce, true);
-					} 
-				echo'</div>
-			</div>
-
-			<div class="siteseo-card">
+			echo '<div class="siteseo-card">
 				<div class="siteseo-card-body">
 					<span class="dashicons dashicons-money-alt siteseo-card-icon"></span>
 					<h3>'.esc_html__('Easy Digital Downloads', 'siteseo').'</h3>
@@ -189,10 +189,9 @@ class Dashboard{
 					if(class_exists('\SiteSEOPro\Settings\Util') && method_exists('\SiteSEOPro\Settings\Util', 'render_toggle')){
 						\SiteSEOPro\Settings\Util::render_toggle('edd', $toggle_easy_digital, $pro_nonce,true);
 					}
-				echo'</div>
-			</div>
-
-			<div class="siteseo-card">
+				echo'</div></div>';
+			}
+			echo '<div class="siteseo-card">
 				<div class="siteseo-card-body">
 					<span class="dashicons dashicons-code-standards siteseo-card-icon"></span>
 					<h3>'.esc_html__('Page Speed', 'siteseo').'</h3>
@@ -324,37 +323,79 @@ class Dashboard{
 			</div>';
 
 	echo'</div></section>';
-
-	echo'<section class="siteseo-dashboard-extras">';
-		if(defined('SITESEO_PRO_VERSION') && defined('SITESEO_PRO_AI_BUY')){
-			do_action('siteseo_pro_show_ai_tokens_sidebar');
-		}
-		echo '<div class="siteseo-need-help">
-			<p>Quick Access</p>
-			<div class="siteseo-quick-links">
-				<div class="siteseo-quick-access-item">
-					<span class="dashicons dashicons-format-status"></span>
-					<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Support</a>
-				</div>
-				<div class="siteseo-quick-access-item">
-					<span class="dashicons dashicons-media-document"></span>
-					<a href="https://siteseo.io/docs/" target="_blank">Documentation</a>
-				</div>
-				<div class="siteseo-quick-access-item">
-					<span class="dashicons dashicons-feedback"></span>
-					<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Feedback</a>
-				</div>
-				<div class="siteseo-quick-access-item">
-					<span class="dashicons dashicons-star-filled" style="color:#FFD700;"></span><a href="https://wordpress.org/support/plugin/siteseo/reviews/?rate=5#new-post" target="_blank">Rate Us</a>
+	
+	if(!defined('SITEPAD')){
+		echo'<section class="siteseo-dashboard-extras">';
+			if(defined('SITESEO_PRO_VERSION') && defined('SITESEO_PRO_AI_BUY')){
+				do_action('siteseo_pro_show_ai_tokens_sidebar');
+			}
+			echo '<div class="siteseo-need-help">
+				<p>Quick Access</p>
+				<div class="siteseo-quick-links">
+					<div class="siteseo-quick-access-item">
+						<span class="dashicons dashicons-format-status"></span>
+						<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Support</a>
+					</div>
+					<div class="siteseo-quick-access-item">
+						<span class="dashicons dashicons-media-document"></span>
+						<a href="https://siteseo.io/docs/" target="_blank">Documentation</a>
+					</div>
+					<div class="siteseo-quick-access-item">
+						<span class="dashicons dashicons-feedback"></span>
+						<a href="https://softaculous.deskuss.com/open.php?topicId=22" target="_blank">Feedback</a>
+					</div>
+					<div class="siteseo-quick-access-item">
+						<span class="dashicons dashicons-star-filled" style="color:#FFD700;"></span><a href="https://wordpress.org/support/plugin/siteseo/reviews/?rate=5#new-post" target="_blank">Rate Us</a>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="siteseo-admin-softaculous-branding">SiteSEO - A Softaculous Product</div>
-		</section>
-	</div>
-	</div>
-	</div>';
+			<div class="siteseo-admin-softaculous-branding">SiteSEO - A Softaculous Product</div>';
 
+			if(!defined('SITEPAD') && !defined('SITESEO_PRO_VERSION')){
+				self::pro_upsell();
+			}
+
+			echo '</section>';
+	}
+
+	echo '</div></div></div>';
+	}
+
+	static function pro_upsell(){
+
+		$features = [
+			'Search Statistics',
+			'Advanced Sitemaps',
+			'Redirection Management',
+			'AI-Generations Titles & Descriptions',
+			'LLMs.txt Support',
+			'and More…',
+		];
+
+		echo '<div class="siteseo-promo-modern-card">
+			<div class="siteseo-promo-header-group">
+			<h3 class="siteseo-promo-title">SiteSEO</h3>
+			<span class="siteseo-promo-badge-pro">Pro</span>
+			</div>
+
+			<p class="siteseo-promo-desc">'.esc_html__('Unlock advanced performance features.', 'siteseo').'</p>
+
+			<ul class="siteseo-promo-feature-list">';
+			foreach($features as $feature){
+				echo '<li class="siteseo-promo-feature-item">
+					<div class="siteseo-promo-check-circle">
+						<div class="siteseo-promo-check-icon"></div>
+					</div>
+					'.esc_html($feature).'
+				</li>';
+			}
+			echo '</ul>
+
+			<a href="https://siteseo.io/pricing/?utm_source=plugin_settings" class="siteseo-promo-btn-main" target="_blank">
+				<span class="siteseo-promo-btn-text">'.esc_html__('Upgrade to Pro', 'siteseo').'</span>
+				<span class="siteseo-promo-arrow">&rarr;</span>
+			</a>
+		</div>';
 	}
 
 }

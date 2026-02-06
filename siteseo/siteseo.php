@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: SiteSEO - SEO Simplified
-Plugin URI: http://wordpress.org/plugins/siteseo/
+Plugin URI: https://siteseo.io/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.3.1
+Version: 1.3.5
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.3.1');
+define('SITESEO_VERSION', '1.3.5');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -132,6 +132,11 @@ function siteseo_load_plugin(){
 	
 	if(!is_admin()){
 		// Code that will be used in the frontend will go here.
+
+		if(defined('WPB_VC_VERSION') && !empty($_GET['vc_editable']) && $_GET['vc_editable'] === 'true'){
+			return; // WPBakery
+		}
+
 		remove_action('wp_head', 'rel_canonical');
 		add_action('after_setup_theme', 'siteseo_remove_elementor_description_meta_tag');
 			
@@ -154,7 +159,7 @@ function siteseo_load_plugin(){
 		add_action('wp_head', '\SiteSEO\SocialMetas::twitter_card', 1);
 
 		// Sitemaps
-		add_action('init', '\SiteSEO\GenerateSitemap::settings');
+		add_action('init', '\SiteSEO\GenerateSitemap::settings', 5);
 
 		// Image & Advanced
 		add_action('wp_head', '\SiteSEO\Advanced::tags');

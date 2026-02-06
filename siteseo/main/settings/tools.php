@@ -24,30 +24,33 @@ class Tools{
 		echo '<form method="post" id="siteseo-form" class="siteseo-option" name="siteseo-flush">
 				<span id="siteseo-tab-title"><strong>'.esc_html__('Tools - SiteSEO','siteseo').'</strong></span><br/><br/>
 				<span class="line"></span>
-				<div style="siteseo-tools-page">
-					<h3>'.esc_html__('Import Settings From Other Plugins','siteseo').'</h3>
-					<div class="siteseo_wrap_label">
-						<p class="description">'.esc_html__('Import posts and terms metadata from the specified source', 'siteseo').'</p>
-					</div>
+				<div style="siteseo-tools-page">';
+					if(!defined('SITEPAD')){
+						echo '<h3>'.esc_html__('Import Settings From Other Plugins','siteseo').'</h3>
+						<div class="siteseo_wrap_label">
+							<p class="description">'.esc_html__('Import posts and terms metadata from the specified source', 'siteseo').'</p>
+						</div>
 
-					<p><select id="siteseo-plugin-selector">
-						<option value="none">'.esc_html__('Select an option', 'siteseo').'</option>';
-						foreach($plugins as $plugin => $name){
-							$plugin_slug = explode('/', $plugin);
-							$plugin = $plugin_slug[0];
+						<p><select id="siteseo-plugin-selector">
+							<option value="none">'.esc_html__('Select an option', 'siteseo').'</option>';
+							foreach($plugins as $plugin => $name){
+								$plugin_slug = explode('/', $plugin);
+								$plugin = $plugin_slug[0];
 
-							echo '<option value="'. esc_attr($plugin) . '-migration-tool">'.esc_html($name).'</option>';
+								echo '<option value="'. esc_attr($plugin) . '-migration-tool">'.esc_html($name).'</option>';
+							}
+
+						echo '</select></p>
+						<p class="description">' . esc_html__('You don\'t need to enable the selected SEO plugin to run the import.', 'siteseo').'</p>';
+					
+						foreach($plugins as $plugin =>$name){
+							self::display_plugins($plugin, $name);
 						}
 
-					echo '</select></p>
-					<p class="description">' . esc_html__('You don\'t need to enable the selected SEO plugin to run the import.', 'siteseo').'</p>';
-					
-					foreach($plugins as $plugin =>$name){
-						self::display_plugins($plugin, $name);
+						echo '<span class="line"></span>';
 					}
-
-					echo '<span class="line"></span>
-					<h3>'.esc_html__('Export plugin settings','siteseo').'</h3>
+					
+					echo '<h3>'.esc_html__('Export plugin settings','siteseo').'</h3>
 					<div class="siteseo_wrap_label">
 						<p class="description">'.esc_html__('Export the plugin settings for this site as a .json file, making it easy to import the configuration into another site.', 'siteseo').'</p>
 					</div>
@@ -102,12 +105,12 @@ class Tools{
 			<li>'. esc_html__('Twitter tags (title, description and image thumbnail)', 'siteseo') .'</li>
 			<li>'. esc_html__('Meta Robots (noindex, nofollow...)', 'siteseo') .'</li>
 			<li>'.esc_html__('Canonical URL', 'siteseo').'</li>';
-			
-			if($plugin !='slim-seo'){
+
+			if($plugin !='slim-seo' && $plugin != 'surerank'){
 				echo '<li>'. esc_html__('Focus / target keywords', 'siteseo') .'<li>';
 			}
 			
-			if($plugin != 'all-in-one-seo-pack' && $plugin !='slim-seo'){
+			if($plugin != 'all-in-one-seo-pack' && $plugin !='slim-seo' && $plugin != 'surerank'){
 				echo '<li>'. esc_html__('Primary category', 'siteseo') .'</li>';
 			}
 			

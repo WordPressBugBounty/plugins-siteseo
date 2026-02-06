@@ -2,9 +2,9 @@
 Contributors: pagelayer, softaculous
 Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.3.1
+Stable tag: 1.3.5
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,7 @@ You can find our official documentation at [https://siteseo.io/docs](https://sit
 - **Dublin Code:** Meta tags for title and description, support by Governments, directories, Bing and Yandex.
 - **Local Business:** Adds schema that helps search engines understand your local business well using data like address, opening hours, website, phone number and more.
 - **RSS Sitemap:** Gives search engines info about your recent feed.
+- **Search Statistics:** Seamlessly integrate Google Search Console and view all your search performance insights right within SiteSEO.
 
 
 = Multi-language Support : =
@@ -120,6 +121,43 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.3.5 (December 25, 2025) =
+* [Pro-Feature] Added a Schema importer, user can now import schema from URL, HTML, or JSON.
+* [Pro-Improvement] Added modification date support for the global Article schema.
+* [Bug-Fix] A function that required PHP 8+ has been replaced with a compatible alternative.
+* [Bug-Fix] Fixed a minor issue in the Organization schema.
+* [Bug-Fix] Fixed a minor issue in the importer when using custom meta.
+* [Task] Added a SureRank importer.
+
+= 1.3.4 (December 16, 2025) =
+* [Feature Pro] Search Statistics: Now get Google Search Console Integration, access Search console data right from your SiteSEO plugin.
+* [Feature Pro] Auto submission of website and sitemap to search console, part of the Search Statistics feature.
+* [Bug-Fix] Fixed an issue where the global description was not showing in the metabox preview.
+* [Bug-Fix] Made sitemap compatible for Polylang plugin.
+* [Bug-Fix] Fixed an issue where the analysis was not detecting the title, description, and keywords for other languages.
+* [Bug-Fix] Fixed an issue with the Twitter social tag where the Twitter username was not detected correctly.
+* [Task] Exclusion of non public post types from instant indexing.
+
+= 1.3.3 (November 17, 2025) =
+* [Security Fix] There was an issue reported by Supakiad S. (m3ez) - E-CQURITY(WordFence) which has been fixed.
+* [Minor Security Fix] There was an issue reported by Athiwat Tiprasaharn (Jitlada)(WordFence) which has been fixed.
+* [Improvement] Added product full description variable for schema.
+* [Improvement] Added product parent category variable.
+* [Bug-Fix] Fixed an issue with the product sitemap.
+* [Bug-Fix] Fixed an issue with the taxonomies sitemap.
+* [Bug-Fix] Fixed an issue where Bricks Builder post data could not be retrieved.
+* [Task] Minor refactor in breadcumb parent post handling.
+* [Task] Tested with WordPress 6.9.
+
+= 1.3.2 (October 30, 2025) =
+* [Minor Security Fix] There was an issue reported by Athiwat Tiprasaharn (Jitlada)(WordFence) which has been fixed.
+* [Improvement] Breadcrumbs now handles parent post.
+* [Improvement] Importer now converts the variables as well.
+* [Improvement] Password protected posts will now be no-indexed by default.
+* [Bug-Fix] There was an issue with Video Sitemap, which was causing it to make multiple video sitemap pages, this has been fixed.
+* [Bug-Fix] There was an issue with WP Bakery unable to save post, this has been fixed.
+* [Bug-Fix] Tabs UI was breaking in some cases this has been fixed.
 
 = 1.3.1 (September 30, 2025) =
 * [Pro-Feature] Added Global Automatic Schema.

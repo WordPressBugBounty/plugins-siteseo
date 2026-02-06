@@ -40,12 +40,12 @@ class Advanced{
 		Util::render_toggle('Image SEO & Advanced Settings - SiteSEO', 'advanced_toggle', $advanced_toggle, $nonce);
 
 		echo '<div id="siteseo-tabs" class="wrap">
-			<div class="nav-tab-wrapper">';
+			<div class="siteseo-nav-tab-wrapper">';
 
 		foreach($titles_meta_subtabs as $tab_key => $tab_caption){
 
-			$active_class = ($current_tab === $tab_key) ? ' nav-tab-active' : '';
-			echo '<a id="' . esc_attr($tab_key) . '-tab" class="nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
+			$active_class = ($current_tab === $tab_key) ? ' siteseo-nav-tab-active' : '';
+			echo '<a id="' . esc_attr($tab_key) . '-tab" class="siteseo-nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
 		}
 
 		echo '</div>		
@@ -131,7 +131,7 @@ class Advanced{
                         <label>
                             <input name="siteseo_options[auto_img_title]" type="checkbox"'.(!empty($option_img_title) ? 'checked="yes"' : '').' value="1"/>'.esc_html__('When uploading an image file, automatically set the title to match the filename.', 'siteseo'). 
                         '</label>
-                        <p class="description">'.esc_html__('We use the product title for WooCommerce items.','siteseo').'</p>
+                        <p class="description">' . esc_html__('We use the product title for ', 'siteseo') . esc_html(!defined('SITEPAD') ? 'WooCommerce' : 'Kkart') . esc_html__(' items.', 'siteseo') . '</p>
                     </td>
                 <tr>
 
@@ -184,6 +184,8 @@ class Advanced{
 
 		//$options = $siteseo->advanced_settings;
 		$options = get_option('siteseo_advanced_option_name');
+		
+		$platform_name = defined('SITEPAD') ? 'SitePad' : 'WordPress';
 
 		$option_taxonomy_desc = isset($options['advanced_tax_desc_editor']) ? $options['advanced_tax_desc_editor'] : '';
 		$option_category_url = isset($options['advanced_category_url']) ? $options['advanced_category_url'] : '';
@@ -249,10 +251,13 @@ class Advanced{
 				</tr>
 				
 				<tr>
-					<th scope="row" style="user-select:auto;">'.esc_html__('Remove WordPress meta generator tag','siteseo').'</th>
+					<th scope="row" style="user-select:auto;">'.
+					// translators: %s is the platform name
+					sprintf(esc_html__('Remove %s meta generator tag', 'siteseo'), esc_html( $platform_name )).'</th>
 					<td>
 						<label>
-							<input name="siteseo_options[wp_generator_meta]" type="checkbox"'.(!empty($option_wp_generator) ? 'checked="yes"' : '').' value="1"/>'.esc_html__('Remove WordPress meta generator in source code', 'siteseo'). 
+							<input name="siteseo_options[wp_generator_meta]" type="checkbox"'.(!empty($option_wp_generator) ? 'checked="yes"' : '').' value="1"/>'. // translators: %s is the platform name
+							sprintf(esc_html__('Remove %s meta generator in source code', 'siteseo'), esc_html( $platform_name)). 
 						'</label>
 						<div class="siteseo-styles pre"><pre>'.esc_html('<meta name="generator" content="WordPress '.(!empty($wp_version) ? $wp_version : '6.8.2').'" />').'</pre></div>
 					</td>
@@ -297,10 +302,14 @@ class Advanced{
 				</tr>
 				
 				<tr>
-					<th scope="row" style="user-select:auto;">'.esc_html__('Remove WordPress shortlink meta tag','siteseo').'</th>
+					<th scope="row" style="user-select:auto;">'.
+						// translators: %s is the platform name
+					    sprintf(esc_html__('Remove %s shortlink meta tag', 'siteseo'), esc_html( $platform_name)).
+					'</th>
 					<td>
 						<label>
-							<input name="siteseo_options[shortlink]" type="checkbox"'.(!empty($option_shortlink) ? 'checked="yes"' : '') .' value="1"/>'.esc_html__('Remove WordPress shortlink meta tag in source', 'siteseo'). 
+							<input name="siteseo_options[shortlink]" type="checkbox"'.(!empty($option_shortlink) ? 'checked="yes"' : '') .' value="1"/>'. // translators: %s is the platform name
+							sprintf(esc_html__('Remove %s shortlink meta tag in source.', 'siteseo'), esc_html( $platform_name )).
 						'</label>
 						
 						<div class="siteseo-styles pre"><pre>'.esc_html('<link rel="shortlink" href="https://www.example.com/"/>').'</pre></div>
@@ -324,7 +333,9 @@ class Advanced{
 						<label>
 							<input name="siteseo_options[rsd_meta]" type="checkbox"'.(!empty($option_rsd_meta_tag) ? 'checked="yes"' : ''). ' value="1"/>'. esc_html__('Remove the Really Simple Discovery (RSD) meta tag from the source code.', 'siteseo'). 
 						'</label>
-						<p class="description">'.esc_html__('The WordPress Site Health feature will display an HTTPS warning if you enable this option. However, this is a false positive.','siteseo').'</p>
+						<p class="description">'.
+						// translators: %s is the platform name
+						sprintf(esc_html__('The %s Site Health feature will display an HTTPS warning if you enable this option. However, this is a false positive.', 'siteseo'), esc_html($platform_name)).'</p>
 						<div class="siteseo-styles pre"><pre>' . esc_html('<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://www.example.com/wp-includes/wlwmanifest.xml" />') . '</pre></div>
 					</td>
 				</tr>
@@ -399,10 +410,13 @@ class Advanced{
 
 		$appearance_fields =[
 			'metaboxes'=>'Metaboxes',
-			'Admin-bar'=>'Admin bar',
 			'Columns' => 'Columns',
 			'Misc' =>'Misc',
 		];
+		
+		if(!defined('SITEPAD')){
+			$appearance_fields['admin-bar'] = 'Admin bar';
+		}
 		
 		echo '<table class="form-table">
 				<tbody>
@@ -427,15 +441,16 @@ class Advanced{
 								<h3>'.esc_html__('Metaboxes','siteseo').'</h3>
 								<p>'.esc_html__('Edit your SEO metadata directly from your favorite page builder.','siteseo').'</p>
 								<table class="form-table" id="metaboxes">
-									<tbody>
-										<tr>
+									<tbody>';
+									if(!defined('SITEPAD')){
+										echo '<tr>
 											<th scope="row">'.esc_html__('Universal Metabox (Gutenberg)','siteseo').'</th>
 											<td>
 												<label><input type="checkbox" name="siteseo_options[enable_universal_metabox]" '.(!empty($option_enable_universal_metabox) ? 'checked="yes"' : 'value="1"').' "/> ' . esc_html__('Enable the universal SEO metabox for the Block Editor (Gutenberg)', 'siteseo') . '<label>
 											</td>
-										</tr>
-										
-										<tr>
+										</tr>';
+									}
+										echo '<tr>
 											<th scope="row">'.esc_html__('Disable Universal Metabox','siteseo').'</th>
 											<td>
 												</label><input type="checkbox" name="siteseo_options[disable_universal_metabox]" '.(!empty($option_disable_universal_metabox) ? 'checked="yes"' : 'value="1"').' "/>'.esc_html__('Disable the universal SEO metabox','siteseo').'
@@ -465,31 +480,35 @@ class Advanced{
 											</td>
 										</tr>
 									</tbody>
-									</table>
-									<div id="Admin-bar">
-									<span class="line"></span>
-									<h3>'.esc_html__('Admin bar','siteseo').'</h3>
-									<p class="description">'.esc_html__('The admin bar appears on the top of your pages when logged in to your WP admin','siteseo').'</p>
-									<table>
-									<tbody>
-										<tr>
-											<th scope="row">'.esc_html__('SEO in admin bar','siteseo').'</th>
-											<td>
-												<label><input type="checkbox" '.(!empty($option_admin_bar) ? 'checked="yes"' : 'value="1"').' name="siteseo_options[admin_bar]"> '.esc_html__('Remove SEO from Admin Bar in backend and frontend', 'siteseo').'</label>
-											</td>
-										</tr>
-										
-										<tr>
-											<th scope="row">'.esc_html__('Noindex in admin bar','siteseo').'</th>
-											<td>
-												<label><input type="checkbox" '.(!empty($option_noindex_admin_bar) ? 'checked="yes"' : 'value="1"').' name="siteseo_options[noindex_admin_bar]"> '.esc_html__('Remove noindex item from Admin Bar in backend and frontend', 'siteseo').'</label>
-											</td>
-										</tr>
-										
-									</tbody>
-									</table>
-									</div>
-									<div id="Columns">
+									</table>';
+									
+									if(!defined('SITEPAD')){
+										echo'<div id="Admin-bar">
+										<span class="line"></span>
+										<h3>'.esc_html__('Admin bar','siteseo').'</h3>
+										<p class="description">'.esc_html__('The admin bar appears on the top of your pages when logged in to your WP admin','siteseo').'</p>
+										<table>
+										<tbody>
+											<tr>
+												<th scope="row">'.esc_html__('SEO in admin bar','siteseo').'</th>
+												<td>
+													<label><input type="checkbox" '.(!empty($option_admin_bar) ? 'checked="yes"' : 'value="1"').' name="siteseo_options[admin_bar]"> '.esc_html__('Remove SEO from Admin Bar in backend and frontend', 'siteseo').'</label>
+												</td>
+											</tr>
+											
+											<tr>
+												<th scope="row">'.esc_html__('Noindex in admin bar','siteseo').'</th>
+												<td>
+													<label><input type="checkbox" '.(!empty($option_noindex_admin_bar) ? 'checked="yes"' : 'value="1"').' name="siteseo_options[noindex_admin_bar]"> '.esc_html__('Remove noindex item from Admin Bar in backend and frontend', 'siteseo').'</label>
+												</td>
+											</tr>
+											
+										</tbody>
+										</table>
+										</div>';
+									}
+									
+									echo'<div id="Columns">
 									<span class="line"></span>
 									<h3>'.esc_html__('Columns','siteseo').'</h3>
 									<p>'.esc_html__('Customize the SEO columns displayed in the posts/pages list.','siteseo').'</p>
@@ -592,6 +611,16 @@ class Advanced{
 	static function security(){
 		global $siteseo, $wp_roles, $submenu;
 		
+		if(!current_user_can('administrator')){
+			echo '<div class="siteseo_wrap_label">
+				<div class="siteseo-notice is-warning">
+					<span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
+					<p>Only Admin can change security settings</p>
+				</div>
+			</div>';
+			return;
+		}
+
 		if(!empty($_POST['submit'])){
 			self::save_settings();
 		}
@@ -688,7 +717,6 @@ class Advanced{
 									'google-analytics' => esc_html__('Analytics', 'siteseo'),
 									'instant-indexing' => esc_html__('Instant Indexing', 'siteseo'),
 									'advanced' => esc_html__('Advanced', 'siteseo'),
-									'import-export' => esc_html__('Tools', 'siteseo')
 								];
 								
 								foreach($settings_pages as $page_key => $page_title){
@@ -711,7 +739,7 @@ class Advanced{
 								}
 
 								//Pro 
-								if(is_plugin_active('siteseo-pro/siteseo.php')){
+								if(is_plugin_active('siteseo-pro/siteseo.php') && !defined('SITEPAD')){
 									echo '<tr>
 										<th scope="row">' . esc_html__('Pro Features', 'siteseo') . '</th>
 										<td>';
@@ -892,7 +920,7 @@ class Advanced{
 		}
 		
 		
-		if(isset($_POST['siteseo_options']['security_tab'])){
+		if(isset($_POST['siteseo_options']['security_tab']) && current_user_can('manage_options')){
 			
 			$has_admin = ['security_metaboxe_role', 'security_metaboxe_ca_role'];
 			

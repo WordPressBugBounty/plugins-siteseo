@@ -291,6 +291,15 @@ class Analysis{
 		$keywords = get_post_meta($post->ID, '_siteseo_analysis_target_kw', true);
 		$meta_desc = get_post_meta($post->ID, '_siteseo_titles_desc', true);
 		
+		// Bricks
+		if(defined('BRICKS_DB_PAGE_CONTENT')){
+			$is_bricks_page = get_post_meta($post->ID, BRICKS_DB_PAGE_CONTENT, true);
+
+			if(!empty($is_bricks_page) && is_array($is_bricks_page)){
+				$content = self::get_bricks_page_content($is_bricks_page);
+			}
+		}
+			
 		if(empty($meta_desc)){
 			$meta_desc = '';
 		}
@@ -497,9 +506,9 @@ class Analysis{
 			'details' => $details
 		];
 	}
-	
+
 	static function check_keywords_density($content, $keywords){
-		$content = strtolower(wp_strip_all_tags($content));
+		$content = mb_strtolower(wp_strip_all_tags($content), 'UTF-8');
 		$keywords = array_filter(explode(',', trim($keywords)));
 		$content_words = str_word_count($content, 1);
 		$count_words = count($content_words);
@@ -522,11 +531,16 @@ class Analysis{
     
 		foreach($keywords as $keyword){
 			$keyword_occurrence = 0;
-			$keyword = strtolower(trim($keyword));
-			
-			// If keyword has multiple words
-			if(str_word_count($keyword) > 1){
-				$pattern = '/\b' . preg_quote($keyword, '/') . '\b/i';
+
+			$keyword = mb_strtolower(trim($keyword), 'UTF-8');
+
+			$keyword_words = preg_split('/\s+/u', $keyword, -1, PREG_SPLIT_NO_EMPTY);
+			$keyword_word_count = count($keyword_words);
+
+			// Count occurrences
+			if($keyword_word_count > 1){
+
+				$pattern = '/' . preg_quote($keyword, '/') . '/iu';
 				preg_match_all($pattern, $content, $matches);
 				$keyword_occurrence = count($matches[0]);
 			} else {
@@ -534,10 +548,14 @@ class Analysis{
 				$keyword_occurrence = isset($word_counts[$keyword]) ? $word_counts[$keyword] : 0;
 
 			}
-		
-			// Calculate density as percentage
-			$kw_density = ($keyword_occurrence * str_word_count($keyword) * 100)/$count_words;
-			
+
+			// Calculate density
+			if($count_words > 0){
+				$kw_density = ($keyword_occurrence * $keyword_word_count * 100) / $count_words;
+			} else {
+				$kw_density = 0;
+			}
+
 			$all_density[] = number_format($kw_density, 2);
 			
 			$density_details[] = 
@@ -547,7 +565,7 @@ class Analysis{
 				sprintf(
 					/* translators: %s represents a keyword density of */
 					esc_html__('%1$s was found %2$d times in your content, a keyword density of %3$s%%', 'siteseo'),
-					$keyword,
+					esc_html($keyword),
 					$keyword_occurrence,
 					number_format($kw_density, 2)
 				)
@@ -555,13 +573,12 @@ class Analysis{
 		}
 
 		$details .= implode('', $density_details);
-		
+
 		$details .= '<p class="description">'.
-			sprintf( 
-			/* translators: %s represents the keywords stuffing */
-				__('Find out more about <a href="%s" target="_blank">keywords stuffing</a>', 'siteseo'), 
+			sprintf(
+				__('Find out more about <a href="%s" target="_blank">keywords stuffing</a>', 'siteseo'),
 				'https://www.youtube.com/watch?v=Rk4qgQdp2UA'
-			) . 
+			) .
 		'</p>';
 
 		if(count($all_density) === 0){
@@ -592,19 +609,23 @@ class Analysis{
 		$status_class = 'good';
 		
 		$title = \SiteSEO\TitlesMetas::replace_variables($title);
+
+		// mb_strlen for correct UTF-8
+		$title_length = mb_strlen($title, 'UTF-8');
+
 		// length
 		if(empty($title)){
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
 			__('A custom title has not been set for this post. If the global meta title works for you, you can disregard this recommendation.', 'siteseo') . '</p>';
 			$status = 'Warning';
 			$status_class = 'warning';
-		} elseif(strlen($title) > 60){
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
+		} elseif($title_length > 60){
+			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' .
 			__('Your custom title is too lengthy.', 'siteseo') . '</p>';
 			$status = 'Warning';
 			$status_class = 'warning';
-		} elseif(strlen($title) >= 10 && strlen($title) <= 60){
-			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>' . 
+		} elseif($title_length >= 10 && $title_length <= 60){
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>' .
 			__('The length of your title is appropriate.', 'siteseo') . '</p>';
 		} else{
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
@@ -649,7 +670,10 @@ class Analysis{
 
 		$desc = !empty($meta_description) ? $meta_description : wp_trim_words($content, 20);
 		$description = \SiteSEO\TitlesMetas::replace_variables($desc);
-		
+
+		// UTF-8
+		$description_length = mb_strlen($description, 'UTF-8');
+
 		// desc length
 		if(empty($meta_description)){
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
@@ -657,11 +681,11 @@ class Analysis{
 				
 			$status = 'Warning';
 			$status_class = 'warning';
-		} elseif(strlen($description) > 160){
+		} elseif($description_length > 160){
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . __('Your custom meta description is too lengthy', 'siteseo') .'</p>';
 			$status = 'Warning';
 			$status_class = 'warning';
-		} elseif(strlen($description) >= 50 && strlen($description) <= 160){
+		} elseif($description_length >= 50 && $description_length <= 160){
 			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('The length of your meta description is appropriate.', 'siteseo').'</p>';
 		} else{
 			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('The description has been set properly.', 'siteseo').'</p>';
@@ -1386,4 +1410,19 @@ class Analysis{
 
 		return false;
 	}
+
+	static function get_bricks_page_content($bricks_page){
+
+		if(empty($bricks_page) || !is_array($bricks_page)){
+			return;
+		}
+
+		$content = \Bricks\Frontend::render_data($bricks_page);
+
+		$content = strip_shortcodes($content); // remove shortcodes
+		$content = wp_strip_all_tags($content); // remove HTML tags
+
+		return $content;
+	}
+
 }

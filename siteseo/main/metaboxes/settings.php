@@ -477,7 +477,7 @@ class Settings{
 					</div>
 					<h3>'.(!empty($metabox_data['meta_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_title'], true)) : (!empty($site_title_placeholder) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($site_title_placeholder, true)) : 'Post Title here')).'</h3>
 					<div class="siteseo-search-preview-description">
-						'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : (!empty($site_desc_placeholder) ? esc_html(\SiteSEO\TitlesMetas::replace_variables(substr($site_desc_placeholder, 0, 160)),true) : 'Post description')).'
+					'.(!empty($metabox_data['meta_desc']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['meta_desc'], true)) : (!empty($site_desc_placeholder) ? esc_html(substr(\SiteSEO\TitlesMetas::replace_variables($site_desc_placeholder, true), 0, 160)) : 'Post description')).'
 					</div>
 					
 				</div>
@@ -492,7 +492,7 @@ class Settings{
 					<button type="button" class="siteseo-metabox-tag" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
 					<button type="button" class="siteseo-metabox-tag" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
 					<button type="button" class="siteseo-metabox-tag" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
-					if(defined('SITESEO_PRO_VERSION')){
+					if(defined('SITESEO_PRO_VERSION') && !defined('SITEPAD')){
 						echo'<span class="siteseo-ai-modal-open" data-context="site-page" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 					}
 				echo'</div>
@@ -510,11 +510,11 @@ class Settings{
 			<div class="siteseo-metabox-input-wrap">
 				<div class="siteseo-metabox-tags">
 					<button type="button" class="siteseo-metabox-tag" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
-					if(defined('SITESEO_PRO_VERSION')){
+					if(defined('SITESEO_PRO_VERSION') && !defined('SITEPAD')){
 						echo'<span class="siteseo-ai-modal-open" data-context="site-page" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 					}
 				echo'</div>
-				<textarea id="siteseo_titles_desc_meta" class="siteseo_titles_desc_meta" name="siteseo_titles_desc" rows="2" placeholder="'.(!empty($site_desc_placeholder) ? esc_attr(\SiteSEO\TitlesMetas::replace_variables($site_desc_placeholder, true)) : esc_html__('Enter description for this post', 'siteseo')).'">'.(!empty($metabox_data['meta_desc']) ? esc_html($metabox_data['meta_desc']) : '').'</textarea>
+				<textarea id="siteseo_titles_desc_meta" class="siteseo_titles_desc_meta" name="siteseo_titles_desc" rows="2" placeholder="'.(!empty($site_desc_placeholder) ? esc_attr(substr(\SiteSEO\TitlesMetas::replace_variables($site_desc_placeholder, true), 0, 160)) : esc_html__('Enter description for this post', 'siteseo')).'">'.(!empty($metabox_data['meta_desc']) ? esc_html($metabox_data['meta_desc']) : '').'</textarea>
 				<div class="siteseo-metabox-limits">
 					<span class="siteseo-metabox-limits-meter"><span style="width:'.esc_attr($meta_desc_percentage).'%"></span></span>
 					<span class="siteseo-metabox-limits-numbers"><em>'.esc_html(strlen($metabox_data['meta_desc'])).'</em> out of 160 max recommended characters</span>
@@ -555,7 +555,7 @@ class Settings{
 						<button type="button" class="siteseo-facebook-title" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
 						<button type="button" class="siteseo-facebook-title" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
 						<button type="button" class="siteseo-facebook-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
-						if(defined('SITESEO_PRO_VERSION')){
+						if(defined('SITESEO_PRO_VERSION') && !defined('SITEPAD')){
 							echo'<span class="siteseo-ai-modal-open" data-context="og" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 						}
 					echo'</div>
@@ -570,7 +570,7 @@ class Settings{
 					<textarea id="siteseo_social_fb_desc_meta" class="siteseo_social_fb_desc_meta" name="siteseo_social_fb_desc" rows="2" placeholder="'.(!empty($social_preview_desc) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true)) : '').'">'.(!empty($metabox_data['fb_desc']) ? esc_html($metabox_data['fb_desc']) : '').'</textarea>
 					<div class="siteseo-metabox-tags">
 						<button type="button" class="siteseo-facebook-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
-						if(defined('SITESEO_PRO_VERSION')){
+						if(defined('SITESEO_PRO_VERSION') && !defined('SITEPAD')){
 							echo'<span class="siteseo-ai-modal-open" data-context="og" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 						}
 					echo'</div>
@@ -642,7 +642,7 @@ class Settings{
 						<button type="button" class="siteseo-x-title" data-tag="%%post_title%%"><span class="dashicons dashicons-plus"></span> Post Title</button>
 						<button type="button" class="siteseo-x-title" data-tag="%%sitetitle%%"><span class="dashicons dashicons-plus"></span> Site Title</button>
 						<button type="button" class="siteseo-x-title" data-tag="%%sep%%"><span class="dashicons dashicons-plus"></span>Seperator</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
-						if(defined('SITESEO_PRO_VERSION')){
+						if(defined('SITESEO_PRO_VERSION') && !defined('SITEPAD')){
 							echo'<span class="siteseo-ai-modal-open" data-context="twitter" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 						}
 					echo'</div>
@@ -657,7 +657,7 @@ class Settings{
 					<textarea id="siteseo_social_twitter_desc_meta" class="siteseo_social_twitter_desc_meta" name="siteseo_social_twitter_desc" rows="2" placeholder="'.(!empty($social_preview_desc) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_desc, true)) : '').'">'.(!empty($metabox_data['x_desc']) ? esc_attr($metabox_data['x_desc']) : '').'</textarea>
 					<div class="siteseo-metabox-tags">
 						<button type="button" class="siteseo-x-desc" data-tag="%%post_excerpt%%"><span class="dashicons dashicons-plus"></span> Post Excerpt</button>'.wp_kses(siteseo_suggestion_button_metabox(), $allowed_suggestion_tags);
-						if(defined('SITESEO_PRO_VERSION')){
+						if(defined('SITESEO_PRO_VERSION') && !defined('SITEPAD')){
 							echo'<span class="siteseo-ai-modal-open" data-context="twitter" title="SiteSEO AI Assistant"><img src="'.esc_url($ai_logo).'" alt="AI Assistant Icon">'.'<label class="siteseo-ai-modal-label">'.esc_html__('Ask AI', 'siteseo').'</label></span>';
 						}
 					echo'</div>
@@ -1345,7 +1345,7 @@ class Settings{
 		
 		set_current_screen($post->post_type);
 
-		echo '<style>body{height: 100vh;} #wpcontent,#wpbody-content,html.wp-toolbar{padding:0;} .postbox .handle-order-higher, .postbox .handle-order-lower,#minor-publishing-actions,.site-menu-header{display:none !important;} #adminmenumain, #wpfooter, #wpadminbar{display:none;} #wpcontent{margin:auto;} #wpbody-content{position:relative;} .siteseo-metabox-tab{background-color:white;} .siteseo-meta-submit-container{position:fixed;bottom: 20px;right : 20px;}  #siteseo_cpt form {position:relative;}.siteseo-btn{display: inline-flex;padding: 0.5rem 1rem;gap: 0.5rem;justify-content: center;align-items: center;border-radius: 0.375rem;font-size: 0.875rem;line-height: 1.25rem;font-weight: 500;white-space: nowrap;cursor:pointer;box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);border:none;text-decoration:none; text-align:center;}.siteseo-btn.primary{background-color:#141b38;color:white;}
+		echo '<style>body{height: 100vh;} #wpcontent,#wpbody-content,html.wp-toolbar{padding:0;} .postbox .handle-order-higher, .postbox .handle-order-lower,#minor-publishing-actions,.site-menu-header{display:none !important;} #adminmenumain, #wpfooter, #wpadminbar, #wpwrap > :first-child,  #wpwrap > :nth-child(2) .lnav-col{display:none;} #wpcontent{margin:auto;} #wpbody-content{position:relative;} .siteseo-metabox-tab{background-color:white;} .siteseo-meta-submit-container{position:fixed;bottom: 20px;right : 20px;}  #siteseo_cpt form {position:relative;}.siteseo-btn{display: inline-flex;padding: 0.5rem 1rem;gap: 0.5rem;justify-content: center;align-items: center;border-radius: 0.375rem;font-size: 0.875rem;line-height: 1.25rem;font-weight: 500;white-space: nowrap;cursor:pointer;box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);border:none;text-decoration:none; text-align:center;}.siteseo-btn.primary{background-color:#141b38;color:white;} #wpwrap > :nth-child(2) > div:nth-child(2){max-width:100%}
 		.siteseo-spinner{display:none;border-radius:50%;animation: siteseo-spinner 1s linear infinite;height: 0.9375rem;width: 0.9375rem;border: 2px solid #dddcdc80;border-left-color: #e3e3e3;} .siteseo-spinner-active{display:inline-block;} @keyframes siteseo-spinner{ 0% { transform: rotate(0deg);} 100% {transform: rotate(360deg);}} .components-button{align-items: center; -webkit-appearance: none; background: none; border: 0; border-radius: 2px; box-sizing: border-box; color:#1e1e1e; cursor: pointer;display: inline-flex; font-family: inherit; font-size: 13px; font-weight: 400; height: 36px; margin: 0; padding: 6px 12px; text-decoration: none; transition: box-shadow .1s linear;}.components-button.is-secondary {background: #0000; box-shadow: inset 0 0 0 1px #3858e9; color:#3858e9; outline: 1px solid #0000; white-space: nowrap;}.siteseo-sidebar-tabs{display:none;} .notice, .update-nag{ display: none !important;}</style>
 		<div id="siteseo_cpt"><form id="siteseo-universal-post" action="post.php" method="post">
 		<input type="hidden" name="post_id" value="'.esc_attr($post_id).'"/>';

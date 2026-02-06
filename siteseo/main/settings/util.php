@@ -51,18 +51,22 @@ class Util{
 		echo '<div class="siteseo-navbar">
 			<div class="logo">
 				<img alt="'.esc_html__('siteseo logo', 'siteseo').'" height="30" src="'. esc_url(SITESEO_ASSETS_URL).'/img/logo-24.svg'.'" width="40"/>
-				<div class="breadcrumb">
+				<div class="siteseo-breadcrumb">
 					<a href="#">'.esc_html__('Home', 'siteseo').'</a>
 					<span>/</span>
 					<a class="active" href="">'.esc_html(get_admin_page_title()).'</a>
 				</div>
-			</div>
-			<div class="links">
-				<span class="siteseo-header-version-badge">v'.esc_html(SITESEO_VERSION).'</span>
-				<a target="_blank" href="https://siteseo.io/docs/">'.esc_html__('Docs', 'siteseo').'</a>
-				<a target="_blank" class="support" href="https://softaculous.deskuss.com/open.php">'.esc_html__('Support', 'siteseo').'</a>
-			</div>
-		</div>';
+			</div>';
+			
+			echo'<div class="links">
+					<span class="siteseo-header-version-badge">v'.esc_html(SITESEO_VERSION).'</span>
+					<a target="_blank" href="https://siteseo.io/docs/">'.esc_html__('Docs', 'siteseo').'</a>';
+					
+					if(!defined('SITEPAD')){
+						echo'<a target="_blank" class="support" href="https://softaculous.deskuss.com/open.php?topicId=22">'.esc_html__('Support', 'siteseo').'</a>';
+					}
+				echo'</div>
+			</div>';
 	}
 	
 	static function importable_plugins(){
@@ -73,6 +77,7 @@ class Util{
 			'seo-by-rank-math/rank-math.php' => 'Rank Math',
 			'wp-seopress/seopress.php' => 'SEOPress',
 			'slim-seo/slim-seo.php' => 'Slim SEO',
+			'surerank/surerank.php' => 'Surerank'
 		];
 	}
 

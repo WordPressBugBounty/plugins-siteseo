@@ -39,11 +39,11 @@ class Titles{
 		Util::render_toggle('Titles & Metas - SiteSEO', 'titles_meta_toggle', $titles_meta_toggle, $nonce);
 
 		echo '<div id="siteseo-tabs" class="wrap">
-		<div class="nav-tab-wrapper">';
+		<div class="siteseo-nav-tab-wrapper">';
 		
 		foreach($titles_meta_subtabs as $tab_key => $tab_caption) {
-			$active_class = ($current_tab === $tab_key) ? ' nav-tab-active' : '';
-			echo '<a id="' . esc_attr($tab_key) . '-tab" class="nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
+			$active_class = ($current_tab === $tab_key) ? ' siteseo-nav-tab-active' : '';
+			echo '<a id="' . esc_attr($tab_key) . '-tab" class="siteseo-nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
 		}
 
 		echo '</div>     
@@ -91,7 +91,8 @@ class Titles{
 			echo'<div class="siteseo_wrap_label">
 				<div class="siteseo-notice is-warning">
 					<span id="dashicons-warning" class="dashicons dashicons-info"></span>&nbsp;
-					<p>'.wp_kses_post(__('A static page is set as your site front page <strong>(WP Dashboard > Settings > Reading)</strong>. To add an SEO title, description, and meta tags for the homepage, please click here -', 'siteseo')).'</p>
+					<p>'. // translators: %s is the platform name
+					wp_kses_post(sprintf(__('A static page is set as your site front page <strong>(%s Dashboard > Settings > Reading)</strong>. To add an SEO title, description, and meta tags for the homepage, please click here -', 'siteseo'), !defined('SITEPAD') ? 'WP' : 'Sitepad')) . '</p>
 					<div>
 						<a href="'.esc_url($edit_link).'" target="_blank">'.esc_html__('Edit Home Page', 'siteseo').'</a>
 					</div>

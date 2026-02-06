@@ -36,30 +36,69 @@ class SocialMetas{
 		//description
 		$site_url = get_site_url();
 		$site_description = get_bloginfo('name');
+		$site_language = get_bloginfo('language');
+
+		// logo
+		$logo_id = attachment_url_to_postid($org_logo);
+
+		// Defaults
+		$logo_width  = '';
+		$logo_height = '';
+
+		// Get image dimensions if attachment exists
+		if(!empty($logo_id)){
+			$image_data = wp_get_attachment_image_src($logo_id, 'full');
+			if(!empty($image_data)){
+				$logo_width = $image_data[1];
+				$logo_height = $image_data[2];
+			}
+		}
 
 		//JSON-LD data
 		$json_ld = [
 			'@context' => 'https://schema.org',
 			'@type' => $org_type ? esc_html($org_type) : 'Organization',
+			'@id' => esc_url(trailingslashit($site_url) . '#' . $org_type),
 			'name' => esc_html($org_name),
 			'url' => esc_url($site_url),
-			'logo' => esc_url($org_logo),
+			'logo' => array_filter([
+				'@type' => 'ImageObject',
+				'@id' => esc_url(trailingslashit($site_url) . '#logo'),
+				'url' => esc_url($org_logo),
+				'contentUrl' => esc_url($org_logo),
+				'caption' => esc_html($org_name),
+				'inLanguage' => esc_html($site_language),
+				'width' => $logo_width,
+				'height' => $logo_height,
+			]),
 			'description' => esc_html($site_description),
 		];
 
 		//contact point
-		if(!empty($org_contact_option) && !empty($org_contact_type) && !empty($org_number)){
+		if(!empty($org_contact_type) && !empty($org_number)){
 			$json_ld['contactPoint'] = [
 				'@type' => 'ContactPoint',
 				'contactType' => esc_html($org_contact_type),
 				'telephone' => esc_html($org_number),
-				'contactOption' => esc_html($org_contact_option),
 			];
+
+			if(!empty($org_contact_option) && $org_contact_option !== 'None'){
+				$contact_point['contactOption'] = esc_html($org_contact_option);
+			}
 		}
 
-		$same_as = array_filter([esc_url($fb_account), esc_url($twitter_account), esc_url($insta_account), esc_url($yt_account), esc_url($pt_account)]);
+		$x_url = 'https://x.com/'.$twitter_account;
+
+		$same_as = array_filter([
+			esc_url($fb_account), 
+			esc_url($x_url), 
+			esc_url($insta_account), 
+			esc_url($yt_account), 
+			esc_url($pt_account)
+		]);
+
 		if(!empty($same_as)){
-			$json_ld['sameAs'] = $same_as;
+			$json_ld['sameAs'] = array_values($same_as);
 		}
 
 		// Output JSON-LD script
@@ -101,7 +140,7 @@ class SocialMetas{
 			
 			// shop page woocommerces
 			if(function_exists('is_shop') && is_shop()){
-				$shop_page_id = wc_get_page_id('shop');
+				$shop_page_id = !defined('SITEPAD') ? wc_get_page_id('shop') : kkart_get_page_id('shop');
 				
 				$archive_title = '';
 				$archive_desc = '';
@@ -322,7 +361,7 @@ class SocialMetas{
 		}
 
 		if(!empty($og_description)){
-			echo '<meta property="og:description" content="'.esc_html(\SiteSEO\TitlesMetas::truncate_desc($og_description)).'" />';
+			echo '<meta property="og:description" content="'.esc_html($og_description).'" />';
 		}
 
 		if(!empty($og_img)){
@@ -358,7 +397,7 @@ class SocialMetas{
 		}
 
 		$site_url = get_home_url();
-		$sitename = get_bloginfo('name');
+		$twitter_user_name = !empty($siteseo->social_settings['social_accounts_twitter']) ? $siteseo->social_settings['social_accounts_twitter'] : '';
 
 		$post_id = isset($post) && is_object($post) ? $post->ID : '';
 		$site_title = get_the_title();
@@ -383,7 +422,7 @@ class SocialMetas{
 			
 			// woocommerce
 			if(function_exists('is_shop') && is_shop()){
-				$shop_page_id = wc_get_page_id('shop');
+				$shop_page_id = !defined('SITEPAD') ? wc_get_page_id('shop') : kkart_get_page_id('shop');
 				
 				$archive_title = '';
 				$archive_desc = '';
@@ -603,15 +642,16 @@ class SocialMetas{
 		}
 		
 		if(!empty($site_description)){
-			echo '<meta name="twitter:description" content="'.esc_html(\SiteSEO\TitlesMetas::truncate_desc($site_description)).'"/>';
+			echo '<meta name="twitter:description" content="'.esc_html($site_description).'"/>';
 		}
 		
 		if(!empty($site_url)){
 			echo '<meta name="twitter:url" content="'.esc_html($site_url).'"/>';
 		}
 		
-		if(!empty($sitename)){
-			echo '<meta name="twitter:site" content="@'.esc_html($sitename).'"/>';
+		if(!empty($twitter_user_name)){
+			$twitter_user_name = trim($twitter_user_name, '@');
+			echo '<meta name="twitter:site" content="@'.esc_html($twitter_user_name).'"/>';
 		}
 		
 		if(!empty($twitter_img)){

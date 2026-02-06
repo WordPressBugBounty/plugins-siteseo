@@ -36,11 +36,11 @@ class Instant{
 		Util::render_toggle('Instant Indexing - SiteSEO', 'indexing_toggle', $indexing_toggle, $nonce);
 
 		echo '<div id="siteseo-tabs" class="wrap">
-		<div class="nav-tab-wrapper">';
+		<div class="siteseo-nav-tab-wrapper">';
 
 		foreach($instant_subtabs as $tab_key => $tab_caption){
-			$active_class = ($current_tab === $tab_key) ? ' nav-tab-active' : '';
-			echo '<a id="'.esc_attr($tab_key).'-tab" class="nav-tab'.esc_attr($active_class).'" data-tab="'.esc_attr($tab_key).'">'.esc_html($tab_caption).'</a>';
+			$active_class = ($current_tab === $tab_key) ? ' siteseo-nav-tab-active' : '';
+			echo '<a id="'.esc_attr($tab_key).'-tab" class="siteseo-nav-tab'.esc_attr($active_class).'" data-tab="'.esc_attr($tab_key).'">'.esc_html($tab_caption).'</a>';
 		}
 
 		echo '</div>

@@ -77,7 +77,7 @@ class GenerateSitemap{
 		self::maybe_redirect();
 
 		// Output the Sitemap style
-		if(get_query_var('sitemap-stylesheet')){
+		if(get_query_var('sitemap-stylesheet') === 'sitemap'){
 			self::sitemap_xsl();
 			exit;
 		}
@@ -207,19 +207,24 @@ class GenerateSitemap{
 		// Taxonomies
 		if(isset($siteseo->sitemap_settings['xml_sitemap_taxonomies_list'])){
 			foreach($siteseo->sitemap_settings['xml_sitemap_taxonomies_list'] as $taxonomy => $settings){
-				$tax_count = wp_count_terms([
+				
+				$args = [
+					'taxonomy' => $taxonomy,
 					'hide_empty' => true,
+					'fields' => 'count',
 					'hierarchical' => false,
 					'update_term_meta_cache' => false,
-				]);
+				];
+				
+				$tax_count = get_terms($args);
 
-				if(empty($tax_count)){
-					return;
+				if(is_wp_error($tax_count) || $tax_count == 0){
+					continue;
 				}
 
 				$total_pages = (int) ceil($tax_count/2000);
 				
-				if(!empty($settings['include'])){
+				if(!empty($settings['include']) && $total_pages > 0){
 					$terms = get_terms([
 						'taxonomy' => $taxonomy,
 						'number' => 1,
@@ -228,10 +233,10 @@ class GenerateSitemap{
 						'fields' => 'ids',
 					]);
 					
-					$lastmod = !empty($terms) ? current_time('c') : current_time('c'); // taxonomy terms don’t have modified, fallback
+					$lastmod = !empty($terms) ? current_time('c') : current_time('c'); // taxonomy terms don't have modified, fallback
 					
 					for($page = 1; $page <= $total_pages; $page++){
-						echo '<sitemap>
+						echo '<sitemap>	
 							<loc>'.esc_url(home_url("/$taxonomy-sitemap$page.xml")).'</loc>
 							<lastmod>'.esc_xml($lastmod).'</lastmod>
 						</sitemap>';
@@ -259,9 +264,12 @@ class GenerateSitemap{
 		// Video
 		if(!empty($pro_settings['toggle_state_video_sitemap']) && !empty($pro_settings['enable_video_sitemap'])){
 			$video_posts = get_posts([
-				'post_type' => 'any',
+				'post_type' => $pro_settings['video_sitemap_posts'],
 				'fields' => 'ids',
-				'numberposts' => -1,
+				'numberposts' => 1,
+				'orderby' => 'modified',
+				'order' => 'DESC',
+				'fields' => 'ids',
 				'meta_query' => [
 					[
 						'key' => '_siteseo_video_disabled',
@@ -269,24 +277,9 @@ class GenerateSitemap{
 					]
 				]
 			]);
-			
-			if(!empty($video_posts)){
-				$total_pages = (int) ceil(count($video_posts) / 1000);
-				$last_video = get_posts([
-					'post_type' => 'any',
-					'numberposts' => 1,
-					'orderby' => 'modified',
-					'order' => 'DESC',
-					'fields' => 'ids',
-					'meta_query' => [
-						[
-							'key' => '_siteseo_video_disabled',
-							'compare' => 'NOT EXISTS'
-						]
-					]
-				]);
 				
-				$lastmod = !empty($last_video) ? get_post_modified_time('c', true, $last_video[0]) : current_time('c');
+				
+			$lastmod = !empty($video_posts) ? get_post_modified_time('c', true, $video_posts[0]) : current_time('c');
 			
 				for($page = 1; $page <= $total_pages; $page++){
 					echo '<sitemap>
@@ -294,7 +287,7 @@ class GenerateSitemap{
 						<lastmod>'.esc_xml($lastmod).'</lastmod>
 					</sitemap>';
 				}
-			}
+
 		}
 		
 		echo '</sitemapindex>';
@@ -358,6 +351,7 @@ class GenerateSitemap{
 			'orderby' => 'modified',
 			'has_password' => false,
 			'no_found_rows' => true,
+			'lang' => 'all',
 			'meta_query' => [
 			[
 				'key' => '_siteseo_robots_index',
@@ -438,6 +432,7 @@ class GenerateSitemap{
 			'offset' => $offset,
 			'hierarchical' => false,
 			'update_term_meta_cache' => false,
+			'lang' => 'all',
 			'meta_query' => [
 			[
 				'key' => '_siteseo_robots_index',

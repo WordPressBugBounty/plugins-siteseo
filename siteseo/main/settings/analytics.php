@@ -40,11 +40,11 @@ class Analytics{
 		Util::render_toggle('Analytics - SiteSEO', 'analytics_toggle', $analytics_toggle, $nonce);
         
 		echo '<div id="siteseo-tabs" class="wrap">
-			<div class="nav-tab-wrapper">';
+			<div class="siteseo-nav-tab-wrapper">';
 
 		foreach($analytics_sub_tags as $tab_key => $tab_caption){
-			$active_class = ($current_tab === $tab_key) ? ' nav-tab-active' : '';
-			echo '<a id="'.esc_attr($tab_key).'-tab" class="nav-tab'.esc_attr($active_class).'" data-tab="'.esc_attr($tab_key).'">'.esc_html($tab_caption).'</a>';
+			$active_class = ($current_tab === $tab_key) ? ' siteseo-nav-tab-active' : '';
+			echo '<a id="'.esc_attr($tab_key).'-tab" class="siteseo-nav-tab'.esc_attr($active_class).'" data-tab="'.esc_attr($tab_key).'">'.esc_html($tab_caption).'</a>';
 		}
 
 		echo '</div>
@@ -583,7 +583,7 @@ class Analytics{
 							<h3>'.esc_html__('Custom Dimensions', 'siteseo').'</h3>
 							<div class="siteseo_wrap_label"><p class="description">'.esc_html__('Set up your Google Analytics custom dimensions.', 'siteseo').'</p></div>
 							<div class="siteseo_wrap_label"><p class="description">'.esc_html__('Custom dimensions and metrics are similar to the default ones in Google Analytics, but you have the flexibility to create your own.', 'siteseo').'</p></div>
-							<div class="description"><p class="description">'.esc_html__('Utilize custom dimensions to gather and analyze data that Google Analytics does not track automatically.', 'siteseo').'</p><div>
+							<div class="description"><p class="description">'.esc_html__('Utilize custom dimensions to gather and analyze data that Google Analytics does not track automatically.', 'siteseo').'</p></div>
 							<div class="description"><p class="description">'.esc_html__('Remember, you must also configure your custom dimensions in your Google Analytics account. Click the help icon for more information.', 'siteseo').'</p></div>
 
 							<table class="form-table">

@@ -39,11 +39,11 @@ class Social{
 		Util::render_toggle('Social Networks - SiteSEO', 'social_toggle', $social_toggle, $nonce);
 
         echo '<div id="siteseo-tabs" class="wrap">
-        <div class="nav-tab-wrapper">';
+        <div class="siteseo-nav-tab-wrapper">';
 
         foreach($social_subtabs as $tab_key => $tab_caption){
-			$active_class = ($current_tab === $tab_key) ? ' nav-tab-active' : '';
-			echo '<a id="' . esc_attr($tab_key) . '-tab" class="nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
+			$active_class = ($current_tab === $tab_key) ? ' siteseo-nav-tab-active' : '';
+			echo '<a id="' . esc_attr($tab_key) . '-tab" class="siteseo-nav-tab' . esc_attr($active_class) . '" data-tab="' . esc_attr($tab_key) . '">' . esc_html($tab_caption) . '</a>';
         }
 
         echo '</div>
@@ -186,7 +186,7 @@ class Social{
 				<tr>
 					<th scope="row" style="user-select:auto;">'.esc_html__('X Username', 'siteseo').'</th>
 					<td>
-						<input type="text" name="siteseo_options[twitter]" placeholder="'.esc_html__('eg : @my_twitter_account','siteseo').'" value="'.esc_attr($twitter_acct).'">
+						<input type="text" name="siteseo_options[twitter]" placeholder="'.esc_html__('eg : x_username','siteseo').'" value="'.esc_attr($twitter_acct).'">
 					</td>
 				</tr>
 
