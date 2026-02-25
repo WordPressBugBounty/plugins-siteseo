@@ -2198,3 +2198,43 @@ display: block;
 white-space: nowrap;
 }
 }
+
+.siteseo-pro-tag{
+position:relative;
+display:inline-block;
+margin-left: 10px;
+padding: 3px;
+border-radius: 3px;
+background-color: gold;
+font-weight: 500;
+color: #212529de;
+font-size: 1.0rem;
+line-height: 1.1rem;
+}
+
+.siteseo-pro-tag::before{
+content: '';
+display: inline-block;
+position: absolute;
+background: rgba(255, 255, 255, 0.5);
+width: 10px;
+height: 100%;
+top: 0;
+left:0;
+filter:blur(3px);
+transform: skewX(-15deg);
+animation: siteseo-shine 2s ease-in-out infinite;
+}
+
+@keyframes siteseo-shine{
+	0% {
+		opacity: 0.5;
+		left: 60px;
+		transition-property: opacity, left;
+	},
+	100% {
+		opacity: 0.6;
+		left: 50px;
+		transition-property: opacity, left;
+	}
+}

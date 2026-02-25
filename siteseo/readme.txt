@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,13 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.3.6 (February  25, 2026) =
+
+* [Pro-Feature] Introduced the SEO Alert feature.
+* [Pro-Feature] Added support for custom Author base.
+* [Pro-Feature] Introduced Podcast feature.
+* [Bug Fix] Fixed an issue in the Local Business schema.
 
 = 1.3.5 (December 25, 2025) =
 * [Pro-Feature] Added a Schema importer, user can now import schema from URL, HTML, or JSON.

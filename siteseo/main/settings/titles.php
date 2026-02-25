@@ -327,7 +327,8 @@ class Titles{
 		$option_search_noindex = !empty($options['titles_archives_search_title_noindex']) ? $options['titles_archives_search_title_noindex'] : '';
 		$option_404_title = !empty($options['titles_archives_404_title']) ? $options['titles_archives_404_title'] : '';
 		$option_404_desc = !empty($options['titles_archives_404_desc']) ? $options['titles_archives_404_desc'] : '';
-    
+		$author_base_url = !empty($options['author_base_url']) ? $options['author_base_url'] : 'author';
+
 		$archives_fields = [
 			'author-archives' => 'Author archives',
 			'date-archives'   => 'Date archives',
@@ -395,7 +396,16 @@ class Titles{
 							' . esc_html__('Disable author archives', 'siteseo') . '
 							</label>
 						</div>
-						<span class="line"><span>
+
+						<div class="siteseo_wrap_label"><p style="font-weight: 500;">'.esc_html__('Author base', 'siteseo');
+						if(!defined('SITESEO_PRO_VERSION')){
+							echo'<span class="siteseo-pro-tag">Pro</span>';
+						}
+
+						echo'</p></div>
+						<input type="text" name="siteseo_options[author_base]" value="' . esc_attr($author_base_url) . '" ' .(!defined('SITESEO_PRO_VERSION') ? 'disabled="disabled" style="cursor:not-allowed;"' : '').'>
+						<div class="siteseo_wrap_label"><p>'.esc_html__('Change the /author/ slug used in author archive URLs.', 'siteseo').'</p>
+
 					</div>
     
 					<div id="date-archives">
@@ -858,6 +868,8 @@ class Titles{
 				$options['titles_tax_titles'][$taxonomy]['nofollow'] = isset($_POST['siteseo_options'][$taxonomy]['nofollow']);
 			}
         }
+
+        $options = apply_filters('siteseo_titles_save_settings', $options);
 
         update_option('siteseo_titles_option_name', $options);
     }
