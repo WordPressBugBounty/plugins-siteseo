@@ -213,6 +213,20 @@ class Analysis{
 							return $a_order - $b_order;
 						});
 
+						// score logic
+						if(isset($seo_analysis['total_score'])){
+							$score = round($seo_analysis['total_score']);
+							if($score < 50){
+								$color = '#f33'; // error
+							} elseif($score < 80){
+								$color = '#fa3'; // warning
+							} else{
+								$color = '#0c6';  // good
+							}
+
+							echo '<div class="siteseo-score-circle" style="background:'.esc_attr($color).';">'.esc_html($score).'%</div>';
+						}
+
 						echo '<div class="siteseo-analysis-summary-pill">';
 							// counts logic
 							if(!empty($seo_analysis['error_count'])){
@@ -226,22 +240,19 @@ class Analysis{
 							if(!empty($seo_analysis['good_count'])){
 								echo '<span><svg xmlns="http://www.w3.org/2000/svg" fill="#0c6" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"/></svg><span>'.esc_html($seo_analysis['good_count']). ' Good</span></span>';
 							}
+						echo '</div>';
+					}
 					
-						echo '</div>
-					</div><!-- .analysis-score -->';
+				echo '</div><!-- .analysis-score -->';
 
-				 // A triangle with exclamation in it.
-				$medium_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>';
+				if(!empty($seo_analysis['checks'])){
+					$medium_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>';
+					// A check inside a solid circle
+					$good_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>';
+					$high_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>';
+					$allowed_svg_tags = ['svg' => ['xmlns' => true, 'viewbox' => true, 'width' => true, 'height' => true, 'class' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true], 'path' => ['d' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true]];
 
-				 // A check inside a solid circle
-				$good_icon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>';
-				
-				$high_icon_svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c9.4-9.4 24.6-9.4 33.9 0l47 47 47-47c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-47 47 47 47c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-47-47-47 47c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l47-47-47-47c-9.4-9.4-9.4-24.6 0-33.9z"/></svg>';
-				
-				$allowed_svg_tags = ['svg' => ['xmlns' => true, 'viewbox' => true, 'width' => true, 'height' => true, 'class' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true], 'path' => ['d' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true]];
-
-			   foreach($seo_analysis['checks'] as $check){
-
+					foreach($seo_analysis['checks'] as $check){
 						echo '<div class="siteseo-analysis-block">';
 							if(isset($check['label'])){
 								echo'<div class="siteseo-analysis-block-title">';
@@ -275,11 +286,10 @@ class Analysis{
 							}
 						echo '</div><!-- .siteseo-analysis-block -->';
 					}
+				}
 
 				echo '</div><!-- #siteseo-analysis-tabs-1 -->
-				</div><!-- #siteseo-analysis-tabs -->';
-			}
-
+			</div><!-- #siteseo-analysis-tabs -->';
 	}
 
 	static function perform_seo_analysis($post){
@@ -308,56 +318,74 @@ class Analysis{
 			'good_count' => 0,
 			'warning_count' => 0,
 			'error_count' => 0,
-			'checks' => []
+			'checks' => [],
+			'total_score' => 0
+		];
+
+		// Weights (Sum = 100)
+		$weights = [
+			'canonical' => 10,
+			'word_count' => 5,
+			'keywords_density' => 10,
+			'meta_title' => 15,
+			'meta_description' => 10,
+			'image_alt' => 5,
+			'outbound_links' => 5,
+			'internal_links' => 5,
+			'headings' => 10,
+			'social_tags' => 10,
+			'structured_data' => 5,
+			'permalink_keywords' => 10,
 		];
 
 		$canonical_check = self::check_canonical_url($permalink);
 		$analysis['checks'][] = $canonical_check;
-		self::update_analysis_score($analysis, $canonical_check);
+		self::update_analysis_score($analysis, $canonical_check, $weights['canonical']);
 
 		$word_count_check = self::check_word_count($content);
 		$analysis['checks'][] = $word_count_check;
-		self::update_analysis_score($analysis, $word_count_check);
+		self::update_analysis_score($analysis, $word_count_check, $weights['word_count']);
 
 		$keywords_density_check = self::check_keywords_density($content, $keywords);
 		$analysis['checks'][] = $keywords_density_check;
-		self::update_analysis_score($analysis, $keywords_density_check);
+		self::update_analysis_score($analysis, $keywords_density_check, $weights['keywords_density']);
 
 		$meta_title_check = self::check_meta_title($title);
 		$analysis['checks'][] = $meta_title_check;
-		self::update_analysis_score($analysis, $meta_title_check);
+		self::update_analysis_score($analysis, $meta_title_check, $weights['meta_title']);
 
 		$meta_description_check = self::check_meta_description($content, $meta_desc);
 		$analysis['checks'][] = $meta_description_check;
-		self::update_analysis_score($analysis, $meta_description_check);
+		self::update_analysis_score($analysis, $meta_description_check, $weights['meta_description']);
 
 		$image_alt_check = self::check_image_alt_texts($content);
 		$analysis['checks'][] = $image_alt_check;
-		self::update_analysis_score($analysis, $image_alt_check);
+		self::update_analysis_score($analysis, $image_alt_check, $weights['image_alt']);
 
 		$links_outbound_check = self::analyze_outbound_links($content);
 		$analysis['checks'][] = $links_outbound_check;
-		self::update_analysis_score($analysis, $links_outbound_check);
+		self::update_analysis_score($analysis, $links_outbound_check, $weights['outbound_links']);
 
 		$links_internal_check = self::analyze_internal_links($content);
 		$analysis['checks'][] = $links_internal_check;
-		self::update_analysis_score($analysis, $links_internal_check);
+		self::update_analysis_score($analysis, $links_internal_check, $weights['internal_links']);
 
-		$headings_check = self::check_headings($content);
+		$target_keywords_arr = array_filter(explode(',', trim($keywords)));
+		$headings_check = self::check_headings($content, $target_keywords_arr, $title);
 		$analysis['checks'][] = $headings_check;
-		self::update_analysis_score($analysis, $headings_check);
+		self::update_analysis_score($analysis, $headings_check, $weights['headings']);
 
 		$social_tags_check = self::check_social_meta_tags($post);
 		$analysis['checks'][] = $social_tags_check;
-		self::update_analysis_score($analysis, $social_tags_check);
+		self::update_analysis_score($analysis, $social_tags_check, $weights['social_tags']);
 
 		$structured_data_check = self::check_structured_data($post);
 		$analysis['checks'][] = $structured_data_check;
-		self::update_analysis_score($analysis, $structured_data_check);
+		self::update_analysis_score($analysis, $structured_data_check, $weights['structured_data']);
 
 		$permalink_keywords_check = self::check_keywords_in_permalink($permalink, $keywords);
 		$analysis['checks'][] = $permalink_keywords_check;
-		self::update_analysis_score($analysis, $permalink_keywords_check);
+		self::update_analysis_score($analysis, $permalink_keywords_check, $weights['permalink_keywords']);
 
 		$meta_robots_check = self::check_meta_robots($post);
 		$analysis['checks'][] = $meta_robots_check;
@@ -376,16 +404,21 @@ class Analysis{
 		update_post_meta($post->ID, '_siteseo_readibility_data', $readability_data);
 		$analysis['checks'][] = $readability_data;
 
+		// Save score
+		update_post_meta($post->ID, '_siteseo_score', round($analysis['total_score']));
+
 		return $analysis;
 	}
 	
-	static function update_analysis_score(&$analysis, $check){
+	static function update_analysis_score(&$analysis, $check, $weight = 0){
 		switch($check['status']){
 		    case 'Good':
 		        $analysis['good_count']++;
+				$analysis['total_score'] += $weight;
 		        break;
 		    case 'Warning':
 		        $analysis['warning_count']++;
+				$analysis['total_score'] += ($weight * 0.6); // 60% points for warnings
 		        break;
 		    case 'Error':
 		        $analysis['error_count']++;
@@ -576,6 +609,7 @@ class Analysis{
 
 		$details .= '<p class="description">'.
 			sprintf(
+			/* translators: %s: URL to learn more about keyword stuffing */
 				__('Find out more about <a href="%s" target="_blank">keywords stuffing</a>', 'siteseo'),
 				'https://www.youtube.com/watch?v=Rk4qgQdp2UA'
 			) .
@@ -719,69 +753,67 @@ class Analysis{
 			'details' => $details
 		];
 	}
-	
+
 	static function check_image_alt_texts($content){
 
-			$result = [
-				'label' => __('Alternative texts of images', 'siteseo'),
-				'status' => 'Good',
-				'status_class' => 'good',
-				'details' => ''
-			];
+		$result = [
+			'label' => __('Alternative texts of images', 'siteseo'),
+			'status' => 'Good',
+			'status_class' => 'good',
+			'details' => ''
+		];
 
-			if(empty($content)){
-				$result['status'] = 'Warning';
-				$result['status_class'] = 'warning';
-				$result['details'] = '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
-					__('No content found to analyze. Please add some content to check for images and alt texts.', 'siteseo') . '</p>';
-				return $result;
-			}
-
-			preg_match_all('/<img[^>]+src=[\'"]([^\'"]+)[\'"][^>]*>/i', $content, $image_matches);
-			preg_match_all('/<img[^>]+alt=[\'"]([^\'"]+)[\'"][^>]*>/i', $content, $alt_matches);
-
-			$images_count = count($image_matches[0]);
-			$alt_text_count = count(array_filter($alt_matches[1], 'strlen'));
-
-			if($images_count === 0){
-				$result['status'] = 'Warning';
-				$result['status_class'] = 'warning';
-				$result['details'] = '<p><span class="dashicons dashicons-thumbs-down"></span>' .
-					__('We couldn\'t find any images in your content. Adding media can boost your SEO.', 'siteseo') . '</p>';
-				return $result;
-			}
-
-			if($images_count !== $alt_text_count){
-				$result['status'] = ($alt_text_count > 0) ? 'Warning' : 'Error';
-				$result['status_class'] = strtolower($result['status']);
-				
-				$result['details'] = '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
-					esc_html__('No alternative text has been found for these images. Alt tags are essential for SEO and accessibility. Please edit your images in the media library or using your preferred page builder, and provide alternative text.', 'siteseo') . '</p>';
-				
-	
-				if(!empty($image_matches[1])){
-					$result['details'] .= '<ul class="attachments">';
-					foreach($image_matches[1] as $index => $img){
-						if(empty($alt_matches[1][$index])){
-							$result['details'] .= '<li class="attachment"><figure>' .
-								'<img src="' . esc_url($img) . '"/>' .
-								'<figcaption style="word-break: break-all;">' . esc_html($img) . '</figcaption>' .
-								'</figure></li>';
-						}
-					}
-					$result['details'] .= '</ul>';
-				}
-				
-				$result['details'] .= '<p>'. __('Please note that we scan all your source code, which means some missing alternative text for images may be found in your header, sidebar, or footer.', 'siteseo') .'</p>';
-			} else{
-    
-				$result['details'] = '<p><span class="dashicons dashicons-thumbs-up"></span>' . 
-					__('All alternative tags have been completed. Great job!', 'siteseo') .'</p>';
-			}
-
+		if(empty($content)){
+			$result['status'] = 'Warning';
+			$result['status_class'] = 'warning';
+			$result['details'] = '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
+				__('No content found to analyze. Please add some content to check for images and alt texts.', 'siteseo') . '</p>';
 			return $result;
-    	}
-	
+		}
+
+		preg_match_all('/<img[^>]+src=[\'"]([^\'"]+)[\'"][^>]*>/i', $content, $image_matches);
+		preg_match_all('/<img[^>]+alt=[\'"]([^\'"]+)[\'"][^>]*>/i', $content, $alt_matches);
+
+		$images_count = count($image_matches[0]);
+		$alt_text_count = count(array_filter($alt_matches[1], 'strlen'));
+
+		if($images_count === 0){
+			$result['status'] = 'Warning';
+			$result['status_class'] = 'warning';
+			$result['details'] = '<p><span class="dashicons dashicons-thumbs-down"></span>' .
+				__('We couldn\'t find any images in your content. Adding media can boost your SEO.', 'siteseo') . '</p>';
+			return $result;
+		}
+
+		if($images_count !== $alt_text_count){
+			$result['status'] = ($alt_text_count > 0) ? 'Warning' : 'Error';
+			$result['status_class'] = strtolower($result['status']);
+			
+			$result['details'] = '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
+				esc_html__('No alternative text has been found for these images. Alt tags are essential for SEO and accessibility. Please edit your images in the media library or using your preferred page builder, and provide alternative text.', 'siteseo') . '</p>';
+			
+
+			if(!empty($image_matches[1])){
+				$result['details'] .= '<ul class="attachments">';
+				foreach($image_matches[1] as $index => $img){
+					if(empty($alt_matches[1][$index])){
+						$result['details'] .= '<li class="attachment">' .
+							__('Image missing alt text', 'siteseo') .
+						'</li>';
+					}
+				}
+				$result['details'] .= '</ul>';
+			}
+			
+			$result['details'] .= '<p>'. __('Please note that we scan all your source code, which means some missing alternative text for images may be found in your header, sidebar, or footer.', 'siteseo') .'</p>';
+		} else{
+
+			$result['details'] = '<p><span class="dashicons dashicons-thumbs-up"></span>' . 
+				__('All alternative tags have been completed. Great job!', 'siteseo') .'</p>';
+		}
+
+		return $result;
+	}
 
 	static function analyze_outbound_links($content){
 
@@ -926,11 +958,12 @@ class Analysis{
 		];
 	}
 
-	static function check_headings($content, $keywords = []) {
+	static function check_headings($content, $keywords = [], $title = '') {
 		$details = '';
 		$status = 'Good';
 		$status_class = 'good';
-		if(empty(trim($content))){
+
+		if(empty(trim($content)) && empty($title)){
 			return [
 				'label' => 'Headings',
 				'status' => 'Warning',
@@ -939,28 +972,23 @@ class Analysis{
 			];
 		}
 
-		preg_match_all('/<h([1-6])([^>]*)>(.*?)<\/h\1>/is', $content, $heading_matches);
-		
-		if(empty($heading_matches[0])){
-			return [
-				'label' => 'Headings',
-				'status' => 'Error',
-				'status_class' => 'error',
-				'details' => '<p><span class="dashicons dashicons-thumbs-down"></span>' . __('No headings found in the content. Using headings is essential for both SEO and accessibility!', 'siteseo') . '</p>'
-			];
-		}
+		// Robust regex for headings with any attributes and case insensitivity
+		preg_match_all('/<h([1-6])(?:\s+[^>]*)?>(.*?)<\/h\1>/is', $content, $heading_matches);
 
-		$heading_counts = array_count_values($heading_matches[1]);
-		$total_headings = count($heading_matches[0]);
+		$heading_counts = !empty($heading_matches[1]) ? array_count_values($heading_matches[1]) : [];
+		$total_headings = !empty($heading_matches[0]) ? count($heading_matches[0]) : 0;
 
-		
 		$h1_count = isset($heading_counts[1]) ? $heading_counts[1] : 0;
-		if($h1_count > 0){
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>' . 
-				/* translators: %d represents the number of h1 tags */
-				sprintf(esc_html__('We found %d Heading 1 (H1) tags in your content.', 'siteseo'), $h1_count+1) . '</p>';
+		
+		// Post Title is virtually the first H1
+		$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>' . __('Your Post Title is used as the primary H1 heading.', 'siteseo') . '</p>';
 
-			$details .= '<p>' . __('You should avoid using more than one H1 heading in your post content. The rule is simple: each web page should have only one H1, which benefits both SEO and accessibility. Below is the list:', 'siteseo') . '</p>';
+		if($h1_count > 0){
+			$details .= '<p><span class="dashicons dashicons-warning"></span>' . 
+				/* translators: %d represents the number of h1 tags */
+				sprintf(esc_html__('We found %d additional Heading 1 (H1) tags in your content.', 'siteseo'), $h1_count) . '</p>';
+
+			$details .= '<p>' . __('You should avoid using more than one H1 heading. The rule is simple: each web page should have only one primary H1 (usually the title), which benefits both SEO and accessibility. Below is the list of H1s found in content:', 'siteseo') . '</p>';
 
 			$details .= '<ul>';
 			foreach(array_keys($heading_matches[1], '1') as $index){
@@ -971,13 +999,24 @@ class Analysis{
 			$status = 'Warning';
 			$status_class = 'warning';
 		}
+
+		if($total_headings === 0){
+			// If no headings in content, we still have the H1 title, but it's better to have subheadings
+			$details .= '<p><span class="dashicons dashicons-info"></span>' . __('No subheadings (H2-H6) found in your content. Using subheadings helps both users and search engines read and understand your content better.', 'siteseo') . '</p>';
+			// We don't mark it as an Error anymore because Title exists, but move to Warning if content is long
+			if(str_word_count(wp_strip_all_tags($content)) > 200){
+				$status = 'Warning';
+				$status_class = 'warning';
+			}
+		}
+
 		foreach([2, 3] as $level){
 			$level_count = isset($heading_counts[$level]) ? $heading_counts[$level] : 0;
-			$details .= '<p><span class="dashicons dashicons-info"></span>' .
-				/* translators: %d represents the heading */ 
-				sprintf(__('Found %1$d H%2$d heading(s)', 'siteseo'), $level_count, $level) . '</p>';
-
 			if($level_count > 0){
+				$details .= '<p><span class="dashicons dashicons-info"></span>' .
+					/* translators: %d represents the heading */ 
+					sprintf(__('Found %1$d H%2$d heading(s)', 'siteseo'), $level_count, $level) . '</p>';
+
 				$details .= '<ul>';
 				foreach(array_keys($heading_matches[1], (string)$level) as $index){
 					$details .= '<li><span class="dashicons dashicons-arrow-right"></span>'. 
@@ -1042,80 +1081,92 @@ class Analysis{
 		$status = 'Good';
 		$status_class = 'good';
 		
-		$og_titles = get_post_meta($post->ID, '_siteseo_social_fb_title', true);
-		$og_title = $og_titles ? $og_titles : '';
-		
+		$og_title = get_post_meta($post->ID, '_siteseo_social_fb_title', true);
+		$og_desc = get_post_meta($post->ID, '_siteseo_social_fb_desc', true);
+		$og_img = get_post_meta($post->ID, '_siteseo_social_fb_img', true);
+
+		// Open Graph Title
 		if(empty($og_title)){
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your Open Graph Title tag has not been set!', 'siteseo') .'</p>';
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your Open Graph Title is missing!', 'siteseo') .'</p>';
 			$status = 'Error';
 			$status_class = 'error';
 		} else{
 			$details .= '<h4>'. __('Open Graph Title', 'siteseo') . '</h4>';
-			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('An Open Graph Title tag was found in your source code.', 'siteseo') . '</p>';
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('An Open Graph Title tag was found.', 'siteseo') . '</p>';
 			$details .= '<ul><li><span class="dashicons dashicons-arrow-right"></span>' . esc_html($og_title) . '</li></ul>';
 		}
 
-		$og_descriptions = get_post_meta($post->ID, '_siteseo_social_fb_desc', true);
-		$og_description = $og_descriptions ? $og_descriptions : '';
-
-		if(empty($og_description)){
+		// Open Graph Description
+		if(empty($og_desc)){
 			$details .= '<h4>'. __('Open Graph Description', 'siteseo') .'</h4>';
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your Open Graph Description has not been set!','siteseo').'</p>';
-			$status = $status === 'Good' ? 'Warning' : $status;
-			$status_class = $status_class === 'good' ? 'warning' : $status_class;
+			if($status === 'Good') $status = 'Warning';
+			if($status_class === 'good') $status_class = 'warning';
 		} else {
-			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>' .
-				/* translators: %s represents the og description */
-				sprintf(esc_html__('We found %s og:description in your content.', 'siteseo'), $og_descriptions) . '</p>';
+			$details .= '<h4>'. __('Open Graph Description', 'siteseo') .'</h4>';
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>' . __('An Open Graph Description tag was found.','siteseo').'</p>';
+			$details .= '<ul><li><span class="dashicons dashicons-arrow-right"></span>' . esc_html($og_desc) . '</li></ul>';
 		}
 
-		// OG Check
-		$og_images = get_post_meta($post->ID, '_siteseo_social_fb_img', true);
-		$og_image = $og_images ? $og_images : '';
-		
-		if(empty($og_image)){
+		// OG Image
+		if(empty($og_img)){
 			$details .= '<h4>'. __('Open Graph Image', 'siteseo') .'</h4>';
 			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your Open Graph Image has not been set!' ,'siteseo') .'</p>';
-			$status = $status === 'Good' ? 'Warning' : $status;
-			$status_class = $status_class === 'good' ? 'warning' : $status_class;
+			if($status === 'Good') $status = 'Warning';
+			if($status_class === 'good') $status_class = 'warning';
 		} else{
-			/* translators: %s represents the og images */
-			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. sprintf(esc_html__('We found %s og:image in your content.', 'siteseo'), $og_images) . '</p>';
+			$details .= '<h4>'. __('Open Graph Image', 'siteseo') .'</h4>';
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('An Open Graph Image tag was found.', 'siteseo') . '</p>';
+			$details .= '<ul><li><span class="dashicons dashicons-arrow-right"></span>' . esc_url($og_img) . '</li></ul>';
 		}
 
-		// Open Graph
-		$og_site_name = get_bloginfo('name');
-		if(empty($og_site_name)){
-			$details .= '<h4>'. __('Open Graph Site Name', 'siteseo') .'</h4>';
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your Open Graph Site Name has not been set!' ,'siteseo') .'</p>';
-			$status = $status === 'Good' ? 'Warning' : $status;
-			$status_class = ($status_class === 'good') ? 'warning' : $status_class;
-		}
-
-		// Twitter
+		// X (Twitter) Checks with Fallbacks
 		$twitter_title = get_post_meta($post->ID, '_siteseo_social_twitter_title', true);
 		if(empty($twitter_title)){
+			if(!empty($og_title)){
+				$details .= '<h4>'. __('X Title', 'siteseo').'</h4>';
+				$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('Your X Title is falling back to Open Graph Title.', 'siteseo').'</p>';
+			} else {
+				$details .= '<h4>'. __('X Title', 'siteseo').'</h4>';
+				$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your X Title has not been set!', 'siteseo').'</p>';
+				if($status === 'Good') $status = 'Warning';
+				if($status_class === 'good') $status_class = 'warning';
+			}
+		} else {
 			$details .= '<h4>'. __('X Title', 'siteseo').'</h4>';
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your X Title has not been set!', 'siteseo').'</p>';
-			$status = $status === 'Good' ? 'Warning' : $status;
-			$status_class = $status_class === 'good' ? 'warning' : $status_class;
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('An X Title tag was found.', 'siteseo') . '</p>';
 		}
 
-		$twitter_description = get_post_meta($post->ID, '_siteseo_social_twitter_desc', true);
-		if(empty($twitter_description)){
+		$twitter_desc = get_post_meta($post->ID, '_siteseo_social_twitter_desc', true);
+		if(empty($twitter_desc)){
+			if(!empty($og_desc)){
+				$details .= '<h4>'. __('X Description','siteseo').'</h4>';
+				$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('Your X Description is falling back to Open Graph Description.','siteseo') .'</p>';
+			} else {
+				$details .= '<h4>'. __('X Description','siteseo').'</h4>';
+				$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your X Description has not been set!','siteseo') .'</p>';
+				if($status === 'Good') $status = 'Warning';
+				if($status_class === 'good') $status_class = 'warning';
+			}
+		} else {
 			$details .= '<h4>'. __('X Description','siteseo').'</h4>';
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your X Description has not been set!','siteseo') .'</p>';
-			$status = $status === 'Good' ? 'Warning' : $status;
-			$status_class = $status_class === 'good' ? 'warning' : $status_class;
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('An X Description tag was found.','siteseo') . '</p>';
 		}
 
-		$twitter_image = get_post_meta($post->ID, '_siteseo_social_twitter_img', true);
-		if(empty($twitter_image)){
+		$twitter_img = get_post_meta($post->ID, '_siteseo_social_twitter_img', true);
+		if(empty($twitter_img)){
+			if(!empty($og_img)){
+				$details .= '<h4>'. __('X Image', 'siteseo') .'</h4>';
+				$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('Your X Image is falling back to Open Graph Image.', 'siteseo').'</p>';
+			} else {
+				$details .= '<h4>'. __('X Image', 'siteseo') .'</h4>';
+				$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your X Image has not been set!', 'siteseo').'</p>';
+				if($status === 'Good') $status = 'Warning';
+				if($status_class === 'good') $status_class = 'warning';
+			}
+		} else {
 			$details .= '<h4>'. __('X Image', 'siteseo') .'</h4>';
-			$details .= '<p><span class="dashicons dashicons-thumbs-down"></span>'. __('Your X Image has not been set!', 'siteseo').'</p>';
-			$status = $status === 'Good' ? 'Warning' : $status;
-			$status_class = ($status_class === 'good') ? 'warning' : $status_class;
+			$details .= '<p><span class="dashicons dashicons-thumbs-up"></span>'. __('An X Image tag was found.', 'siteseo') . '</p>';
 		}
 
 		return [
@@ -1124,18 +1175,39 @@ class Analysis{
 			'status_class' => $status_class,
 			'details' => $details
 		];
-
 	}
 
-    static function check_structured_data($post){
-        $schema_type = get_post_meta($post->ID, '_siteseo_structured_data_type', true);
-        $status = !empty($schema_type) ? 'Good' : 'Warning';
+    static function check_structured_data($post_obj){
+        $schema_type = get_post_meta($post_obj->ID, '_siteseo_structured_data_type', true);
+		$custom_schema = get_post_meta($post_obj->ID, '_siteseo_structured_data_custom', true);
+		
+		$global_schemas = [];
+		if(defined('SITESEO_PRO_VERSION')){			
+			$global_schemas = \SiteSEOPro\StructuredData::check_global_schema_is_applicable();
+		}
+
+        $status = (!empty($schema_type) || !empty($custom_schema) || !empty($global_schemas)) ? 'Good' : 'Warning';
+		$details = '';
+
+		if(!empty($schema_type) || !empty($custom_schema)){
+			/* translators: %s: Schema type name */
+			$details = !empty($schema_type) ? sprintf(__('Local Schema Type: %s', 'siteseo'), $schema_type) : __('Custom Local Schema found.', 'siteseo');
+			if(!empty($global_schemas)){
+				/* translators: %s: Schema type name */
+				$details .= ' ' . sprintf(__('Global schemas also applied: %s', 'siteseo'), implode(', ', array_unique($global_schemas)));
+			}
+		} elseif(!empty($global_schemas)){
+			/* translators: %s: Schema type name */
+			$details = sprintf(__('Global Schema found: %s', 'siteseo'), implode(', ', array_unique($global_schemas)));
+		} else {
+			$details = __('No local or global structured data (Schema.org) found. Adding structured data helps search engines understand your content better.', 'siteseo');
+		}
 
         return [
             'label' => 'Structured Data',
             'status' => $status,
             'status_class' => strtolower($status),
-            'details' => !empty($schema_type) ? 'Schema Type: '.$schema_type : 'No schema defined'
+            'details' => $details
         ];
     }
 

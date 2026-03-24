@@ -107,11 +107,11 @@ class ImageSeo{
 			$attachment_id = get_queried_object_id();
 			$parent_id = wp_get_post_parent_id($attachment_id);
 
-			if($parent_id){
-				wp_redirect(get_permalink($parent_id));
+			if(!empty($parent_id)){
+				wp_safe_redirect(get_permalink($parent_id));
 
 			}else{
-				wp_redirect(home_url());
+				wp_safe_redirect(home_url());
 			}
 
 			exit; 

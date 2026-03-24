@@ -141,7 +141,20 @@ class Columns{
 			case 'seo_score':
 				if(!empty($options['appearance_score_col'])){
 					$score = get_post_meta($post_id, '_siteseo_score', true);
-					echo !empty($score) ? esc_html($score) : '';
+					if($score !== ''){						
+						$score = round($score);
+						if($score < 50){
+							$color = '#f33'; // error
+						} elseif($score < 80){
+							$color = '#fa3'; // warning
+						} else{
+							$color = '#0c6';  // good
+						}
+
+						echo '<div class="siteseo-score-circle" style="background:'.esc_attr($color).';">'.esc_html($score).'</div>';
+					} else {
+						echo '';
+					}
 				}
 				break;
 		}

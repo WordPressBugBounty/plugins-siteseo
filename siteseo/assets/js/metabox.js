@@ -808,4 +808,51 @@ jQuery(document).ready(function($){
 			}
 		});
 	}
+
+	// Handle image removal for Facebook and X previews
+	$(document).on('click', '.siteseo-image-overlay', function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		
+		let target = $(this).data('target');
+
+		if (target === 'fb') {
+			// Clear Facebook image
+			$('.siteseo_social_fb_img_meta').val('');
+			$('.siteseo_social_fb_img_attachment_id').val('');
+			$('.siteseo_social_fb_img_width').val('');
+			$('.siteseo_social_fb_img_height').val('');
+			
+			// Update preview with placeholder
+			$('.siteseo-metabox-fb-image img').attr('src', siteseoAdminAjax.social_placeholder);
+			
+			// Remove overlay
+			$(this).remove();
+			
+			// If X is using same as OG
+			if ($('.siteseo-x-toggle-switch input').is(':checked')) {
+				$('.siteseo_social_twitter_img_meta').val('');
+				$('.siteseo_social_twitter_img_attachment_id').val('');
+				$('.siteseo_social_twitter_img_width').val('');
+				$('.siteseo_social_twitter_img_height').val('');
+				$('.siteseo-metabox-x-image img').attr('src', siteseoAdminAjax.social_placeholder);
+				$('.siteseo-metabox-x-image .siteseo-image-overlay').remove();
+			}
+		} else if(target === 'x'){
+			// Clear X image
+			$('.siteseo_social_twitter_img_meta').val('');
+			$('.siteseo_social_twitter_img_attachment_id').val('');
+			$('.siteseo_social_twitter_img_width').val('');
+			$('.siteseo_social_twitter_img_height').val('');
+			
+			// Update preview with placeholder
+			$('.siteseo-metabox-x-image img').attr('src', siteseoAdminAjax.social_placeholder);
+			
+			// Remove overlay
+			$(this).remove();
+		}
+		
+		// Trigger
+		$('.siteseo_social_fb_img_meta, .siteseo_social_twitter_img_meta').trigger('change');
+	});
 });

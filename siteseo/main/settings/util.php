@@ -93,4 +93,10 @@ class Util{
 		
 		return $input;
 	}
+	
+	static function pro_notices_tab(){
+		echo'<div class="notice notice-warning">
+			<p>'.esc_html__('This is a part of SiteSEO Pro, so update/upgrade to pro to utilize this feature', 'siteseo').'</p>
+		</div>';
+	}
 }

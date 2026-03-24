@@ -316,15 +316,18 @@ jQuery(document).ready(function($){
 
 		// Hide save button
 		let exclude_tab = ['tab_siteseopro_robots_txt', 'tab_auto_schema', 'tab_siteseopro_htaccess'],
+		pro_feature_tab = ['tab_google_news', 'tab_video_sitemap', 'tab_rss_sitemap'],
 		is_pro_exits = (typeof siteseo_pro !== 'undefined' && siteseo_pro.schema) ? true : false,
 		$save_btn = $('.siteseo-submit-button');
 
-		if((is_pro_exits && exclude_tab.includes(tabId))){
+		if((is_pro_exits && exclude_tab.includes(tabId)) || (!is_pro_exits && pro_feature_tab.includes(tabId))) {
+
 			$save_btn.hide();
 		} else {
 			$save_btn.show();
 		}
-		// save ative tab 
+
+		// save active tab 
 		localStorage.setItem('siteseo_active_tab', tabId);
 	}
 

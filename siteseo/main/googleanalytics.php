@@ -643,7 +643,16 @@ class GoogleAnalytics{
 			// Taxonomy archives
 			if($is_taxonomy || is_category() || is_tag()){
 				$term = get_queried_object();
+				
+				if(empty($term) || !isset($term->term_id)){
+					return;
+				}
+
 				$term_id = $term->term_id;
+
+				if(empty($term_id)){
+					return;
+				}
 
 				// Check redirection is enabled
 				$enable_redirect = get_term_meta($term_id, '_siteseo_redirections_enabled', true);

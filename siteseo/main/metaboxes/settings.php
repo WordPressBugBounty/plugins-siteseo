@@ -536,8 +536,13 @@ class Settings{
 				</div>
 				<div class="siteseo-metabox-fb-preview">
 					<div class="siteseo-metabox-fb-image">
-						<img src="'.(!empty($metabox_data['fb_img']) ? esc_url($metabox_data['fb_img']) : esc_url($social_placeholder)).'" alt="Facebook preview"/>
-					</div>
+					<img src="'.(!empty($metabox_data['fb_img']) ? esc_url($metabox_data['fb_img']) : esc_url($social_placeholder)).'" alt="Facebook preview" class="siteseo-fb-preview-img"/>';
+					 if(!empty($metabox_data['fb_img'])){
+						echo'<div class="siteseo-image-overlay" data-target="fb" title="Remove image">
+							<span class="dashicons dashicons-no-alt"></span>
+						</div>';
+					 }
+				echo'</div>
 					<div class="siteseo-metabox-fb-data">
 						<div class="siteseo-metabox-fb-host">'.(!empty($host_uri) ? esc_html($host_uri) : '').'</div>
 						<div class="siteseo-metabox-fb-title">'.(!empty($metabox_data['fb_title']) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($metabox_data['fb_title'], true)) : esc_html(\SiteSEO\TitlesMetas::replace_variables($social_preview_title, true))).'</div>
@@ -601,8 +606,13 @@ class Settings{
 				<div>
 				<div class="siteseo-metabox-x-preview">
 					<div class="siteseo-metabox-x-image">
-						<img src="'.($x_image ? esc_url($x_image) : '').'" alt="X preview"/>
-					</div>
+					<img src="'.($x_image ? esc_url($x_image) : esc_url($social_placeholder)).'" alt="X preview" class="siteseo-x-preview-img"/>';
+						if(!empty($x_image) && $x_image !== $social_placeholder){
+							echo'<div class="siteseo-image-overlay" data-target="x" title="Remove image">
+								<span class="dashicons dashicons-no-alt"></span>
+							</div>';
+						}
+					echo'</div>
 					<div class="siteseo-metabox-x-data">
 						<div class="siteseo-metabox-x-title">'.(!empty($x_title_preview) ? esc_html(\SiteSEO\TitlesMetas::replace_variables($x_title_preview, true)) : '').'</div>
 					</div>

@@ -739,7 +739,17 @@ class TitlesMetas{
 				}
 			} elseif(is_tag()) {
 				$term = get_queried_object();
+
+				if(empty($term) || ! isset($term->term_id)){
+					return;
+				}
+
 				$term_id = $term->term_id;
+
+				if(empty($term_id)){
+					return;
+				}
+
 				$term_meta_title = get_term_meta($term_id, '_siteseo_titles_title', true);
 				$default_title = isset($settings['titles_tax_titles']['post_tag']['title']) ? $settings['titles_tax_titles']['post_tag']['title'] : '';
 				$disabled = !empty($settings['titles_tax_titles']['post_tag']['disabled']);
@@ -1031,5 +1041,16 @@ class TitlesMetas{
 
 	static function truncate_desc($desc){
 		return trim($desc);
+	}
+
+	static function add_meta_keywords(){
+		global $post;
+
+		$post_id = isset($post) && is_object($post) ? $post->ID : '';
+		$target_keyword = get_post_meta($post_id, '_siteseo_analysis_target_kw', true);
+
+		if(!empty($target_keyword)){
+			echo'<meta name="keywords" content="'.esc_attr($target_keyword).'">';
+		}
 	}
 }
