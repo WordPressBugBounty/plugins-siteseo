@@ -69,7 +69,7 @@ class Titles{
 
 	}
 
-    static function home(){
+	static function home(){
 		global $siteseo;
 
 		if(!empty($_POST['submit'])){
@@ -84,7 +84,9 @@ class Titles{
 		$option_site_title_alt = !empty($options['titles_home_site_title_alt']) ? $options['titles_home_site_title_alt'] : '';
 		$option_site_desc = !empty($options['titles_home_site_desc']) ? $options['titles_home_site_desc'] : '';
 
-		if(get_option('show_on_front') === 'page'){
+		$is_static_page = (get_option('show_on_front') === 'page');
+    
+		if(!empty($is_static_page)){
 			$front_page_id = get_option('page_on_front');
 			$edit_link = get_edit_post_link($front_page_id, '');
 			
@@ -98,7 +100,6 @@ class Titles{
 					</div>
 				</div>
 			</div>';
-			return;
 		}
 
 		echo '<h3 class="siteseo-tabs">'.esc_html__('HOME','siteseo').'</h3>
@@ -114,68 +115,71 @@ class Titles{
 
 		<table class="form-table">
 			<tbody>
-                <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('Separator','siteseo').'</th>
-                    <td>
-                        <input type="text" name="siteseo_options[separator]" placeholder="'.esc_attr__('Specify your separator, e.g:-','siteseo').'" value="'.esc_attr($option_separator).'">
-                        <p class="description">'.esc_attr__('Include this separator using %%sep%% in your title and meta description.','siteseo').'</p>
-                    </td>
-                </tr>
+				<tr>
+					<th scope="row" style="user-select:auto;">'.esc_html__('Separator','siteseo').'</th>
+					<td>
+						<input type="text" name="siteseo_options[separator]" placeholder="'.esc_attr__('Specify your separator, e.g:-','siteseo').'" value="'.esc_attr($option_separator).'">
+						<p class="description">'.esc_attr__('Include this separator using %%sep%% in your title and meta description.','siteseo').'</p>
+					</td>
+				</tr>';
 
-                <td colspan="2"><span class="dashed-line"></span></td>
-
-                <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('Site title','siteseo').'</th>
-                    <td>
-                        <input type="text" name="siteseo_options[site_title]" value="'.esc_attr($option_site_title).'" placeholder="'.esc_html__('My fantastic site','siteseo').'">
-                        <div class="wrap-tags">
-                            <button class="tag-title-btn" id="btn-site-title" data-tag="%%sitetitle%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
+		// Only show the rest of the fields if NOT a static page
+		if(empty($is_static_page)){
+			echo'<td colspan="2"><span class="dashed-line"></span></td>
+				<tr>
+					<th scope="row" style="user-select:auto;">'.esc_html__('Site title','siteseo').'</th>
+					<td>
+						<input type="text" name="siteseo_options[site_title]" value="'.esc_attr($option_site_title).'" placeholder="'.esc_html__('My fantastic site','siteseo').'">
+						<div class="wrap-tags">
+							<button class="tag-title-btn" id="btn-site-title" data-tag="%%sitetitle%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
 							esc_html__('SITE TITLE','siteseo').'</button>
-                            <button class="tag-title-btn" id="btn-separator" data-tag="%%sep%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
+							<button class="tag-title-btn" id="btn-separator" data-tag="%%sep%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
 							esc_html__('SEPARATOR','siteseo').'</button>
-                            <button class="tag-title-btn" id="btn-tagline" data-tag="%%tagline%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
+							<button class="tag-title-btn" id="btn-tagline" data-tag="%%tagline%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
 							esc_html__('TAGLINE','siteseo').'</button>';
 							siteseo_suggestion_button();
-                        echo '</div>
-                    </td>
-                </tr>
+						echo '</div>
+					</td>
+				</tr>
 
-                <td colspan="2"><span class="dashed-line"></span></td>
+				<td colspan="2"><span class="dashed-line"></span></td>
 
-                <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('Alternative site title','siteseo').'</th>
-                    <td>
-                        <input type="text" value="'.esc_attr($option_site_title_alt).'"  name="siteseo_options[alt_site_title]" placeholder="'.esc_html__('Alternative website title','siteseo').'">
-                        <p class="description">'.esc_html__('The alternative name of the website (e.g., a commonly recognized acronym or shorter name, if applicable). Ensure the name meets the criteria.', 'siteseo').'</p>
-                    </td>
-                </tr>
+				<tr>
+					<th scope="row" style="user-select:auto;">'.esc_html__('Alternative site title','siteseo').'</th>
+					<td>
+						<input type="text" value="'.esc_attr($option_site_title_alt).'"  name="siteseo_options[alt_site_title]" placeholder="'.esc_html__('Alternative website title','siteseo').'">
+						<p class="description">'.esc_html__('The alternative name of the website (e.g., a commonly recognized acronym or shorter name, if applicable). Ensure the name meets the criteria.', 'siteseo').'</p>
+					</td>
+				</tr>
 
-                <td colspan="2"><span class="dashed-line"></span></td>
+				<td colspan="2"><span class="dashed-line"></span></td>
 
-                <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('Meta description','siteseo').'</th>
-                    <td>
-                        <textarea type="text" name="siteseo_options[media_desc]" placeholder="'.esc_html__('This is an awesome website about galactic creatures.','siteseo').'">'.esc_html($option_site_desc).'</textarea>
-                        <div class="wrap-tags">
-                            <button class="tag-title-btn" id="btn-tagline-meta" data-tag="%%tagline%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
+				<tr>
+					<th scope="row" style="user-select:auto;">'.esc_html__('Meta description','siteseo').'</th>
+					<td>
+						<textarea type="text" name="siteseo_options[media_desc]" placeholder="'.esc_html__('This is an awesome website about galactic creatures.','siteseo').'">'.esc_html($option_site_desc).'</textarea>
+						<div class="wrap-tags">
+							<button class="tag-title-btn" id="btn-tagline-meta" data-tag="%%tagline%%"><span id="icon" class="dashicons dashicons-insert"></span>'.
 							esc_html__('TAGLINE','siteseo').'</button>';
-                            siteseo_suggestion_button();  
-                       echo '</div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+							siteseo_suggestion_button();  
+					   echo'</div>
+					</td>
+				</tr>';
+		}
+		
+		echo'</tbody>
+		</table>
 		<input type="hidden" name="siteseo_options[home_tab]" value="1"/>';
-    }
+	}
 
-    static function advanced(){
+	static function advanced(){
 		global $siteseo;
 
 		if(!empty($_POST['submit'])){
 			self::save_settings();
 		}
 
-        //$options = $siteseo->titles_settings;
+		//$options = $siteseo->titles_settings;
 		$options = get_option('siteseo_titles_option_name');
 
 		$option_noindex = !empty($options['titles_noindex']) ? $options['titles_noindex'] : '';
@@ -264,44 +268,44 @@ class Titles{
 							</td>
 						</tr>
 
-                <td colspan="2"><span class="dashed-line"></span></td>
+	                <td colspan="2"><span class="dashed-line"></span></td>
 
-                 <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('Indicate paginated content to Google','siteseo').'</th>
-                    <td>
-                        <label>
-                            <input name="siteseo_options[page_rel]" type="checkbox"' . (!empty($option_page_rel) ? 'checked="yes"' : '') . ' value="1"/>' . esc_html__('Add rel next/prev link in head of paginated archive pages', 'siteseo') . 
-                        '</label>
-                        <p class="description">'.esc_html__('eg: https://example.com/category/my-category/page/2/.','siteseo').'</p>
-                    </td>
-                </tr>
+	                 <tr>
+	                    <th scope="row" style="user-select:auto;">'.esc_html__('Indicate paginated content to Google','siteseo').'</th>
+	                    <td>
+	                        <label>
+	                            <input name="siteseo_options[page_rel]" type="checkbox"' . (!empty($option_page_rel) ? 'checked="yes"' : '') . ' value="1"/>' . esc_html__('Add rel next/prev link in head of paginated archive pages', 'siteseo') . 
+	                        '</label>
+	                        <p class="description">'.esc_html__('eg: https://example.com/category/my-category/page/2/.','siteseo').'</p>
+	                    </td>
+	                </tr>
 
-                <td colspan="2"><span class="dashed-line"></span></td>
+	                <td colspan="2"><span class="dashed-line"></span></td>
 
-                 <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('noindex on paged archives','siteseo').'</th>
-                    <td>
-                        <label>
-                            <input name="siteseo_options[titles_paged_noindex]" type="checkbox" '. (!empty($option_paged_noindex) ? 'checked="yes"' : '') . ' value="1"/>'.esc_html__('Add a "noindex" meta robots for all paginated archive pages', 'siteseo'). 
-                        '</label>
-                        <p class="description">'.esc_html__('eg: https://example.com/category/my-category/page/2/.','siteseo').'</p>
-                    </td>
-                </tr>
+	                 <tr>
+	                    <th scope="row" style="user-select:auto;">'.esc_html__('noindex on paged archives','siteseo').'</th>
+	                    <td>
+	                        <label>
+	                            <input name="siteseo_options[titles_paged_noindex]" type="checkbox" '. (!empty($option_paged_noindex) ? 'checked="yes"' : '') . ' value="1"/>'.esc_html__('Add a "noindex" meta robots for all paginated archive pages', 'siteseo'). 
+	                        '</label>
+	                        <p class="description">'.esc_html__('eg: https://example.com/category/my-category/page/2/.','siteseo').'</p>
+	                    </td>
+	                </tr>
 
-                <td colspan="2"><span class="dashed-line"></span></td>
+	                <td colspan="2"><span class="dashed-line"></span></td>
 
-                <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('noindex on attachment pages','siteseo').'</th>
-                    <td>
-                        <label>
-                            <input name="siteseo_options[attachments_noindex]" type="checkbox"' . (!empty($option_attachments_noindex) ? 'checked="yes"' : '').' value="1"/>'.esc_html__(' Add a "noindex" meta robots for all attachment pages', 'siteseo') . 
-                        '</label>
-                        <p class="description">'.esc_html__('eg: https://example.com/my-media-attachment-page.','siteseo').'</p>
-                    </td>
-                </tr>
-            </tbody>
-        </table><input type="hidden" name="siteseo_options[advanced_tab]" value="1"/>';
-    }
+	                <tr>
+	                    <th scope="row" style="user-select:auto;">'.esc_html__('noindex on attachment pages','siteseo').'</th>
+	                    <td>
+	                        <label>
+	                            <input name="siteseo_options[attachments_noindex]" type="checkbox"' . (!empty($option_attachments_noindex) ? 'checked="yes"' : '').' value="1"/>'.esc_html__(' Add a "noindex" meta robots for all attachment pages', 'siteseo') . 
+	                        '</label>
+	                        <p class="description">'.esc_html__('eg: https://example.com/my-media-attachment-page.','siteseo').'</p>
+	                    </td>
+	                </tr>
+	            </tbody>
+	        </table><input type="hidden" name="siteseo_options[advanced_tab]" value="1"/>';
+	}
 
 	static function archives(){
 		global $siteseo;

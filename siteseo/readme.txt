@@ -2,9 +2,9 @@
 Contributors: pagelayer, softaculous
 Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.3.7
+Stable tag: 1.3.8
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,13 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.3.8 (April 8, 2026) =
+
+* [Pro-Feature] Added SEO Quick Settings options.
+* [Pro-Feature] Added Advanced Redirect feature.
+* [Pro-feature] Added External Links Manager feature.
+* [Bug-Fix] Fixed missing Gutenberg blocks issue caused by block category override.
 
 = 1.3.7 (March 24, 2026) =
 

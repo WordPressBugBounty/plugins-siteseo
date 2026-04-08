@@ -1182,7 +1182,7 @@ class Analysis{
 		$custom_schema = get_post_meta($post_obj->ID, '_siteseo_structured_data_custom', true);
 		
 		$global_schemas = [];
-		if(defined('SITESEO_PRO_VERSION')){			
+		if(defined('SITESEO_PRO_VERSION') && class_exists('\SiteSEOPro\StructuredData') && method_exists('\SiteSEOPro\StructuredData', 'check_global_schema_is_applicable')){			
 			$global_schemas = \SiteSEOPro\StructuredData::check_global_schema_is_applicable();
 		}
 

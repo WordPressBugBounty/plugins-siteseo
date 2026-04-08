@@ -470,12 +470,12 @@ class Admin{
 	}
 
 	static function create_siteseo_block($categories){
-		$siteseo[] = [
+		$categories[] = [
 			'slug'  => 'siteseo',
 			'title' => 'SiteSEO'
 		];
 
-		return $siteseo;	
+		return $categories;	
 	}
 	
 	static function enqueue_sidebar(){
