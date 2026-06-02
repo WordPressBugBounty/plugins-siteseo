@@ -300,14 +300,23 @@ class Analysis{
 		$permalink = get_permalink($post->ID);
 		$keywords = get_post_meta($post->ID, '_siteseo_analysis_target_kw', true);
 		$meta_desc = get_post_meta($post->ID, '_siteseo_titles_desc', true);
-		
-		// Bricks
-		if(defined('BRICKS_DB_PAGE_CONTENT')){
+	
+		$html_content = $content;
+		// div5 page builder, Bricks
+		if(has_blocks($content)){
+			$html_content = do_blocks($content); // HTML preserved for headings
+			$content = wp_strip_all_tags($html_content); // plain text for word count/keywords
+		} elseif(defined('BRICKS_DB_PAGE_CONTENT')){
 			$is_bricks_page = get_post_meta($post->ID, BRICKS_DB_PAGE_CONTENT, true);
 
 			if(!empty($is_bricks_page) && is_array($is_bricks_page)){
 				$content = self::get_bricks_page_content($is_bricks_page);
+				$html_content = $content;
 			}
+		} else {
+			// Classic editor or other — apply_filters to get rendered HTML
+			$html_content = apply_filters('the_content', $content);
+			$content = wp_strip_all_tags($html_content);
 		}
 			
 		if(empty($meta_desc)){
@@ -371,7 +380,7 @@ class Analysis{
 		self::update_analysis_score($analysis, $links_internal_check, $weights['internal_links']);
 
 		$target_keywords_arr = array_filter(explode(',', trim($keywords)));
-		$headings_check = self::check_headings($content, $target_keywords_arr, $title);
+		$headings_check = self::check_headings($html_content, $target_keywords_arr, $title); // <-- $html_content here
 		$analysis['checks'][] = $headings_check;
 		self::update_analysis_score($analysis, $headings_check, $weights['headings']);
 
@@ -503,9 +512,16 @@ class Analysis{
 	}
 	
 	static function check_word_count($content){
-		$word_count = str_word_count(wp_strip_all_tags($content));
-		$unique_words = count(array_unique(str_word_count(wp_strip_all_tags($content), 1)));
-		
+
+		$content = wp_strip_all_tags($content);
+
+		// Unicode-safe word count (supports Ukrainian, Japanese, etc.)
+		preg_match_all('/[\p{L}\p{N}\']+/u', $content, $matches);
+		$words = $matches[0];
+
+		$word_count = count($words);
+		$unique_words = count(array_unique(array_map('mb_strtolower', $words)));
+
 		$details = '';
 		
 		if($word_count != 0){
@@ -543,7 +559,11 @@ class Analysis{
 	static function check_keywords_density($content, $keywords){
 		$content = mb_strtolower(wp_strip_all_tags($content), 'UTF-8');
 		$keywords = array_filter(explode(',', trim($keywords)));
-		$content_words = str_word_count($content, 1);
+
+		// Unicode-safe word extraction (supports Ukrainian, Japanese, etc.)
+		preg_match_all('/[\p{L}\p{N}\']+/u', $content, $matches);
+		$content_words = $matches[0];
+
 		$count_words = count($content_words);
 		$details = '';
 

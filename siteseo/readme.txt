@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.3.8
+Stable tag: 1.3.9
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,15 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.3.9 (June 2, 2026) =
+
+* [Pro-Improvement] Added pagination support for the HTML sitemap.
+* [Improvement] Made compatibility with the Divi 5 page builder.
+* [Bug-Fix] Fixed an issue where gtag was being enqueued twice.
+* [Bug-Fix] Fixed an issue with the breadcrumbs schema.
+* [Bug-Fix] Fixed an issue with the Open Graph image limit.
+* [Bug-Fix] Fixed an issue in the Organization schema where the Twitter account field was added without a value.
 
 = 1.3.8 (April 8, 2026) =
 

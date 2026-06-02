@@ -231,8 +231,7 @@ jQuery(document).ready(function($){
 				var attachment = mediaUploader.state().get('selection').first().toJSON();
 
 				var isValid = validateImageDimensions(
-					attachment.width, 
-					attachment.height, 
+					attachment,
 					buttonId.includes('facebook')
 				);
 
@@ -296,16 +295,16 @@ jQuery(document).ready(function($){
 		);
 	}
 
-	function validateImageDimensions(width, height, isFacebook){
+	function validateImageDimensions(attachment, isFacebook){
 		if(isFacebook){
-			if(width < 200 || height < 200){
+			if(attachment.width < 200 || attachment.height < 200){
 				return {
 					valid: false,
 					message: 'Image must be at least 200x200 pixels for Facebook'
 				};
 			}
 
-			if((width * height * 4) / (1024 * 1024) > 8){
+			if((attachment.filesizeInBytes / (1024 * 1024)) > 8){
 				return {
 					valid: false,
 					message: 'Image size exceeds Facebook 8MB limit'
@@ -315,14 +314,14 @@ jQuery(document).ready(function($){
 			return { valid: true };
 		}
 
-		if(width < 144 || height < 144){
+		if(attachment.width < 144 || attachment.height < 144){
 			return {
 				valid: false,
 				message: 'Image must be at least 144x144 pixels for X'
 			};
 		}
 
-		if((width * height * 4) / (1024 * 1024) > 5){
+		if((attachment.filesizeInBytes / (1024 * 1024)) > 5){
 			return {
 				valid: false,
 				message: 'Image size exceeds X 5MB limit'

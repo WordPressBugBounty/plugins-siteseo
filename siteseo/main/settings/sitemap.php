@@ -280,7 +280,7 @@ class Sitemap{
 
 		echo '<h3 class="siteseo-tabs">'.esc_html__('HTML Sitemap', 'siteseo').'</h3>
 		<p>'.esc_html__('Generate an HTML sitemap for your visitors to improve your SEO.','siteseo').'</p>
-		<p>'.esc_html__('Restricted to 1,000 posts per post type. You can change the order and sorting settings below.','siteseo').'</p>
+		<p>'.esc_html__('Shows 1,000 posts per page with pagination. You can change the order and sorting settings below.','siteseo').'</p>
 
 		<div class="siteseo-notice"><span class="dashicons dashicons-info"></span>
 		<div>

@@ -792,6 +792,7 @@ class Import{
 		return [
 			'count' => $imported_count,
 			'log' => $log,
+			/* translators: %d: Number of imported items. */
 			'message' => sprintf(__('SureRank import completed. Imported %d items.', 'siteseo'), $imported_count),
 		];
 	}

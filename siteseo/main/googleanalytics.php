@@ -28,7 +28,8 @@ class GoogleAnalytics{
 			add_action('wp_head', '\SiteSEO\GoogleAnalytics::ga_tracking_code');
 		}
 
-		if(!empty($siteseo->analaytics_settings['google_analytics_enable'])){
+		// Only load legacy gtag tracking if GA4 is NOT enabled (to prevent duplicate scripts)
+		if(!empty($siteseo->analaytics_settings['google_analytics_enable']) && empty($siteseo->analaytics_settings['google_analytics_ga4'])){
 			add_action('wp_footer', '\SiteSEO\GoogleAnalytics::tracking');
 		}
 
@@ -724,7 +725,7 @@ class GoogleAnalytics{
 					exit;
 				}
 
-				wp_redirect($final_url, $status_code);
+				wp_safe_redirect($final_url, $status_code);
 				exit;
 			}
 		}

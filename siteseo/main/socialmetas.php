@@ -87,7 +87,7 @@ class SocialMetas{
 			}
 		}
 
-		$x_url = 'https://x.com/'.$twitter_account;
+		$x_url = !empty($twitter_account) ? 'https://x.com/'.$twitter_account : '';
 
 		$same_as = array_filter([
 			esc_url($fb_account), 

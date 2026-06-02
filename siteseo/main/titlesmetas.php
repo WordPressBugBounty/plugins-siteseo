@@ -518,36 +518,8 @@ class TitlesMetas{
 			$replacements = array_merge($replacements, $kkart_variables);
 		}
 
-		$safe_list = [
-			'_siteseo_titles_title',
-			'_siteseo_titles_desc',
-			'_siteseo_social_fb_title',
-			'_siteseo_social_fb_desc',
-			'_siteseo_social_fb_img',
-			'_siteseo_social_twitter_title',
-			'_siteseo_social_twitter_desc',
-			'_siteseo_social_twitter_img',
-
-			// WooCommerce 
-			'_price',
-			'_regular_price',
-			'_sale_price',
-			'_stock',
-			'_stock_status',
-			'_sku',
-			'_weight',
-			'_length',
-			'width',
-			'_height',
-			'total_sales',
-		];
-
 		if(preg_match_all('/%%_cf_(.*?)%%/', $content, $matches)){
 			foreach ($matches[1] as $custom_field) {
-
-				if(!in_array($custom_field, $safe_list, true)){
-					continue;
-				}
 
 				$meta_value = get_post_meta($post->ID, $custom_field, true);
 				$replacements["%%_cf_{$custom_field}%%"] = $meta_value;
@@ -557,10 +529,6 @@ class TitlesMetas{
 		if(preg_match_all('/%%_ct_(.*?)%%/', $content, $matches)){
 			foreach($matches[1] as $taxonomy){
 
-				if(!in_array($taxonomy, $safe_list, true)){
-					continue;
-				}
-
 				$terms = get_the_terms($post->ID, $taxonomy);
 				$term_names = is_array($terms) ? wp_list_pluck($terms, 'name') : [];
 				$replacements["%%_ct_{$taxonomy}%%"] = implode(', ', $term_names);
@@ -569,10 +537,6 @@ class TitlesMetas{
 
 		if(preg_match_all('/%%_ucf_(.*?)%%/', $content, $matches)){
 			foreach($matches[1] as $user_meta){
-
-				if(!in_array($user_meta, $safe_list, true)){
-					continue;
-				}
 
 				$meta_value = get_user_meta($author_id, $user_meta, true);
 				$replacements["%%_ucf_{$user_meta}%%"] = $meta_value;

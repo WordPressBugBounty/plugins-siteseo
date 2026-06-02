@@ -353,10 +353,22 @@ class GenerateSitemap{
 			'no_found_rows' => true,
 			'lang' => 'all',
 			'meta_query' => [
+			'relation' => 'OR',
 			[
 				'key' => '_siteseo_robots_index',
 				'compare' => 'NOT EXISTS'
-			]]
+			],
+			[
+				'key' => '_siteseo_robots_index',
+				'value' => '',
+				'compare' => '='
+			],
+			[
+				'key' => '_siteseo_robots_index',
+				'value' => '0',
+				'compare' => '='
+			]
+		]
 		]);
 
 		if(get_option('permalink_structure')){
@@ -434,10 +446,22 @@ class GenerateSitemap{
 			'update_term_meta_cache' => false,
 			'lang' => 'all',
 			'meta_query' => [
-			[
-				'key' => '_siteseo_robots_index',
-				'compare' => 'NOT EXISTS'
-			]]
+				'relation' => 'OR',
+				[
+					'key' => '_siteseo_robots_index',
+					'compare' => 'NOT EXISTS'
+				],
+				[
+					'key' => '_siteseo_robots_index',
+					'value' => '',
+					'compare' => '='
+				],
+				[
+					'key' => '_siteseo_robots_index',
+					'value' => '0',
+					'compare' => '='
+				]
+			]
 		]);
 
 		foreach($terms as $term){
@@ -554,16 +578,26 @@ class GenerateSitemap{
 		$orderby = !empty($orderby_map[$order_by]) ? $orderby_map[$order_by] : 'date';
 		$cpt_list = !empty($atts['cpt']) ? explode(',', $atts['cpt']) : [];
 
+		$paged = max(1, get_query_var('paged'), get_query_var('page'), isset($_GET['sitemap_page']) ? (int)$_GET['sitemap_page'] : 1);
+		$posts_per_page = 1000;
+		$offset = ($paged - 1) * $posts_per_page;
+
 		if(!empty($siteseo->sitemap_settings['xml_sitemap_post_types_list'])){ 
 			foreach($siteseo->sitemap_settings['xml_sitemap_post_types_list'] as $post_type => $settings){
 				if(!empty($settings['include']) && (empty($cpt_list) || in_array($post_type, $cpt_list))){
+
+					$count_posts = wp_count_posts($post_type);
+					$total_posts = isset($count_posts->publish) ? $count_posts->publish : 0;
+ 
+					if($total_posts == 0) continue;
 
 					$output .= '<h2>'.esc_html(ucfirst($post_type)).'</h2>';
 
 					$args = [
 						'post_type' => $post_type,
 						'post_status' => 'publish',
-						'numberposts' => -1,
+						'posts_per_page' => $posts_per_page,
+						'offset' => $offset,
 						'orderby' => $orderby,
 						'order' => $order,
 					];
@@ -588,6 +622,20 @@ class GenerateSitemap{
 							$output .= '</li>';
 						}
 						$output .= '</ul>';
+
+							if($total_posts > $posts_per_page){
+								$total_pages = ceil($total_posts / $posts_per_page);
+								$output .= '<div class="siteseo-pagination">';
+								$output .= paginate_links([
+									'base' => add_query_arg('sitemap_page', '%#%'),
+									'format' => '',
+									'prev_text' => __('&laquo; Previous', 'siteseo'),
+									'next_text' => __('Next &raquo;', 'siteseo'),
+									'total' => $total_pages,
+									'current' => $paged,
+								]);
+								$output .= '</div>';
+							}
 					}else{
 						$output .= '';
 					}
