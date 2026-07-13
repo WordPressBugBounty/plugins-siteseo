@@ -395,6 +395,11 @@ class GenerateSitemap{
 		}
 
 		foreach($posts as $post){
+			// WPML compat, switch to post language so get_permalink returns correct URL
+			if(function_exists('wpml_get_language_information')){
+				$l = wpml_get_language_information(null, $post->ID);
+				if(!empty($l['language_code'])) do_action('wpml_switch_language', $l['language_code']);
+			}
 				
 			if($post->ID == get_option('page_on_front')){
 				continue;
@@ -419,6 +424,10 @@ class GenerateSitemap{
 			</url>";
 		}
 
+		if(function_exists('wpml_get_language_information')){
+			do_action('wpml_switch_language', 'all');
+		}
+		
 		echo '</urlset>';
 		exit;
 	}
@@ -465,6 +474,11 @@ class GenerateSitemap{
 		]);
 
 		foreach($terms as $term){
+			// WPML compat, switch to term language so get_term_link returns correct URL
+			if(function_exists('wpml_get_language_information')){
+				$l = apply_filters('wpml_element_language_code', null, array('element_id' => $term->term_taxonomy_id, 'element_type' => 'tax_' . $taxonomy));
+				if(!empty($l)) do_action('wpml_switch_language', $l);
+			}
 			
 			// most recent post in this term to determine lastmod date
 			$recent_posts = get_posts([
@@ -491,6 +505,10 @@ class GenerateSitemap{
 			</url>';
 		}
 
+		if(function_exists('wpml_get_language_information')){
+			do_action('wpml_switch_language', 'all');
+		}
+		
 		echo '</urlset>';
 		exit;
 	}
@@ -604,16 +622,22 @@ class GenerateSitemap{
 
 					$posts = get_posts($args);
 
-					if(!empty($posts)){
-						$output .= '<ul>';
-						foreach($posts as $post){
-							if(in_array($post->ID, $exclude_pages)){
-								continue;
-							}
+				if(!empty($posts)){
+					$output .= '<ul>';
+					foreach($posts as $post){
+						if(in_array($post->ID, $exclude_pages)){
+							continue;
+						}
 
-							$post_title = get_the_title($post->ID) ?: $post->ID;
+						// WPML compat
+						if(function_exists('wpml_get_language_information')){
+							$l = wpml_get_language_information(null, $post->ID);
+							if(!empty($l['language_code'])) do_action('wpml_switch_language', $l['language_code']);
+						}
 
-							$output .= '<li><a href="'.esc_url(get_permalink($post->ID)).'">'.esc_html($post_title).'</a>';
+						$post_title = get_the_title($post->ID) ?: $post->ID;
+
+						$output .= '<li><a href="'.esc_url(get_permalink($post->ID)).'">'.esc_html($post_title).'</a>';
 
 							if(!$disable_date){
 								$output .= '<span class="post-date"> - '.esc_html(get_the_modified_date('j F Y', $post->ID)).'</span>';
@@ -641,6 +665,10 @@ class GenerateSitemap{
 					}
 				}
 			}
+		}
+
+		if(function_exists('wpml_get_language_information')){
+			do_action('wpml_switch_language', 'all');
 		}
 
 		return $output;

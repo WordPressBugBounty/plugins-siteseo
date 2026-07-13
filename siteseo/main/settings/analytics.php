@@ -781,7 +781,7 @@ class Analytics{
 				echo '</div></th>
 				<td>
 					<div id="general-settings">
-						<h3>'.esc_html__('Google Anlytics', 'siteseo').'</h3>
+						<h3>'.esc_html__('Google Analytics', 'siteseo').'</h3>
 						<div class="siteseo_wrap_label"><p class="description">'.esc_html__('Connect your Google Analytics to your website. The tracking code will be automatically added to your site.', 'siteseo') .'</p></div>
 						<span class="line"></span>
 						<div class="siteseo_wrap_label"><p class="'.esc_html__('description">Link your Google Analytics to your website. The tracking code will be automatically added to your site', 'siteseo').'</p></div>

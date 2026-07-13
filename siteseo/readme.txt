@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.2
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,12 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.4.0 (July 13, 2026) =
+
+* [Feature] Added AI Abilities Pro feature
+* [Improvement] Made compatibility with WPML plugin
+* [Bug-Fix] There were issues with external and internal links in SEO analysis, this has been fixed.
 
 = 1.3.9 (June 2, 2026) =
 

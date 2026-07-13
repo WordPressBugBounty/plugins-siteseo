@@ -254,6 +254,8 @@ class Admin{
 		if(!empty($is_admin)){
 			add_submenu_page('siteseo', __('Search Statistics', 'siteseo'), __('Search Statistics', 'siteseo') . (( time() < strtotime('31 January 2026') ) ? ' <span style="color:#28a745;margin-left:2px;">NEW</span>' : ''), 'manage_options', 'siteseo-search-statistics', '\SiteSEO\Settings\Statistics::init');
 			
+			add_submenu_page('siteseo', __('Abilities', 'siteseo'), __('AI Abilities', 'siteseo') . ' <span  style="vertical-align:middle;background:#d63638;font-size:9px;padding:0 6px;border-radius:10px;line-height:18px;color:#fff;">New!</span>', 'manage_options', 'siteseo-abilities', '\SiteSEO\Settings\Abilities::home');
+
 			add_submenu_page('siteseo', __('Tools', 'siteseo'), 'Tools', 'manage_options','siteseo-tools' ,'\SiteSEO\Settings\Tools::menu');
 		}
 	
@@ -443,6 +445,18 @@ class Admin{
 				'url'   => admin_url('admin-ajax.php'), 
 				'nonce' => wp_create_nonce('siteseo_admin_nonce') 
 			));
+
+			// Dedicated assets for the Abilities / MCP page.
+			if(!empty($_GET['page']) && $_GET['page'] === 'siteseo-abilities'){
+				wp_enqueue_script('siteseo-abilities', SITESEO_ASSETS_URL . '/js/abilities.js', ['jquery'], SITESEO_VERSION, true);
+				wp_enqueue_style('abilities', SITESEO_ASSETS_URL . '/css/abilities.css', [], SITESEO_VERSION);
+
+				wp_localize_script('siteseo-abilities', 'siteseo_abilities', [
+					'ajax_url'     => admin_url('admin-ajax.php'),
+					'nonce'        => wp_create_nonce('siteseo_admin_nonce'),
+					'endpoint_url' => trailingslashit(home_url()) . ltrim(\SiteSEO\Settings\Abilities::$ABILITIES_ENDPOINT, '/'),
+				]);
+			}
 		}
 	}
 

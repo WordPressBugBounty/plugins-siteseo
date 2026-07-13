@@ -367,15 +367,15 @@ class Analysis{
 		$analysis['checks'][] = $meta_description_check;
 		self::update_analysis_score($analysis, $meta_description_check, $weights['meta_description']);
 
-		$image_alt_check = self::check_image_alt_texts($content);
+		$image_alt_check = self::check_image_alt_texts($html_content);
 		$analysis['checks'][] = $image_alt_check;
 		self::update_analysis_score($analysis, $image_alt_check, $weights['image_alt']);
 
-		$links_outbound_check = self::analyze_outbound_links($content);
+		$links_outbound_check = self::analyze_outbound_links($html_content);
 		$analysis['checks'][] = $links_outbound_check;
 		self::update_analysis_score($analysis, $links_outbound_check, $weights['outbound_links']);
 
-		$links_internal_check = self::analyze_internal_links($content);
+		$links_internal_check = self::analyze_internal_links($html_content);
 		$analysis['checks'][] = $links_internal_check;
 		self::update_analysis_score($analysis, $links_internal_check, $weights['internal_links']);
 

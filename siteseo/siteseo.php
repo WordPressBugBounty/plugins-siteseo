@@ -4,7 +4,7 @@ Plugin Name: SiteSEO - SEO Simplified
 Plugin URI: https://siteseo.io/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.3.9
+Version: 1.4.0
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.3.9');
+define('SITESEO_VERSION', '1.4.0');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -72,6 +72,12 @@ function siteseo_load_plugin(){
 	$siteseo->analaytics_settings = get_option('siteseo_google_analytics_option_name', []);
 	
 	siteseo_check_update();
+
+	// Register SiteSEO abilities with the WordPress 6.9+ Abilities API.
+	if(!empty($siteseo->setting_enabled['toggle-abilities']) && function_exists('wp_register_ability')){
+		add_action('wp_abilities_api_categories_init', '\SiteSEO\AbilitiesRegister::register_categories');
+		add_action('wp_abilities_api_init', '\SiteSEO\AbilitiesRegister::register_abilities');
+	}
 	
 	if(!empty($siteseo->setting_enabled['toggle-advanced'])){
 		add_action('init','\SiteSEO\ImageSeo::init', 11); // Upload happens with AJAX so we need this here

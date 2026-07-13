@@ -40,6 +40,13 @@ class Ajax{
 		
 		// Onboarding Actions
 		add_action('wp_ajax_siteseo_save_onboarding_settings', '\SiteSEO\Ajax::save_onboarding_settings');
+
+		// === Abilities / MCP === //
+		add_action('wp_ajax_siteseo_install_mcp_adapter', '\SiteSEO\Ajax::install_mcp_adapter');
+		add_action('wp_ajax_siteseo_generate_app_password', '\SiteSEO\Ajax::generate_app_password');
+		add_action('wp_ajax_siteseo_test_mcp_connection', '\SiteSEO\Ajax::test_mcp_connection');
+		add_action('wp_ajax_siteseo_save_test_status', '\SiteSEO\Ajax::save_test_status');
+		add_action('wp_ajax_siteseo_save_abilities', '\SiteSEO\Ajax::save_toggle_state');
 	}
 
 	static function handle_import(){
@@ -376,6 +383,9 @@ class Ajax{
 			case 'siteseo_save_analytics_toggle':
 				$toggle_key = 'toggle-google-analytics';
 				break;
+			case 'siteseo_save_abilities':
+				$toggle_key = 'toggle-abilities';
+				break;
 			default:
 				wp_send_json_error(['message' => __('Invalid action', 'siteseo')]);
 				return;
@@ -630,5 +640,258 @@ class Ajax{
 		}
 
 		update_option('softaculous_plugin_update_notice', $plugin_update_notice);
+	}
+
+	// =========================================================================
+	// === Abilities / MCP =====================================================
+	// =========================================================================
+
+	// Fetch the latest MCP Adapter release info from GitHub (cached 1 hour).
+	static function get_mcp_adapter_release(){
+		$cached = get_transient(\SiteSEO\Settings\Abilities::$MCP_ADAPTER_RELEASE_CACHE);
+		if(false !== $cached && is_array($cached)){
+			return $cached;
+		}
+
+		$response = wp_remote_get(\SiteSEO\Settings\Abilities::$MCP_ADAPTER_RELEASE_URL, [
+			'timeout' => 10,
+			'headers' => ['Accept' => 'application/vnd.github+json'],
+		]);
+
+		if(is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)){
+			return [];
+		}
+
+		$body = json_decode(wp_remote_retrieve_body($response), true);
+		if(!is_array($body) || empty($body['tag_name']) || empty($body['assets'][0]['browser_download_url'])){
+			return [];
+		}
+
+		$payload = [
+			'version'      => ltrim((string)$body['tag_name'], 'v'),
+			'download_url' => esc_url_raw($body['assets'][0]['browser_download_url']),
+		];
+
+		set_transient(\SiteSEO\Settings\Abilities::$MCP_ADAPTER_RELEASE_CACHE, $payload, HOUR_IN_SECONDS);
+		return $payload;
+	}
+
+	// Install (or activate) the official WordPress MCP Adapter plugin with one click.
+	static function install_mcp_adapter(){
+		check_ajax_referer('siteseo_admin_nonce', 'nonce');
+
+		$option = get_option('siteseo_toggle', []);
+		
+		if(empty($option['toggle-abilities'])){
+			wp_send_json_error(__('The MCP Adapter cannot be installed because the Abilities toggle is turned off. Please enable it above and try again.', 'siteseo'));
+		}
+
+		if(!current_user_can('install_plugins')){
+			wp_send_json_error(__('You do not have permission to install plugins.', 'siteseo'));
+		}
+
+		// Already loaded (e.g. shipped by another plugin / WP core).
+		if(class_exists('\\WP\\MCP\\Core\\McpAdapter')){
+			wp_send_json_success([
+				'message' => __('MCP Adapter is already active on this site.', 'siteseo'),
+				'state'   => 'active',
+			]);
+		}
+
+		$requested_action = !empty($_POST['adapter_action']) ? sanitize_key(wp_unslash($_POST['adapter_action'])) : 'install';
+
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		$installed_file = \SiteSEO\Settings\Abilities::get_installed_mcp_adapter_file();
+
+		// Installed but inactive -> just activate.
+		if(!empty($installed_file)){
+			$activated = activate_plugin($installed_file);
+			if(is_wp_error($activated)){
+				wp_send_json_error($activated->get_error_message());
+			}
+			wp_send_json_success([
+				'message' => __('MCP Adapter activated.', 'siteseo'),
+				'state'   => 'active',
+			]);
+		}
+
+		// Nothing installed yet -> fetch the release and run the upgrader.
+		if($requested_action !== 'install'){
+			wp_send_json_error(__('Invalid adapter action.', 'siteseo'));
+		}
+
+		$release = self::get_mcp_adapter_release();
+		if(empty($release['download_url'])){
+			wp_send_json_error(__('Could not resolve the MCP Adapter download URL. Please try again in a moment.', 'siteseo'));
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+
+		$skin     = new \WP_Ajax_Upgrader_Skin();
+		$upgrader = new \Plugin_Upgrader($skin);
+		$result   = $upgrader->install($release['download_url']);
+
+		if(is_wp_error($result)){
+			wp_send_json_error($result->get_error_message());
+		}
+
+		if(false === $result || !$upgrader->plugin_info()){
+			$errors = method_exists($skin, 'get_errors') ? $skin->get_errors() : new \WP_Error();
+			$message = is_wp_error($errors) && $errors->get_error_message() ? $errors->get_error_message() : __('The MCP Adapter could not be installed.', 'siteseo');
+			wp_send_json_error($message);
+		}
+
+		$plugin_file = $upgrader->plugin_info();
+		$activated    = activate_plugin($plugin_file);
+
+		if(is_wp_error($activated)){
+			wp_send_json_error($activated->get_error_message());
+		}
+
+		wp_send_json_success([
+			'message' => sprintf(__('MCP Adapter %s installed and activated.', 'siteseo'), $release['version']),
+			'state'   => 'active',
+			'version' => $release['version'],
+		]);
+	}
+
+	// Generate a WordPress Application Password for the current user.
+	static function generate_app_password(){
+		check_ajax_referer('siteseo_admin_nonce', 'nonce');
+
+		$option = get_option('siteseo_toggle', []);
+		
+		if(empty($option['toggle-abilities'])){
+			wp_send_json_error(__('Cannot generate AI Application Password because the Abilities feature is disabled. Please enable it first.', 'siteseo'));
+		}
+
+		if(!current_user_can('manage_options')){
+			wp_send_json_error(__('You do not have permission to generate an Application Password.', 'siteseo'));
+		}
+
+		if(!class_exists('\WP_Application_Passwords')){
+			wp_send_json_error(__('Application Passwords are not available on this site.', 'siteseo'));
+		}
+
+		$user_id = get_current_user_id();
+		if(!$user_id){
+			wp_send_json_error(__('You must be logged in to generate an Application Password.', 'siteseo'));
+		}
+
+		if(!wp_is_application_passwords_available_for_user($user_id)){
+			wp_send_json_error(__('Application Passwords are not available for your account. Please contact a site administrator.', 'siteseo'));
+		}
+
+		$created = \WP_Application_Passwords::create_new_application_password($user_id, [
+			'name'   => \SiteSEO\Settings\Abilities::$APP_PASSWORD_NAME,
+			'app_id' => \SiteSEO\Settings\Abilities::$APP_PASSWORD_APP_ID,
+		]);
+
+		if(is_wp_error($created)){
+			wp_send_json_error($created->get_error_message());
+		}
+
+		$user = wp_get_current_user();
+
+		wp_send_json_success([
+			'username' => $user ? $user->user_login : '',
+			'password' => isset($created[0]) ? (string)$created[0] : '',
+			'message'  => __('Application Password generated. Copy it now — it will not be shown again.', 'siteseo'),
+		]);
+	}
+
+	// Server-side test of the MCP endpoint (called from the Test Connection button
+	// when the client-side fetch is blocked by CORS or unavailable).
+	static function test_mcp_connection(){
+		check_ajax_referer('siteseo_admin_nonce', 'nonce');
+
+		if(!current_user_can('manage_options')){
+			wp_send_json_error(__('You do not have permission to test the connection.', 'siteseo'));
+		}
+
+		$start  = microtime(true);
+		$url    = trailingslashit(home_url()) . ltrim(\SiteSEO\Settings\Abilities::$ABILITIES_ENDPOINT, '/');
+
+		// Server-side reachability check. The plaintext Application Password
+		// lives only in the browser's memory (shown once on generation), so the
+		// authoritative authenticated test runs client-side. This fallback only
+		// verifies the endpoint is reachable and returns a parsable payload.
+		$username = isset($_POST['username']) ? sanitize_text_field(wp_unslash($_POST['username'])) : '';
+		$password = isset($_POST['password']) ? sanitize_text_field(wp_unslash($_POST['password'])) : '';
+		
+		$response = wp_remote_get($url, [
+			'headers' => [
+				'Accept' => 'application/json',
+				'Authorization' => 'Basic ' . base64_encode($username . ':' . $password),
+			],
+		]);
+
+		$elapsed = round((microtime(true) - $start) * 1000);
+
+		if(is_wp_error($response)){
+			$message = sprintf(__('Could not reach the abilities endpoint (%s).', 'siteseo'), $response->get_error_message());
+			\SiteSEO\Settings\Abilities::save_test_connection_status(false, $message);
+			wp_send_json_error([
+				'message' => $message,
+			]);
+		}
+
+		$code = wp_remote_retrieve_response_code($response);
+		$body = json_decode(wp_remote_retrieve_body($response), true);
+
+		if($code >= 200 && $code < 300 && is_array($body)){
+			$siteseo_abilities = 0;
+			foreach($body as $ability){
+				$name = isset($ability['name']) ? $ability['name'] : (isset($ability['id']) ? $ability['id'] : '');
+				if(is_string($name) && strpos($name, 'siteseo-') === 0){
+					$siteseo_abilities++;
+				}
+			}
+
+			$message = sprintf(__('Authenticated with your Application Password and discovered %1$d SiteSEO abilities in %2$dms. Your site is ready to connect an AI client below.', 'siteseo'), $siteseo_abilities, $elapsed);
+
+			\SiteSEO\Settings\Abilities::save_test_connection_status(true, $message);
+
+			wp_send_json_success([
+				'message'    => $message,
+				'abilities'  => $siteseo_abilities,
+				'elapsed_ms' => $elapsed,
+			]);
+		}
+
+		if($code === 401 || $code === 403){
+			$message = __('Your Application Password was rejected — it may have been revoked. Generate a new one and test again.', 'siteseo');
+			\SiteSEO\Settings\Abilities::save_test_connection_status(false, $message);
+			wp_send_json_error([
+				'message' => $message,
+			]);
+		}
+
+		$message = sprintf(__('The abilities endpoint responded with status %1$d. Check the MCP Adapter is active and try again.', 'siteseo'), $code);
+		\SiteSEO\Settings\Abilities::save_test_connection_status(false, $message);
+		wp_send_json_error([
+			'message' => $message,
+		]);
+	}
+
+	// Persist the "Test connection" result produced by the client-side fetch
+	// (which owns the plaintext Application Password) so the pill keeps its
+	// state across page reloads.
+	static function save_test_status(){
+		check_ajax_referer('siteseo_admin_nonce', 'nonce');
+
+		if(!current_user_can('manage_options')){
+			wp_send_json_error(__('You do not have permission to do that.', 'siteseo'));
+		}
+
+		$ok      = !empty($_POST['ok']);
+		$message = !empty($_POST['message']) ? sanitize_text_field(wp_unslash($_POST['message'])) : '';
+
+		\SiteSEO\Settings\Abilities::save_test_connection_status($ok, $message);
+
+		wp_send_json_success();
 	}
 }
