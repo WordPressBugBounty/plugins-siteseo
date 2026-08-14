@@ -2,9 +2,9 @@
 Contributors: pagelayer, softaculous
 Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,15 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.4.1 (August 14, 2026) =
+
+* [Pro-Improvement] Added a Custom ID option for Local Business.
+* [Pro-Improvement] Improvement with WooCommerce product rating schema.
+* [Bug-Fix] Fixed an issue where sitemap pagination failed to list all posts on large sites.
+* [Bug-Fix] Fixed an issue where meta descriptions were not rendering on category, tag, and custom taxonomy pages.
+* [Bug-Fix] Fixed migration failures when importing data from other plugins on sites with a large number of posts.
+* [Task] Tested with WordPress 7.1
 
 = 1.4.0 (July 13, 2026) =
 

@@ -52,9 +52,9 @@ class TitlesMetas{
 		foreach($taxonomies as $taxonomy){
 			// taxonomies
 			$term_id = 0;
-			if(is_tax() || is_category() || is_tag()){
-				$queried_object = get_queried_object();
-				$term_id = $queried_object->term_id ? $queried_object->term_id : 0;
+			$queried_object = get_queried_object();
+			if((is_tax() || is_category() || is_tag()) && isset($queried_object->taxonomy) && $queried_object->taxonomy == $taxonomy->name){
+				$term_id = isset($queried_object->term_id) ? $queried_object->term_id : 0;
 				
 				if($term_id){
 					$robots['noindex'] = !empty(get_term_meta($term_id, '_siteseo_robots_index', true)) || $robots['noindex'];
@@ -918,7 +918,7 @@ class TitlesMetas{
 
 				$description = !empty($term_meta_desc) ? $term_meta_desc : $default_desc;
 
-				if(!empty($disabled)){
+				if(empty($disabled) && !empty($description)){
 					$description = self::replace_variables($description);
 					echo '<meta name="description" content="' . esc_attr(self::truncate_desc($description)) . '">';
 				}

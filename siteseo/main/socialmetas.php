@@ -54,11 +54,21 @@ class SocialMetas{
 			}
 		}
 
+		$custom_type = !empty($siteseo->social_settings['social_knowledge_custom_type']) ? $siteseo->social_settings['social_knowledge_custom_type'] : '';
+
+		if($org_type === 'Custom' && !empty($custom_type)){
+			$schema_type = esc_html($custom_type);
+			$schema_id = esc_url(trailingslashit($site_url) . '#' . ltrim($custom_type, '#'));
+		} else {
+			$schema_type = $org_type ? esc_html($org_type) : 'Organization';
+			$schema_id = esc_url(trailingslashit($site_url) . '#' . $schema_type);
+		}
+
 		//JSON-LD data
 		$json_ld = [
 			'@context' => 'https://schema.org',
-			'@type' => $org_type ? esc_html($org_type) : 'Organization',
-			'@id' => esc_url(trailingslashit($site_url) . '#' . $org_type),
+			'@type' => $schema_type,
+			'@id' => $schema_id,
 			'name' => esc_html($org_name),
 			'url' => esc_url($site_url),
 			'logo' => array_filter([
@@ -100,6 +110,8 @@ class SocialMetas{
 		if(!empty($same_as)){
 			$json_ld['sameAs'] = array_values($same_as);
 		}
+
+		$json_ld = apply_filters('siteseo_social_graph_json_ld', $json_ld);
 
 		// Output JSON-LD script
 		echo '<script type="application/ld+json">';

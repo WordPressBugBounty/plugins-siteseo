@@ -163,24 +163,19 @@ class GenerateSitemap{
 		// Post types
 		if(isset($siteseo->sitemap_settings['xml_sitemap_post_types_list'])){
 			foreach($siteseo->sitemap_settings['xml_sitemap_post_types_list'] as $post_type => $settings){
-				$posts = get_posts(
-					[
-						'post_type' => $post_type,
-						'fields'=> 'ids',
-						'numberposts' => -1,
-						'post_status' => 'publish',
-						'has_password' => false,
-						'no_found_rows' => true,
-						'ignore_sticky_posts' => true,
-						'update_post_term_cache' => false,
-					]
-				);
+				global $wpdb;
+				$cache_key = 'siteseo_sitemap_count_' . $post_type;
+				$total_posts = get_transient($cache_key);
+				if(false === $total_posts){
+					$total_posts = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(ID) FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_password = ''", $post_type));
+					set_transient($cache_key, $total_posts, 12 * HOUR_IN_SECONDS);
+				}
 
-				if(empty($posts)){
+				if($total_posts == 0){
 					continue;
 				}
 
-				$total_pages = (int) ceil(count($posts) / 1000);
+				$total_pages = (int) ceil($total_posts / 1000);
 
 				if(!empty($settings['include']) && !empty($total_pages)){
 					$last_post = get_posts([
@@ -281,12 +276,26 @@ class GenerateSitemap{
 				
 			$lastmod = !empty($video_posts) ? get_post_modified_time('c', true, $video_posts[0]) : current_time('c');
 			
-				for($page = 1; $page <= $total_pages; $page++){
-					echo '<sitemap>
-						<loc>'.esc_url(home_url("/video-sitemap$page.xml")).'</loc>
-						<lastmod>'.esc_xml($lastmod).'</lastmod>
-					</sitemap>';
+			$video_count = 0;
+			$v_post_types = is_array($pro_settings['video_sitemap_posts']) ? $pro_settings['video_sitemap_posts'] : [$pro_settings['video_sitemap_posts']];
+			foreach ($v_post_types as $v_post_type) {
+				global $wpdb;
+				$cache_key = 'siteseo_sitemap_video_count_' . $v_post_type;
+				$count = get_transient($cache_key);
+				if(false === $count){
+					$count = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(ID) FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_password = ''", $v_post_type));
+					set_transient($cache_key, $count, 12 * HOUR_IN_SECONDS);
 				}
+				$video_count += $count;
+			}
+			$video_total_pages = (int) ceil($video_count / 1000);
+
+			for($page = 1; $page <= $video_total_pages; $page++){
+				echo '<sitemap>
+					<loc>'.esc_url(home_url("/video-sitemap$page.xml")).'</loc>
+					<lastmod>'.esc_xml($lastmod).'</lastmod>
+				</sitemap>';
+			}
 
 		}
 		
@@ -341,35 +350,25 @@ class GenerateSitemap{
 		
 		$offset = (1000*(self::$paged - 1));
 
-		$posts = get_posts(
-		[
-			'post_type' => $post_type,
-			'post_status' => 'publish',
-			'numberposts' => 1000,
-			'offset' => $offset,
-			'order' => 'DESC',
-			'orderby' => 'modified',
-			'has_password' => false,
-			'no_found_rows' => true,
-			'lang' => 'all',
-			'meta_query' => [
-			'relation' => 'OR',
-			[
-				'key' => '_siteseo_robots_index',
-				'compare' => 'NOT EXISTS'
-			],
-			[
-				'key' => '_siteseo_robots_index',
-				'value' => '',
-				'compare' => '='
-			],
-			[
-				'key' => '_siteseo_robots_index',
-				'value' => '0',
-				'compare' => '='
-			]
-		]
-		]);
+		$cache_key = 'siteseo_sitemap_posts_' . $post_type . '_' . self::$paged;
+		$posts = get_transient($cache_key);
+
+		if(false === $posts){
+			global $wpdb;
+			$posts = $wpdb->get_results($wpdb->prepare("
+				SELECT p.* 
+				FROM {$wpdb->posts} p
+				LEFT JOIN {$wpdb->postmeta} pm ON (p.ID = pm.post_id AND pm.meta_key = '_siteseo_robots_index')
+				WHERE p.post_type = %s 
+				AND p.post_status = 'publish' 
+				AND p.post_password = ''
+				AND (pm.meta_value IS NULL OR pm.meta_value = '' OR pm.meta_value = '0')
+				ORDER BY p.post_modified DESC
+				LIMIT %d OFFSET %d
+			", $post_type, 1000, $offset));
+			
+			set_transient($cache_key, $posts, 12 * HOUR_IN_SECONDS);
+		}
 
 		if(get_option('permalink_structure')){
 			$xsl_url = home_url('/sitemaps.xsl');
@@ -446,32 +445,24 @@ class GenerateSitemap{
 		echo '<?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="' . esc_url($xsl_url) . '" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-		$terms = get_terms([
-			'taxonomy' => $taxonomy,
-			'hide_empty' => false,
-			'number' => 2000,
-			'offset' => $offset,
-			'hierarchical' => false,
-			'update_term_meta_cache' => false,
-			'lang' => 'all',
-			'meta_query' => [
-				'relation' => 'OR',
-				[
-					'key' => '_siteseo_robots_index',
-					'compare' => 'NOT EXISTS'
-				],
-				[
-					'key' => '_siteseo_robots_index',
-					'value' => '',
-					'compare' => '='
-				],
-				[
-					'key' => '_siteseo_robots_index',
-					'value' => '0',
-					'compare' => '='
-				]
-			]
-		]);
+		$cache_key = 'siteseo_sitemap_terms_' . $taxonomy . '_' . self::$paged;
+		$terms = get_transient($cache_key);
+
+		if(false === $terms){
+			global $wpdb;
+			$terms = $wpdb->get_results($wpdb->prepare("
+				SELECT t.*, tt.* 
+				FROM {$wpdb->terms} t
+				INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+				LEFT JOIN {$wpdb->termmeta} tm ON (t.term_id = tm.term_id AND tm.meta_key = '_siteseo_robots_index')
+				WHERE tt.taxonomy = %s
+				AND (tm.meta_value IS NULL OR tm.meta_value = '' OR tm.meta_value = '0')
+				ORDER BY t.term_id DESC
+				LIMIT %d OFFSET %d
+			", $taxonomy, 2000, $offset));
+
+			set_transient($cache_key, $terms, 12 * HOUR_IN_SECONDS);
+		}
 
 		foreach($terms as $term){
 			// WPML compat, switch to term language so get_term_link returns correct URL
@@ -604,8 +595,13 @@ class GenerateSitemap{
 			foreach($siteseo->sitemap_settings['xml_sitemap_post_types_list'] as $post_type => $settings){
 				if(!empty($settings['include']) && (empty($cpt_list) || in_array($post_type, $cpt_list))){
 
-					$count_posts = wp_count_posts($post_type);
-					$total_posts = isset($count_posts->publish) ? $count_posts->publish : 0;
+					global $wpdb;
+					$cache_key = 'siteseo_html_sitemap_count_' . $post_type;
+					$total_posts = get_transient($cache_key);
+					if(false === $total_posts){
+						$total_posts = (int) $wpdb->get_var($wpdb->prepare("SELECT COUNT(ID) FROM {$wpdb->posts} WHERE post_type = %s AND post_status = 'publish' AND post_password = ''", $post_type));
+						set_transient($cache_key, $total_posts, 12 * HOUR_IN_SECONDS);
+					}
  
 					if($total_posts == 0) continue;
 
@@ -986,6 +982,26 @@ class GenerateSitemap{
 		if(in_array($wp->request, $redirects)){
 			wp_safe_redirect(home_url('sitemaps.xml'), 301);
 			die();
+		}
+	}
+
+	static function clear_cache_on_status_change($new_status, $old_status, $post){
+		global $wpdb;
+
+		if($new_status == $old_status){
+			return;
+		}
+
+		if(!empty($post) && !empty($post->post_type)){
+			delete_transient('siteseo_sitemap_count_' . $post->post_type);
+			delete_transient('siteseo_sitemap_video_count_' . $post->post_type);
+			delete_transient('siteseo_html_sitemap_count_' . $post->post_type);
+			
+			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_siteseo_sitemap_posts_' . $post->post_type . '\_%'));
+			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_timeout_siteseo_sitemap_posts_' . $post->post_type . '\_%'));
+
+			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_siteseo_sitemap_terms_\_%'));
+			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_timeout_siteseo_sitemap_terms_\_%'));
 		}
 	}
 	

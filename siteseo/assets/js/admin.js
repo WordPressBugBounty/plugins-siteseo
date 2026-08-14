@@ -293,6 +293,15 @@ jQuery(document).ready(function($){
 
 		mediaUploader.open();
 	});
+
+	// knowledge graph custom type toggle
+	$('#siteseo_knowledge_type_select').on('change', function(){
+		if($(this).val() === 'Custom') {
+			$('#siteseo_knowledge_custom_type_wrap').show();
+		} else {
+			$('#siteseo_knowledge_custom_type_wrap').hide();
+		}
+	});
 	
 	// get active tab
 	function getDefaultTab(){

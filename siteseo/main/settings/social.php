@@ -84,6 +84,8 @@ class Social{
         $option_org_contact_type = !empty($options['social_knowledge_contact_type']) ? $options['social_knowledge_contact_type'] : '';
         $option_org_contact_option = !empty($options['social_knowledge_contact_option']) ? $options['social_knowledge_contact_option'] : '';
 
+        $option_custom_type = !empty($options['social_knowledge_custom_type']) ? $options['social_knowledge_custom_type'] : '';
+
         echo '<h3 class="siteseo-tabs">'.esc_html__('Knowledge Graph','siteseo').'</h3>
         <p class="description">'.esc_html__('Set up Google Knowledge Graph.','siteseo').'</p>
         <table class="form-table">
@@ -91,11 +93,16 @@ class Social{
                 <tr>
                     <th scope="row" style="user-select:auto;">'.esc_html__('Person or organization','siteseo').'</th>
                     <td>
-                        <select name="siteseo_options[org_type]">
+                        <select name="siteseo_options[org_type]" id="siteseo_knowledge_type_select">
                             <option value="none" '.selected($option_org_type, 'none', false).'>'.esc_html__('None','siteseo').'</option>
                             <option value="Person" '.selected($option_org_type, 'Person', false).'>'.esc_html__('Person','siteseo').'</option>
                             <option value="Organization" '.selected($option_org_type, 'Organization', false).'>'.esc_html__('Organization','siteseo').'</option>
+                            <option value="Custom" '.selected($option_org_type, 'Custom', false).'>'.esc_html__('Custom','siteseo').'</option>
                         </select>
+                        <div id="siteseo_knowledge_custom_type_wrap" style="margin-top: 10px; '.($option_org_type === 'Custom' ? '' : 'display:none;').'">
+                            <input type="text" name="siteseo_options[custom_type]" value="'.esc_attr($option_custom_type).'" placeholder="'.esc_html__('eg. LocalBusiness or Dentist','siteseo').'">
+                            <p class="description">'.esc_html__('Enter custom schema type or anchor name. The @id will automatically append as #yourtype to your site URL.','siteseo').'</p>
+                        </div>
                     </td>
                 </tr>
 
@@ -409,6 +416,7 @@ class Social{
 			$options['social_knowledge_phone'] = isset($_POST['siteseo_options']['org_contact_number']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['org_contact_number'])) : '';
 			$options['social_knowledge_contact_type'] = isset($_POST['siteseo_options']['org_contact_type']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['org_contact_type'])) : '';
 			$options['social_knowledge_contact_option'] = isset($_POST['siteseo_options']['org_contact_option']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['org_contact_option'])) : '';
+			$options['social_knowledge_custom_type'] = isset($_POST['siteseo_options']['custom_type']) ? sanitize_text_field(wp_unslash($_POST['siteseo_options']['custom_type'])) : '';
 		}
 
 		if(isset($_POST['siteseo_options']['social_account_tab'])){

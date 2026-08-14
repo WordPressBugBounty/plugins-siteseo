@@ -17,8 +17,10 @@ class Import{
 		$imported_count = 0;
 		$log = [];
 		
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
-		foreach($posts as $post){
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 	 
 			$robots = get_post_meta($post->ID, 'rank_math_robots', true);
 			$robots_array = is_array($robots) ? $robots : [];
@@ -54,12 +56,17 @@ class Import{
 		$taxonomies = get_taxonomies();
 		
 		foreach($taxonomies as $taxonomy){
-			$terms = get_terms([
+			$term_ids = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
+				'fields' => 'ids',
 			]);
 			
-			foreach($terms as $term){
+			if(is_wp_error($term_ids)) continue;
+
+			foreach($term_ids as $t_id){
+				$term = new \stdClass();
+				$term->term_id = $t_id;
 				$term_robots = get_term_meta($term->term_id, 'rank_math_robots', true);
 				$term_robots_array = is_array($term_robots) ? $term_robots : [];
 
@@ -104,8 +111,10 @@ class Import{
 		$imported_count = 0;
 		$log = [];
     
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
-		foreach($posts as $post){
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 			$yoast_robots = get_post_meta($post->ID, '_yoast_wpseo_meta-robots-adv', true);
 			$robots_array = $yoast_robots ? explode(',', $yoast_robots) : [];
 			
@@ -188,8 +197,10 @@ class Import{
 		$imported_count = 0;
 		$log = [];
 		
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
-		foreach($posts as $post){
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 
 			$meta_mapping = [
 				'_siteseo_titles_title' => self::replace_snippet_vars((get_post_meta($post->ID, '_aioseo_title', true)),'aio_seo'),
@@ -222,12 +233,17 @@ class Import{
 		$taxonomies = get_taxonomies();
 		
 		foreach($taxonomies as $taxonomy){
-			$terms = get_terms([
+			$term_ids = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
+				'fields' => 'ids',
 			]);
 			
-			foreach($terms as $term){
+			if(is_wp_error($term_ids)) continue;
+
+			foreach($term_ids as $t_id){
+				$term = new \stdClass();
+				$term->term_id = $t_id;
 				
 				$meta_mapping = [
 					'_siteseo_titles_title' => self::replace_snippet_vars((get_term_meta($term->term_id, '_aioseo_title', true)),'aio_seo'),
@@ -269,8 +285,10 @@ class Import{
 		$imported_count = 0;
 		$log = [];
 
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
-		foreach($posts as $post){
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 			$meta_mapping = [
 				'_siteseo_titles_title' => get_post_meta($post->ID, '_genesis_title', true),
 				'_siteseo_titles_desc' => get_post_meta($post->ID, '_genesis_description', true),
@@ -301,12 +319,17 @@ class Import{
 		$taxonomies = get_taxonomies();
 		
 		foreach($taxonomies as $taxonomy){
-			$terms = get_terms([
+			$term_ids = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
+				'fields' => 'ids',
 			]);
 			
-			foreach($terms as $term){
+			if(is_wp_error($term_ids)) continue;
+
+			foreach($term_ids as $t_id){
+				$term = new \stdClass();
+				$term->term_id = $t_id;
 				$term_data = get_term_meta($term->term_id, 'autodescription-term-settings', true);
 				
 				if(empty($term_data) || !is_array($term_data)){
@@ -352,8 +375,10 @@ class Import{
 		$imported_count = 0;
 		$log = [];
 
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
-		foreach($posts as $post){
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 			
 			$robots_index = get_post_meta($post->ID, '_seopress_robots_index', true);
 			$robots_follow = get_post_meta($post->ID, '_seopress_robots_follow', true);
@@ -397,12 +422,17 @@ class Import{
 		$taxonomies = get_taxonomies();
 		
 		foreach($taxonomies as $taxonomy){
-			$terms = get_terms([
+			$term_ids = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
+				'fields' => 'ids',
 			]);
 			
-			foreach($terms as $term){
+			if(is_wp_error($term_ids)) continue;
+
+			foreach($term_ids as $t_id){
+				$term = new \stdClass();
+				$term->term_id = $t_id;
 				
 				$robots_index = get_term_meta($term->term_id, '_seopress_robots_index', true);
 				$robots_follow = get_term_meta($term->term_id, '_seopress_robots_follow', true);
@@ -457,11 +487,13 @@ class Import{
 		$imported_count = 0;
 		$log = [];
 		
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
 		
 		$taxonomies = get_taxonomies(array('public' => true), 'objects');
 		
-		foreach($posts as $post){
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 			$post_data = get_post_meta($post->ID, 'slim_seo', true);
 			
 			if(empty($post_data) || !is_array($post_data)){
@@ -491,12 +523,17 @@ class Import{
 		
 		foreach($taxonomies as $taxonomy){
 			
-			$terms = get_terms([
+			$term_ids = get_terms([
 				'taxonomy' => $taxonomy,
 				'hide_empty' => false,
+				'fields' => 'ids',
 			]);
         
-			foreach($terms as $term){
+			if (is_wp_error($term_ids)) continue;
+
+			foreach($term_ids as $t_id){
+				$term = new \stdClass();
+				$term->term_id = $t_id;
 				$term_data = get_term_meta($term->term_id, 'slim_seo', true);
 				
 				if(empty($term_data) || !is_array($term_data)){
@@ -697,8 +734,10 @@ class Import{
 		$imported_count = 0;
 		$log = [];
 
-		$posts = get_posts(['posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
-		foreach($posts as $post){
+		$post_ids = get_posts(['fields' => 'ids', 'posts_per_page' => -1, 'post_type' => 'any', 'post_status' => 'any']);
+		foreach($post_ids as $p_id){
+			$post = new \stdClass();
+			$post->ID = $p_id;
 
 			$general = get_post_meta($post->ID, 'surerank_settings_general', true);
 			$general = is_array($general) ? $general : [];
@@ -740,16 +779,19 @@ class Import{
 
 		foreach($taxonomies as $taxonomy){
 
-			$terms = get_terms([
+			$term_ids = get_terms([
 				'taxonomy'   => $taxonomy,
 				'hide_empty' => false,
+				'fields'     => 'ids',
 			]);
 
-			if(is_wp_error($terms) || empty($terms)){
+			if(is_wp_error($term_ids) || empty($term_ids)){
 				continue;
 			}
 
-			foreach($terms as $term){
+			foreach($term_ids as $t_id){
+				$term = new \stdClass();
+				$term->term_id = $t_id;
 
 				$general = get_term_meta($term->term_id, 'surerank_settings_general', true);
 				$general = is_array($general) ? $general : [];
