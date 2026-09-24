@@ -42,7 +42,9 @@ class TableofContent{
 		$options = get_option('siteseo_advanced_option_name');
 		//$options = $siteseo->advanced_settings;
 		
-		$content = get_the_content();
+		global $post;
+		$post_obj = !empty($post) ? get_post($post) : (is_singular() ? get_queried_object() : null);
+		$content = (!empty($post_obj) && $post_obj instanceof \WP_Post) ? get_the_content(null, false, $post_obj) : get_the_content();
 
 		if(empty($content)){
 			return;

@@ -4,7 +4,7 @@ Plugin Name: SiteSEO - SEO Simplified
 Plugin URI: https://siteseo.io/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.4.1
+Version: 1.4.2
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.4.1');
+define('SITESEO_VERSION', '1.4.2');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -112,6 +112,12 @@ function siteseo_load_plugin(){
 		add_shortcode('siteseo_html_sitemap', '\SiteSEO\GenerateSitemap::html_sitemap');
 	}
 
+	// Sitemap Cache Invalidation Hooks (must run everywhere: Admin, REST API, Cron, Frontend)
+	add_action('save_post', '\SiteSEO\GenerateSitemap::clear_cache_on_status_change');
+	add_action('deleted_post', '\SiteSEO\GenerateSitemap::clear_cache_on_status_change');
+	add_action('trashed_post', '\SiteSEO\GenerateSitemap::clear_cache_on_status_change');
+	add_action('untrashed_post', '\SiteSEO\GenerateSitemap::clear_cache_on_status_change');
+
 	// Redirect
 	add_action('template_redirect', '\SiteSEO\GoogleAnalytics::handle_custom_redirect');
 	add_action('init', '\SiteSEO\Advanced::remove_wc_category_base');
@@ -168,7 +174,7 @@ function siteseo_load_plugin(){
 		add_action('wp_head', '\SiteSEO\SocialMetas::twitter_card', 1);
 
 		// Sitemaps
-		add_action('transition_post_status', '\SiteSEO\GenerateSitemap::clear_cache_on_status_change', 10, 3);
+
 		add_action('init', '\SiteSEO\GenerateSitemap::settings', 5);
 
 		// Image & Advanced

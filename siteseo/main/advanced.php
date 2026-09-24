@@ -87,6 +87,7 @@ class Advanced{
 		
 		if(!empty($siteseo->advanced_settings['advanced_category_url'])){
 			add_action('init', '\SiteSEO\Advanced::remove_category_base', 111);
+			add_filter('term_link', '\SiteSEO\Advanced::filter_category_link', 10, 3);
 			add_action('template_redirect', '\SiteSEO\Advanced::redirect_category');
 		}
 	}
@@ -153,6 +154,15 @@ class Advanced{
 		return $comment_author;
 	}
 	
+	static function filter_category_link($termlink, $term, $taxonomy){
+		if($taxonomy === 'category'){
+			$category_base = '/category/';
+			return str_replace($category_base, '/', $termlink);
+		}
+
+		return $termlink;
+	}
+
 	static function remove_category_base(){
 		
 		$categories = get_categories(array('hide_empty' => false));

@@ -83,6 +83,103 @@ class AbilitiesRegister{
 		];
 	}
 
+	// Whether the XML sitemap module is enabled.
+	protected static function is_sitemap_enabled(){
+		global $siteseo;
+
+		$toggles = isset($siteseo->setting_enabled) && is_array($siteseo->setting_enabled) ? $siteseo->setting_enabled : get_option('siteseo_toggle', []);
+
+		$sitemap_settings = isset($siteseo->sitemap_settings) && is_array($siteseo->sitemap_settings) ? $siteseo->sitemap_settings : get_option('siteseo_xml_sitemap_option_name', []);
+		
+		return !empty($toggles['toggle-xml-sitemap']) && !empty($sitemap_settings['xml_sitemap_general_enable']);
+	}
+
+	// Read the physical robots.txt file from the site root.
+	protected static function get_robots_file_content(){
+		if(!defined('ABSPATH')){
+			return '';
+		}
+
+		$file = ABSPATH . 'robots.txt';
+
+		if(!file_exists($file) || !is_readable($file)){
+			return '';
+		}
+
+		$content = file_get_contents($file);
+
+		return false === $content ? '' : $content;
+	}
+
+	// Parse robots.txt content into a flat list of custom rules.
+	protected static function parse_robots_rules($content){
+		$rules = [];
+
+		if(!is_string($content) || '' === trim($content)){
+			return $rules;
+		}
+
+		$lines = preg_split('/\r\n|\r|\n/', $content);
+		$user_agents = [];
+		$last_was_ua = false;
+
+		foreach($lines as $line){
+			$line = trim($line);
+
+			if('' === $line || '#' === $line[0]){
+				continue;
+			}
+
+			// Strip trailing comments.
+			$hash = strpos($line, '#');
+			if(false !== $hash){
+				$line = trim(substr($line, 0, $hash));
+				if('' === $line){
+					continue;
+				}
+			}
+
+			$parts = explode(':', $line, 2);
+			if(count($parts) < 2){
+				continue;
+			}
+
+			$directive = strtolower(trim($parts[0]));
+			$value = trim($parts[1]);
+
+			if('user-agent' === $directive){
+				// Consecutive user-agent lines share one group; a
+				// user-agent line after rules starts a new group.
+				if(!$last_was_ua){
+					$user_agents = [];
+				}
+
+				if('' !== $value && !in_array($value, $user_agents, true)){
+					$user_agents[] = $value;
+				}
+
+				$last_was_ua = true;
+				continue;
+			}
+
+			$last_was_ua = false;
+
+			if('' === $value || !in_array($directive, ['allow', 'disallow', 'crawl-delay'], true)){
+				continue;
+			}
+
+			foreach($user_agents as $agent){
+				$rules[] = [
+					'user_agent' => $agent,
+					'type' => $directive,
+					'value' => $value,
+				];
+			}
+		}
+
+		return $rules;
+	}
+
 	// =========================================================================
 	// Permission callbacks
 	// =========================================================================
@@ -779,18 +876,10 @@ class AbilitiesRegister{
 	 * @return array
 	 */
 	public static function get_site_audit(){
-		$sitemap_enabled = false;
-		if(function_exists('siteseo_get_toggle_option')){
-			$sitemap_enabled = '1' === siteseo_get_toggle_option('xml-sitemap');
-		}
 
-		$sitemap_index_url = null;
-		if($sitemap_enabled && function_exists('siteseo_get_service')){
-			$option = siteseo_get_service('SitemapOption');
-			if($option && '1' === $option->isEnabled()){
-				$sitemap_index_url = home_url('/sitemaps.xml');
-			}
-		}
+		$sitemap_enabled = self::is_sitemap_enabled();
+
+		$sitemap_index_url = $sitemap_enabled ? home_url('/sitemaps.xml') : null;
 
 		$rules = self::parse_robots_rules(self::get_robots_file_content());
 
@@ -815,18 +904,10 @@ class AbilitiesRegister{
 	 * @return array
 	 */
 	public static function get_sitemap_status(){
-		$enabled = false;
-		if(function_exists('siteseo_get_toggle_option')){
-			$enabled = '1' === siteseo_get_toggle_option('xml-sitemap');
-		}
 
-		$index_url = null;
-		if($enabled && function_exists('siteseo_get_service')){
-			$option = siteseo_get_service('SitemapOption');
-			if($option && '1' === $option->isEnabled()){
-				$index_url = home_url('/sitemaps.xml');
-			}
-		}
+		$enabled = self::is_sitemap_enabled();
+
+		$index_url = $enabled ? home_url('/sitemaps.xml') : null;
 
 		return [
 			'enabled'   => $enabled,

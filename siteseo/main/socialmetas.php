@@ -194,7 +194,7 @@ class SocialMetas{
 				// OG:IMG
 				if(!empty(get_post_meta($shop_page_id, '_siteseo_social_fb_img', true))){
 					$og_img = get_post_meta($shop_page_id, '_siteseo_social_fb_img', true);
-				} else if(get_the_post_thumbnail_url($post, 'full')){
+				} else if(empty($siteseo->social_settings['social_facebook_img_default']) && get_the_post_thumbnail_url($post, 'full')){
 					$og_img = get_the_post_thumbnail_url($post, 'full');
 				} else {
 					$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
@@ -278,7 +278,7 @@ class SocialMetas{
 				// OG:IMG
 				if(!empty(get_post_meta($post_id, '_siteseo_social_fb_img', true))){
 					$og_img = get_post_meta($post_id, '_siteseo_social_fb_img', true);
-				} else if(get_the_post_thumbnail_url($post, 'full')){
+				} else if(empty($siteseo->social_settings['social_facebook_img_default']) && get_the_post_thumbnail_url($post, 'full')){
 					$og_img = get_the_post_thumbnail_url($post, 'full');
 				} else {
 					$og_img = !empty($siteseo->social_settings['social_facebook_img']) ? $siteseo->social_settings['social_facebook_img'] : '';
@@ -331,8 +331,35 @@ class SocialMetas{
 			$og_img_width = 0;
 			$og_img_height = 0;
 
-			if(!empty($og_img)){
-				$image_info = @getimagesize($og_img);
+			// 1. attachment metadata first — no file/network access at all.
+			$attachment_id = attachment_url_to_postid($og_img);
+
+			if(!empty($attachment_id)){
+				$meta = wp_get_attachment_metadata($attachment_id);
+
+				if(!empty($meta['width']) && !empty($meta['height'])){
+					$og_img_width = $meta['width'];
+					$og_img_height = $meta['height'];
+				}
+			}
+
+			// 2. Not an attachment (or no stored size) — try local path before hitting HTTP.
+			if(empty($og_img_width) || empty($og_img_height)){
+				$image_info = false;
+				$uploads = wp_get_upload_dir();
+
+				if(!empty($uploads['baseurl']) && strpos($og_img, $uploads['baseurl']) === 0){
+					$local_path = str_replace($uploads['baseurl'], $uploads['basedir'], $og_img);
+
+					if(is_readable($local_path)){
+						$image_info = @getimagesize($local_path);
+					}
+				}
+
+				// 3. Last resort, keep old behavior.
+				if($image_info === false){
+					$image_info = @getimagesize($og_img);
+				}
 
 				if($image_info !== false){
 					$og_img_width = $image_info[0];

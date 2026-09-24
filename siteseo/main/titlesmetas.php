@@ -407,6 +407,9 @@ class TitlesMetas{
 	static function replace_variables($content, $in_editor = false){
 		global $post, $siteseo, $wp_query, $term;
 		
+		$post_obj = !empty($post) ? get_post($post) : (is_singular() ? get_queried_object() : null);
+		$post_obj = ($post_obj instanceof \WP_Post) ? $post_obj : null;
+
 		// Site info
 		$site_title = get_bloginfo('name');
 		$site_tagline = get_bloginfo('description');
@@ -423,44 +426,67 @@ class TitlesMetas{
 		$archive_year = get_the_date('Y');
 		
 		// Author
-		$author_id = isset($post->post_author) ? $post->post_author : get_current_user_id();
+		$author_id = !empty($post_obj->post_author) ? $post_obj->post_author : (isset($post->post_author) ? $post->post_author : get_current_user_id());
 		$author_first_name = get_the_author_meta('first_name', $author_id);
 		$author_last_name = get_the_author_meta('last_name', $author_id);
 		$author_website = get_the_author_meta('url', $author_id);
 		$author_nickname = get_the_author_meta('nickname', $author_id);
 		$author_bio = get_the_author_meta('description', $author_id);
 		
+		$post_id = !empty($post_obj->ID) ? $post_obj->ID : (isset($post->ID) ? $post->ID : 0);
+
 		// WooCommerce
 		$wc_variables = [];
-		if(function_exists('wc_get_product') && is_singular('product')){
-			$product = wc_get_product($post->ID);
+		if(function_exists('wc_get_product') && is_singular('product') && !empty($post_id)){
+			$product = wc_get_product($post_id);
 			if($product){
 				$wc_variables = array(
-					'%%wc_single_cat%%' => wp_strip_all_tags(wc_get_product_category_list($post->ID)),
-					'%%wc_single_tag%%' => wp_strip_all_tags(wc_get_product_tag_list($post->ID)),
+					'%%wc_single_cat%%' => wp_strip_all_tags(wc_get_product_category_list($post_id)),
+					'%%wc_single_tag%%' => wp_strip_all_tags(wc_get_product_tag_list($post_id)),
 					'%%wc_single_short_desc%%' => $product->get_short_description(),
 					'%%wc_single_price%%' => $product->get_price(),
 					'%%wc_single_price_exe_tax%%' => wc_get_price_excluding_tax($product),
 					'%%wc_sku%%' => $product->get_sku(),
-					'%%wc_parent_cat%%' => self::get_parent_category_name($post->ID),
+					'%%wc_parent_cat%%' => self::get_parent_category_name($post_id),
 				);
 			}
 		}
 		
 		//KKART
 		$kkart_variables = [];
-		if(function_exists('kkart_get_product') && is_singular('product')){
-			$product = kkart_get_product($post->ID);
+		if(function_exists('kkart_get_product') && is_singular('product') && !empty($post_id)){
+			$product = kkart_get_product($post_id);
 			if($product){
 				$kkart_variables = array(
-					'%%wc_single_cat%%' => wp_strip_all_tags(kkart_get_product_category_list($post->ID)),
-					'%%wc_single_tag%%' => wp_strip_all_tags(kkart_get_product_tag_list($post->ID)),
+					'%%wc_single_cat%%' => wp_strip_all_tags(kkart_get_product_category_list($post_id)),
+					'%%wc_single_tag%%' => wp_strip_all_tags(kkart_get_product_tag_list($post_id)),
 					'%%wc_single_short_desc%%' => $product->get_short_description(),
 					'%%wc_single_price%%' => $product->get_price(),
 					'%%wc_single_price_exe_tax%%' => kkart_get_price_excluding_tax($product),
 					'%%wc_sku%%' => $product->get_sku(),
-					'%%wc_parent_cat%%' => self::get_parent_category_name($post->ID),
+					'%%wc_parent_cat%%' => self::get_parent_category_name($post_id),
 				);
+			}
+		}
+
+		$post_title = '';
+		if(is_singular() || $in_editor === TRUE){
+			$post_title = !empty($post_obj) ? get_the_title($post_obj) : get_the_title();
+		} elseif(is_home()){
+			$post_title = get_the_title(get_option('page_for_posts'));
+		}
+
+		$post_excerpt = '';
+		if(is_singular() || $in_editor === TRUE){
+			$post_excerpt = !empty($post_obj) ? get_the_excerpt($post_obj) : get_the_excerpt();
+		}
+
+		$post_content = '';
+		if(is_singular() || $in_editor === TRUE){
+			if(!empty($post_obj)){
+				$post_content = wp_strip_all_tags(get_the_content('', false, $post_obj));
+			} elseif(!empty($post)){
+				$post_content = wp_strip_all_tags(get_the_content('', false, $post));
 			}
 		}
 
@@ -468,16 +494,16 @@ class TitlesMetas{
 			'%%sep%%' => $site_sep,
 			'%%sitetitle%%' => $site_title,
 			'%%tagline%%' => $site_tagline,
-			'%%post_title%%' => (is_singular() || $in_editor === TRUE) ? get_the_title() : (is_home() ? get_the_title(get_option('page_for_posts')) : ''),
-			'%%post_excerpt%%' => (is_singular() || $in_editor === TRUE) ? get_the_excerpt() : '',
-			'%%post_content%%' => (is_singular() || $in_editor === TRUE) ? wp_strip_all_tags(get_the_content()) : '',
-			'%%post_thumbnail_url%%' => get_the_post_thumbnail_url($post),
-			'%%post_url%%' => urldecode(get_permalink()),
-			'%%post_date%%' => get_the_date(),
-			'%%post_modified_date%%' => get_the_modified_date(),
-			'%%post_author%%' => get_the_author(),
-			'%%post_category%%' => wp_strip_all_tags(get_the_category_list(', ')),
-			'%%post_tag%%' => wp_strip_all_tags(get_the_tag_list('', ', ', '')),
+			'%%post_title%%' => $post_title,
+			'%%post_excerpt%%' => $post_excerpt,
+			'%%post_content%%' => $post_content,
+			'%%post_thumbnail_url%%' => !empty($post_obj) ? get_the_post_thumbnail_url($post_obj) : get_the_post_thumbnail_url($post),
+			'%%post_url%%' => !empty($post_obj) ? urldecode(get_permalink($post_obj)) : urldecode(get_permalink()),
+			'%%post_date%%' => !empty($post_obj) ? get_the_date('', $post_obj) : get_the_date(),
+			'%%post_modified_date%%' => !empty($post_obj) ? get_the_modified_date('', $post_obj) : get_the_modified_date(),
+			'%%post_author%%' => !empty($post_obj) ? get_the_author_meta('display_name', $post_obj->post_author) : get_the_author(),
+			'%%post_category%%' => wp_strip_all_tags(get_the_category_list(', ', '', !empty($post_id) ? $post_id : false)),
+			'%%post_tag%%' => wp_strip_all_tags(get_the_tag_list('', ', ', '', !empty($post_id) ? $post_id : 0)),
 			'%%_category_title%%' => single_cat_title('', false),
 			'%%_category_description%%' => category_description(),
 			'%%tag_title%%' => single_tag_title('', false),
@@ -914,7 +940,7 @@ class TitlesMetas{
 					$default_desc = isset($settings['titles_tax_titles'][$taxonomy_name]['description']) ? $settings['titles_tax_titles'][$taxonomy_name]['description'] : '';
 				}
 
-				$disabled = isset($settings['titles_tax_titles'][$taxonomy_name]['disabled']);
+				$disabled = !empty($settings['titles_tax_titles'][$taxonomy_name]['disabled']);
 
 				$description = !empty($term_meta_desc) ? $term_meta_desc : $default_desc;
 

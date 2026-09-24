@@ -254,8 +254,10 @@ class Admin{
 		if(!empty($is_admin)){
 			add_submenu_page('siteseo', __('Search Statistics', 'siteseo'), __('Search Statistics', 'siteseo') . (( time() < strtotime('31 January 2026') ) ? ' <span style="color:#28a745;margin-left:2px;">NEW</span>' : ''), 'manage_options', 'siteseo-search-statistics', '\SiteSEO\Settings\Statistics::init');
 			
-			add_submenu_page('siteseo', __('Abilities', 'siteseo'), __('AI Abilities', 'siteseo') . ' <span  style="vertical-align:middle;background:#d63638;font-size:9px;padding:0 6px;border-radius:10px;line-height:18px;color:#fff;">New!</span>', 'manage_options', 'siteseo-abilities', '\SiteSEO\Settings\Abilities::home');
-
+			if(!defined('SITEPAD')){
+				add_submenu_page('siteseo', __('Abilities', 'siteseo'), __('AI Abilities', 'siteseo') . ' <span  style="vertical-align:middle;background:#d63638;font-size:9px;padding:0 6px;border-radius:10px;line-height:18px;color:#fff;">New!</span>', 'manage_options', 'siteseo-abilities', '\SiteSEO\Settings\Abilities::home');
+			}
+			
 			add_submenu_page('siteseo', __('Tools', 'siteseo'), 'Tools', 'manage_options','siteseo-tools' ,'\SiteSEO\Settings\Tools::menu');
 		}
 	

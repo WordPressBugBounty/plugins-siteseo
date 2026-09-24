@@ -338,7 +338,7 @@ class Social{
         <table class="form-table">
             <tbody>
                 <tr>
-                    <th scope="row" style="user-select:auto;">'.esc_html__('Enable OG date','siteseo').'</th>
+                    <th scope="row" style="user-select:auto;">'.esc_html__('Enable Open Graph Data','siteseo').'</th>
                     <td>
                         <label for="facebook_graph_enable">
                         <input id="facebook_graph_enable" type="checkbox" name="siteseo_options[enable_fb_og]" '.(!empty($option_fb_enable_og) ? 'checked="yes"' : 'value="1"').'>'. esc_html__('Enable OG data','siteseo') .'

@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,18 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.4.2 (September 24 , 2026) =
+
+* [Pro-Improvement] Improved security checks for plugin updates by verifying plugin signatures before upgrading.
+* [Improvement] Fixed an issue where the sitemap cache was not cleared when the post type changed while its status remained the same.
+* [Improvement] Improved page-loading performance by optimizing social media image data
+* [Pro-Bug-Fix] Fixed an issue in llms.txt where the post limit setting was ignored.
+* [Pro-Bug-Fix] Fixed an issue where the author URL in the structured data schema used the post ID instead of the author ID.
+* [Bug-Fix] Fixed an issue where /category/ was not excluded from URLs when hovering over the Advanced category URL option.
+* [Bug-Fix] Fixed an issue where the default image did not override the og:image tag.
+* [Bug-Fix] Fixed the missing standard meta description tag on taxonomy archive pages.
+* [Bug-Fix] Fixed a TypeError that occurred when generating post content for meta tags.
 
 = 1.4.1 (August 14, 2026) =
 

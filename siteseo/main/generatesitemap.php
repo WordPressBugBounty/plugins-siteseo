@@ -985,24 +985,24 @@ class GenerateSitemap{
 		}
 	}
 
-	static function clear_cache_on_status_change($new_status, $old_status, $post){
+	static function clear_cache_on_status_change($post_id){
 		global $wpdb;
 
-		if($new_status == $old_status){
+		$post = get_post($post_id);
+
+		if(empty($post->post_type)){
 			return;
 		}
 
-		if(!empty($post) && !empty($post->post_type)){
-			delete_transient('siteseo_sitemap_count_' . $post->post_type);
-			delete_transient('siteseo_sitemap_video_count_' . $post->post_type);
-			delete_transient('siteseo_html_sitemap_count_' . $post->post_type);
-			
-			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_siteseo_sitemap_posts_' . $post->post_type . '\_%'));
-			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_timeout_siteseo_sitemap_posts_' . $post->post_type . '\_%'));
+		$type = $post->post_type;
 
-			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_siteseo_sitemap_terms_\_%'));
-			$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", '_transient_timeout_siteseo_sitemap_terms_\_%'));
-		}
+		delete_transient('siteseo_sitemap_count_' . $type);
+		delete_transient('siteseo_sitemap_video_count_' . $type);
+		delete_transient('siteseo_html_sitemap_count_' . $type);
+
+		$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",'_transient_siteseo_sitemap_posts_' . $type . '\_%', '_transient_timeout_siteseo_sitemap_posts_' . $type . '\_%'));
+
+		$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",'_transient_siteseo_sitemap_terms_\_%', '_transient_timeout_siteseo_sitemap_terms_\_%'));
 	}
 	
 }
