@@ -646,38 +646,13 @@ class Ajax{
 	// === Abilities / MCP =====================================================
 	// =========================================================================
 
-	// Fetch the latest MCP Adapter release info from GitHub (cached 1 hour).
-	static function get_mcp_adapter_release(){
-		$cached = get_transient(\SiteSEO\Settings\Abilities::$MCP_ADAPTER_RELEASE_CACHE);
-		if(false !== $cached && is_array($cached)){
-			return $cached;
-		}
-
-		$response = wp_remote_get(\SiteSEO\Settings\Abilities::$MCP_ADAPTER_RELEASE_URL, [
-			'timeout' => 10,
-			'headers' => ['Accept' => 'application/vnd.github+json'],
-		]);
-
-		if(is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)){
-			return [];
-		}
-
-		$body = json_decode(wp_remote_retrieve_body($response), true);
-		if(!is_array($body) || empty($body['tag_name']) || empty($body['assets'][0]['browser_download_url'])){
-			return [];
-		}
-
-		$payload = [
-			'version'      => ltrim((string)$body['tag_name'], 'v'),
-			'download_url' => esc_url_raw($body['assets'][0]['browser_download_url']),
-		];
-
-		set_transient(\SiteSEO\Settings\Abilities::$MCP_ADAPTER_RELEASE_CACHE, $payload, HOUR_IN_SECONDS);
-		return $payload;
-	}
-
 	// Install (or activate) the official WordPress MCP Adapter plugin with one click.
 	static function install_mcp_adapter(){
+
+		if(!current_user_can('activate_plugins')){
+			wp_send_json_error(__('You do not have permission to install plugins.', 'siteseo'));
+		}
+
 		check_ajax_referer('siteseo_admin_nonce', 'nonce');
 
 		$option = get_option('siteseo_toggle', []);
@@ -686,30 +661,25 @@ class Ajax{
 			wp_send_json_error(__('The MCP Adapter cannot be installed because the Abilities toggle is turned off. Please enable it above and try again.', 'siteseo'));
 		}
 
-		if(!current_user_can('install_plugins')){
-			wp_send_json_error(__('You do not have permission to install plugins.', 'siteseo'));
-		}
-
-		// Already loaded (e.g. shipped by another plugin / WP core).
-		if(class_exists('\\WP\\MCP\\Core\\McpAdapter')){
-			wp_send_json_success([
-				'message' => __('MCP Adapter is already active on this site.', 'siteseo'),
-				'state'   => 'active',
-			]);
-		}
-
 		$requested_action = !empty($_POST['adapter_action']) ? sanitize_key(wp_unslash($_POST['adapter_action'])) : 'install';
 
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/misc.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
 		$installed_file = \SiteSEO\Settings\Abilities::get_installed_mcp_adapter_file();
 
 		// Installed but inactive -> just activate.
 		if(!empty($installed_file)){
+
 			$activated = activate_plugin($installed_file);
+
 			if(is_wp_error($activated)){
 				wp_send_json_error($activated->get_error_message());
 			}
+
 			wp_send_json_success([
 				'message' => __('MCP Adapter activated.', 'siteseo'),
 				'state'   => 'active',
@@ -721,40 +691,40 @@ class Ajax{
 			wp_send_json_error(__('Invalid adapter action.', 'siteseo'));
 		}
 
-		$release = self::get_mcp_adapter_release();
-		if(empty($release['download_url'])){
-			wp_send_json_error(__('Could not resolve the MCP Adapter download URL. Please try again in a moment.', 'siteseo'));
+		$api = plugins_api('plugin_information', [
+			'slug' => \SiteSEO\Settings\Abilities::$MCP_ADAPTER_SLUG,
+			'fields' => ['sections' => false],
+		]);
+
+		if(is_wp_error($api)){
+			wp_send_json_error($api->get_error_message());
 		}
-
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-		require_once ABSPATH . 'wp-admin/includes/misc.php';
-		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-		$skin     = new \WP_Ajax_Upgrader_Skin();
+		
+		$skin = new \WP_Ajax_Upgrader_Skin();
 		$upgrader = new \Plugin_Upgrader($skin);
-		$result   = $upgrader->install($release['download_url']);
+		$result = $upgrader->install($api->download_link);
 
 		if(is_wp_error($result)){
 			wp_send_json_error($result->get_error_message());
 		}
 
-		if(false === $result || !$upgrader->plugin_info()){
-			$errors = method_exists($skin, 'get_errors') ? $skin->get_errors() : new \WP_Error();
-			$message = is_wp_error($errors) && $errors->get_error_message() ? $errors->get_error_message() : __('The MCP Adapter could not be installed.', 'siteseo');
-			wp_send_json_error($message);
+		if(empty($result) || $skin->get_errors()->has_errors()){
+			$message = $skin->get_errors()->get_error_message();
+			wp_send_json_error($message ? $message : __('The MCP Adapter could not be installed.', 'siteseo'));
 		}
 
-		$plugin_file = $upgrader->plugin_info();
-		$activated    = activate_plugin($plugin_file);
+		$activated = activate_plugin($upgrader->plugin_info());
 
 		if(is_wp_error($activated)){
 			wp_send_json_error($activated->get_error_message());
 		}
 
+		$version = \SiteSEO\Settings\Abilities::get_installed_mcp_adapter_version();
+
 		wp_send_json_success([
-			'message' => sprintf(__('MCP Adapter %s installed and activated.', 'siteseo'), $release['version']),
-			'state'   => 'active',
-			'version' => $release['version'],
+			'message' => sprintf(__('MCP Adapter %s installed and activated.', 'siteseo'), $version),
+			'state' => 'active',
+			'version' => $version,
 		]);
 	}
 

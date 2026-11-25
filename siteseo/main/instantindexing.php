@@ -263,13 +263,31 @@ class InstantIndexing{
 		];
 	}
 	
+	// Thrive Architect saves with its own action and writes tve_updated_post.
+	// It does not call transition_post_status, so reuse the normal submit path.
+	static function on_thrive_save($post_id){
+		$post = get_post(absint($post_id));
+
+		if(empty($post)){
+			return;
+		}
+
+		self::on_status_change($post->post_status, $post->post_status, $post);
+	}
+
+	static function on_thrive_meta($meta_id, $post_id, $meta_key){
+		if($meta_key !== 'tve_updated_post'){
+			return;
+		}
+
+		self::on_thrive_save($post_id);
+	}
+
 	// Sends request to bing when the status of post changes
 	// We will only do it only if the post is published.
 	static function on_status_change($new_status, $old_status, $post){
 
-		if($new_status == $old_status){
-			return;
-		}
+
 		
 		if($new_status != 'publish'){
 			return;

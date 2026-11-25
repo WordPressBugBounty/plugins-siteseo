@@ -149,44 +149,64 @@ class TableofContent{
 		if(!has_shortcode($content, 'siteseo_toc')){
 			return $content;
 		}
-		
-		$dom = new DOMDocument();
-		$internalErrors = libxml_use_internal_errors(true);
-		$dom->preserveWhiteSpace = false;
 
-		$html = '';
+		// Newer WordPress: core HTML API edits the original markup in place
+		if(class_exists('\WP_HTML_Tag_Processor') && method_exists('\WP_HTML_Tag_Processor', 'get_modifiable_text')){
+			$p = new \WP_HTML_Tag_Processor($content);
 
-		if($dom->loadHTML('<?xml encoding="utf-8" ?>' . $content)){
-			$xpath = new DOMXPath($dom);
+			while($p->next_tag()){
+				$tag = $p->get_tag();
+				$id = $p->get_attribute('id');
 
-			$headings = $xpath->query('//h1|//h2|//h3|//h4|//h5|//h6');
-
-			if(empty($headings)){
-				return;
-			}
-
-			foreach($headings as $heading){
-				$title = trim(wp_strip_all_tags($heading->nodeValue));
-				$id = $heading->getAttribute('id');
-				
-				if(!empty($id)){
+				if(!preg_match('/^H[1-6]$/', $tag) || $p->is_tag_closer() || (is_string($id) && $id !== '')){
 					continue;
 				}
-				
-				if(empty($title)){
-					continue;
-				}
-				
-				$id = self::title_to_id($title);
 
-				$heading->setAttribute('id', $id);
+				// Read the heading text, then come back to the start tag
+				$p->set_bookmark('siteseo_h');
+				$title = '';
+
+				while($p->next_token()){
+					if('#text' === $p->get_token_name()){
+						$title .= $p->get_modifiable_text();
+					}elseif($p->get_token_name() === $tag && $p->is_tag_closer()){
+						break;
+					}
+				}
+
+				$p->seek('siteseo_h');
+				$p->release_bookmark('siteseo_h');
+
+				$title = trim(wp_strip_all_tags($title));
+
+				if($title !== ''){
+					$p->set_attribute('id', self::title_to_id($title));
+				}
 			}
 
-			$content = $dom->saveHTML($dom->documentElement);
+			return $p->get_updated_html();
 		}
 
-		return $content;
+		// Older WordPress (less then 6.2): and sitepad 
+		$updated = preg_replace_callback('#<(h[1-6])((?:\s[^>]*)?)>(.*?)</\1\s*>#is', function($m){
 
+			if(preg_match('/(?:^|\s)id\s*=/i', $m[2])){
+				return $m[0];
+			}
+
+			$title = trim(html_entity_decode(wp_strip_all_tags($m[3]), ENT_QUOTES, 'UTF-8'));
+			$id = ($title === '') ? '' : self::title_to_id($title);
+
+			if($id === ''){
+				return $m[0];
+			}
+
+			return '<'.$m[1].' id="'.esc_attr($id).'"'.$m[2].'>'.$m[3].'</'.$m[1].'>';
+
+		}, $content);
+
+		// On regex error return the original content (never blank the page)
+		return ($updated === null) ? $content : $updated;
 	}
 
 }

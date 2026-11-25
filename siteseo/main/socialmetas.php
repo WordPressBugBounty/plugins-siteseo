@@ -33,6 +33,8 @@ class SocialMetas{
 		$yt_account = !empty($siteseo->social_settings['social_accounts_youtube']) ? $siteseo->social_settings['social_accounts_youtube'] : '';
 		$pt_account = !empty($siteseo->social_settings['social_accounts_pinterest']) ? $siteseo->social_settings['social_accounts_pinterest'] : '';
 
+		// Load additional accounts (saved as an array of URLs, one per line)
+		$additional_accounts = !empty($siteseo->social_settings['social_accounts_additional']) && is_array($siteseo->social_settings['social_accounts_additional']) ? $siteseo->social_settings['social_accounts_additional'] : [];
 		//description
 		$site_url = get_site_url();
 		$site_description = get_bloginfo('name');
@@ -93,7 +95,7 @@ class SocialMetas{
 			];
 
 			if(!empty($org_contact_option) && $org_contact_option !== 'None'){
-				$contact_point['contactOption'] = esc_html($org_contact_option);
+				$json_ld['contactPoint']['contactOption'] = esc_html($org_contact_option);
 			}
 		}
 
@@ -107,8 +109,17 @@ class SocialMetas{
 			esc_url($pt_account)
 		]);
 
+		//Append additional accounts to sameAs
+		foreach($additional_accounts as $additional_url){
+			if(!empty($additional_url)){
+				$same_as[] = esc_url($additional_url);
+			}
+		}
+
+		// Dedupe and reindex
+		$same_as = array_values(array_unique(array_filter($same_as)));
 		if(!empty($same_as)){
-			$json_ld['sameAs'] = array_values($same_as);
+			$json_ld['sameAs'] = $same_as;
 		}
 
 		$json_ld = apply_filters('siteseo_social_graph_json_ld', $json_ld);

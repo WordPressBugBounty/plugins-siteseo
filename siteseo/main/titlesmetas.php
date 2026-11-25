@@ -269,6 +269,14 @@ class TitlesMetas{
 		// static set posts page
 		if(is_home() && !is_front_page()){
 			$blog_page_id = get_option('page_for_posts');
+			if(defined('PAGELAYER_VERSION')){
+				global $pagelayer;
+				if(!empty($pagelayer->template_post) && get_post_meta($pagelayer->template_post, '_siteseo_robots_index', true)){
+					$blog_page_id = $pagelayer->template_post;
+				} elseif(!empty($pagelayer->template_post) && empty($blog_page_id)){
+					$blog_page_id = $pagelayer->template_post;
+				}
+			}
 			
 			$robots = [
 				'index' => true,
@@ -335,73 +343,111 @@ class TitlesMetas{
 		
 	}
 	
-	static function add_canonical_url(){	
-		$post_types = siteseo_post_types();
-		
-		foreach($post_types as $post_type){
-			
-			if($post_type->has_archive && is_post_type_archive($post_type->name)){
-				$post_id = get_the_ID();
-				$archive_url = get_post_type_archive_link($post_type->name);
-				$canonical_meta = get_post_meta($post_id, '_siteseo_robots_canonical', true);
-				$canonical = !empty($canonical_meta) ? $canonical_meta : $archive_url;
-				
-				if($archive_url){
-					echo '<link rel="canonical" href="'.esc_url($archive_url).'" />' . "\n";
-				}
-			}
-			
-			if(is_singular($post_type->name)){
-				$post_id = get_the_ID();
-				$canonical_meta = get_post_meta($post_id, '_siteseo_robots_canonical', true);
-				$canonical = !empty($canonical_meta) ? $canonical_meta : urldecode(get_permalink($post_id));
-				
-				if($canonical){
-					echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
-				}
-			}
+	static function get_paged_canonical_url($url, $paged){
+		global $wp_rewrite;
+
+		if($paged <= 1 || empty($url)){
+			return $url;
 		}
 
-		//taxonomies
-		$taxonomies = get_taxonomies(array('public' => true), 'objects');
-		
-		if(is_tag() || is_category() || is_tax()){
+		if(!get_option('permalink_structure') || empty($wp_rewrite)){
+			return add_query_arg('paged', $paged, $url);
+		}
+
+		$pagination_base = !empty($wp_rewrite->pagination_base) ? $wp_rewrite->pagination_base : 'page';
+		return trailingslashit($url) . user_trailingslashit($pagination_base . '/' . $paged, 'paged');
+	}
+
+	static function add_canonical_url(){
+		$canonical = '';
+		$paged = get_query_var('paged') ? (int) get_query_var('paged') : 1;
+
+		if(is_singular()){
+			$post_id = get_the_ID();
+			$canonical_meta = get_post_meta($post_id, '_siteseo_robots_canonical', true);
+
+			if(!empty($canonical_meta)){
+				$canonical = $canonical_meta;
+			} else{
+				$canonical = wp_get_canonical_url($post_id);
+				if(empty($canonical)){
+					$canonical = urldecode(get_permalink($post_id));
+				}
+			}
+		} elseif(is_front_page() && is_home()){
+			// Default home page (blog index)
+			$canonical = self::get_paged_canonical_url(trailingslashit(home_url()), $paged);
+		} elseif(is_home() && !is_front_page()){
+			// Static posts page
+			$blog_page_id = get_option('page_for_posts');
+			if($blog_page_id){
+				$canonical_meta = get_post_meta($blog_page_id, '_siteseo_robots_canonical', true);
+				if(!empty($canonical_meta)){
+					$canonical = $canonical_meta;
+				} else{
+					$canonical = self::get_paged_canonical_url(urldecode(get_permalink($blog_page_id)), $paged);
+				}
+			} else{
+				$canonical = self::get_paged_canonical_url(trailingslashit(home_url()), $paged);
+			}
+		} elseif(is_post_type_archive()){
+			$post_type = get_query_var('post_type');
+			if(is_array($post_type)){
+				$post_type = reset($post_type);
+			}
+			$archive_url = get_post_type_archive_link($post_type);
+			if($archive_url){
+				$canonical = self::get_paged_canonical_url($archive_url, $paged);
+			}
+		} elseif(is_tag() || is_category() || is_tax()){
 			$term = get_queried_object();
 			if($term && isset($term->term_id, $term->taxonomy)){
 				$term_id = $term->term_id;
 				$taxonomy_name = $term->taxonomy;
-				
+
 				$canonical_meta = get_term_meta($term_id, '_siteseo_robots_canonical', true);
-				$canonical = !empty($canonical_meta) ? $canonical_meta : urldecode(get_term_link($term_id, $taxonomy_name));
-				
-				if($canonical){
-					echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+				if(!empty($canonical_meta)){
+					$canonical = $canonical_meta;
+				} else{
+					$term_link = get_term_link($term_id, $taxonomy_name);
+					if(!is_wp_error($term_link)){
+						$canonical = self::get_paged_canonical_url(urldecode($term_link), $paged);
+					}
 				}
 			}
-		}
-		
-		// default home page
-		if(is_front_page() && is_home()){
-			$canonical = trailingslashit(home_url());
-			echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";				
-		}
-		
-		// if static posts set
-		if(is_home() && !is_front_page()){ 
-			$blog_page_id = get_option('page_for_posts');
-			if($blog_page_id){
-				$canonical_meta = get_post_meta($blog_page_id, '_siteseo_robots_canonical', true);
-				$canonical = !empty($canonical_meta) ? $canonical_meta : urldecode(get_permalink($blog_page_id));
-				
-				if($canonical){
-					echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+		} elseif(is_author()){
+			$author = get_queried_object();
+			if($author && isset($author->ID)){
+				$author_url = get_author_posts_url($author->ID);
+				if($author_url){
+					$canonical = self::get_paged_canonical_url($author_url, $paged);
 				}
-			} else{
-				$canonical = trailingslashit(home_url());
-				echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+			}
+		} elseif(is_date()){
+			$year = get_query_var('year');
+			$monthnum = get_query_var('monthnum');
+			$day = get_query_var('day');
+
+			$date_url = '';
+			if(is_day()){
+				$date_url = get_day_link($year, $monthnum, $day);
+			} elseif(is_month()){
+				$date_url = get_month_link($year, $monthnum);
+			} elseif(is_year()){
+				$date_url = get_year_link($year);
+			}
+
+			if(!empty($date_url) && !is_wp_error($date_url)){
+				$canonical = self::get_paged_canonical_url($date_url, $paged);
 			}
 		}
-		 
+
+		$canonical = apply_filters('siteseo_canonical', $canonical);
+		$canonical = apply_filters('siteseo_titles_canonical', $canonical);
+
+		if(!empty($canonical)){
+			echo '<link rel="canonical" href="'.esc_url($canonical).'" />' . "\n";
+		}
 	}
 	
 	static function replace_variables($content, $in_editor = false){
@@ -645,6 +691,14 @@ class TitlesMetas{
 		// static posts pages
 		if(is_home() && !is_front_page()){
 			$blog_page_id = get_option('page_for_posts');
+			if(defined('PAGELAYER_VERSION')){
+				global $pagelayer;
+				if(!empty($pagelayer->template_post) && get_post_meta($pagelayer->template_post, '_siteseo_titles_title', true)){
+					$blog_page_id = $pagelayer->template_post;
+				} elseif(!empty($pagelayer->template_post) && empty($blog_page_id)){
+					$blog_page_id = $pagelayer->template_post;
+				}
+			}
 			
 			if($blog_page_id){
 				$blog_meta_title = get_post_meta($blog_page_id, '_siteseo_titles_title', true);
@@ -858,6 +912,14 @@ class TitlesMetas{
 		// if set static posts page
 		if(is_home() && !is_front_page()){
 			$blog_page_id = get_option('page_for_posts');
+			if(defined('PAGELAYER_VERSION')){
+				global $pagelayer;
+				if(!empty($pagelayer->template_post) && get_post_meta($pagelayer->template_post, '_siteseo_titles_desc', true)){
+					$blog_page_id = $pagelayer->template_post;
+				} elseif(!empty($pagelayer->template_post) && empty($blog_page_id)){
+					$blog_page_id = $pagelayer->template_post;
+				}
+			}
 			if($blog_page_id){
 				$meta_desc = get_post_meta($blog_page_id, '_siteseo_titles_desc', true);
 				if(!empty($meta_desc)){

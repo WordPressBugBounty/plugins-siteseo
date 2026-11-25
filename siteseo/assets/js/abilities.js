@@ -16,7 +16,7 @@ jQuery(document).ready(function($){
 	// =====================================================================
 
 	var state = {
-		password: null,           // freshly generated application password (memory only)
+		password: null, // freshly generated application password (memory only)
 		username: '',
 		activeClient: 'claude-desktop'
 	};
@@ -77,7 +77,11 @@ jQuery(document).ready(function($){
 
 		$btn.prop('disabled', true);
 		var original = $btn.html();
-		$btn.html(action === 'install' ? CFG.i18n_installing : CFG.i18n_activating);
+		var busy_label = CFG.i18n_installing;
+		if(action === 'activate'){
+			busy_label = CFG.i18n_activating;
+		}
+		$btn.html(busy_label);
 		setMsg($area, '');
 
 		$.ajax({

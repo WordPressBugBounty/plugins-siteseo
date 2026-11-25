@@ -18,9 +18,8 @@ class Abilities{
 	static $APP_PASSWORD_NAME = 'SiteSEO AI Agents';
 	static $APP_PASSWORD_APP_ID = 'siteseo-mcp';
 
-	// GitHub release endpoint for the official WordPress MCP Adapter plugin.
-	static $MCP_ADAPTER_RELEASE_URL = 'https://api.github.com/repos/WordPress/mcp-adapter/releases/latest';
-	static $MCP_ADAPTER_RELEASE_CACHE = 'siteseo_pro_mcp_adapter_release';
+	// WordPress.org slug of the official MCP Adapter plugin.
+	static $MCP_ADAPTER_SLUG = 'mcp-adapter';
 
 	// REST endpoint (provided by the adapter / WP 6.9+) used to test the connection.
 	static $ABILITIES_ENDPOINT = '/wp-json/wp-abilities/v1/abilities';
@@ -43,7 +42,7 @@ class Abilities{
 
 		// Status probes (kept cheap; safe to run on each render).
 		$abilities_api_available = function_exists('wp_register_ability');
-		$adapter_active = class_exists('\\WP\\MCP\\Core\\McpAdapter');
+		$adapter_active = is_plugin_active('mcp-adapter/mcp-adapter.php');
 		$adapter_installed = '' !== self::get_installed_mcp_adapter_file();
 		$has_app_password = self::current_user_has_mcp_app_password();
 		$test_status = self::get_test_connection_status();
@@ -263,36 +262,36 @@ class Abilities{
 						<!-- Hidden data for snippet building -->
 						<?php
 							echo '<script type="application/json" id="siteseo-abilities-data">' . wp_json_encode([
-								'siteUrl'        => $site_url,
-								'mcpServerUrl'   => $mcp_server_url,
-								'endpointUrl'    => $endpoint_url,
-								'username'       => $username,
+								'siteUrl' => $site_url,
+								'mcpServerUrl' => $mcp_server_url,
+								'endpointUrl' => $endpoint_url,
+								'username' => $username,
 								'passwordHolder' => $app_pass_placeholder,
 								'userPlaceholder'=> $user_placeholder,
-								'serverName'     => 'siteseo-site',
-								'adapterActive'  => $adapter_active,
+								'serverName' => 'siteseo-site',
+								'adapterActive' => $adapter_active,
 								'hasAppPassword' => $has_app_password,
-								'i18n'           => [
-									'copy'          => esc_html__('Copy snippet', 'siteseo'),
-									'copied'        => esc_html__('Copied!', 'siteseo'),
-									'installing'    => esc_html__('Installing...', 'siteseo'),
-									'activating'    => esc_html__('Activating...', 'siteseo'),
-									'generating'    => esc_html__('Generating...', 'siteseo'),
-									'testing'       => esc_html__('Testing...', 'siteseo'),
-									'genErrTitle'   => esc_html__('Could not generate the password.', 'siteseo'),
-									'testOkPrefix'  => esc_html__('Success:', 'siteseo'),
-									'testFailPrefix'=> esc_html__('Failed:', 'siteseo'),
+								'i18n' => [
+									'copy' => esc_html__('Copy snippet', 'siteseo'),
+									'copied' => esc_html__('Copied!', 'siteseo'),
+									'installing' => esc_html__('Installing...', 'siteseo'),
+									'activating' => esc_html__('Activating...', 'siteseo'),
+									'generating' => esc_html__('Generating...', 'siteseo'),
+									'testing' => esc_html__('Testing...', 'siteseo'),
+									'genErrTitle' => esc_html__('Could not generate the password.', 'siteseo'),
+									'testOkPrefix' => esc_html__('Success:', 'siteseo'),
+									'testFailPrefix' => esc_html__('Failed:', 'siteseo'),
 								],
 							]) . '</script>';
 
 							// Segmented tab bar
 							$clients = [
 								'claude-desktop' => ['label' => esc_html__('Claude Desktop', 'siteseo'), 'icon' => 'C'],
-								'claude-code'    => ['label' => esc_html__('Claude Code CLI', 'siteseo'), 'icon' => '>_'],
-								'cursor'         => ['label' => esc_html__('Cursor', 'siteseo'),          'icon' => 'Cu'],
-								'vscode'         => ['label' => esc_html__('VS Code', 'siteseo'),          'icon' => 'VS'],
-								'antigravity'    => ['label' => esc_html__('Antigravity', 'siteseo'),          'icon' => 'AG'],
-								'gemini-cli'     => ['label' => esc_html__('Gemini CLI', 'siteseo'),       'icon' => 'G', 'deprecated' => true],
+								'claude-code' => ['label' => esc_html__('Claude Code CLI', 'siteseo'), 'icon' => '>_'],
+								'cursor' => ['label' => esc_html__('Cursor', 'siteseo'),          'icon' => 'Cu'],
+								'vscode' => ['label' => esc_html__('VS Code', 'siteseo'),          'icon' => 'VS'],
+								'antigravity' => ['label' => esc_html__('Antigravity', 'siteseo'),          'icon' => 'AG'],
+								'gemini-cli' => ['label' => esc_html__('Gemini CLI', 'siteseo'),       'icon' => 'G', 'deprecated' => true],
 							];
 
 							echo '<div class="siteseo-abilities-segmented" role="tablist" aria-label="' . esc_attr__('AI clients', 'siteseo') . '">';
@@ -362,7 +361,7 @@ class Abilities{
 						<ul class="siteseo-abilities-resource-list">
 							<li><a href="https://siteseo.io/docs/ai/how-to-setup-mcp-adapter-and-abilities/" target="_blank" rel="noopener noreferrer"><?php esc_html_e('SiteSEO documentation', 'siteseo'); ?></a><span class="siteseo-abilities-resource-sub"><?php esc_html_e('Guides', 'siteseo'); ?></span></li>
 							<li><a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Model Context Protocol', 'siteseo'); ?></a><span class="siteseo-abilities-resource-sub"><?php esc_html_e('What MCP is and how it works', 'siteseo'); ?></span></li>
-							<li><a href="https://github.com/WordPress/mcp-adapter" target="_blank" rel="noopener noreferrer"><?php esc_html_e('WordPress MCP Adapter', 'siteseo'); ?></a><span class="siteseo-abilities-resource-sub"><?php esc_html_e('Official plugin repository', 'siteseo'); ?></span></li>
+							<li><a href="https://wordpress.org/plugins/mcp-adapter" target="_blank" rel="noopener noreferrer"><?php esc_html_e('WordPress MCP Adapter', 'siteseo'); ?></a><span class="siteseo-abilities-resource-sub"><?php esc_html_e('Official plugin repository', 'siteseo'); ?></span></li>
 						</ul>
 					</div>
 
@@ -431,6 +430,12 @@ class Abilities{
 					'description' => esc_html__('Returns the SiteSEO settings tree (titles, social, advanced, sitemap, analytics).', 'siteseo'),
 				],
 			],
+			esc_html__('Sitemap', 'siteseo') => [
+				[
+					'label'       => esc_html__('Get Sitemap Status', 'siteseo'),
+					'description' => esc_html__('Returns whether the XML sitemap is enabled and the sitemap index URL.', 'siteseo'),
+				],
+			],
 			esc_html__('Robots.txt', 'siteseo') => [
 				[
 					'label'       => esc_html__('Get Robots.txt Output', 'siteseo'),
@@ -459,12 +464,6 @@ class Abilities{
 					'description' => esc_html__('Returns a site-wide SEO health snapshot: homepage score, sitemap state, robots rule count and public post types.', 'siteseo'),
 				],
 			],
-			esc_html__('Sitemap', 'siteseo') => [
-				[
-					'label'       => esc_html__('Get Sitemap Status', 'siteseo'),
-					'description' => esc_html__('Returns whether the XML sitemap is enabled and the sitemap index URL.', 'siteseo'),
-				],
-			],
 		];
 	}
 
@@ -482,14 +481,18 @@ class Abilities{
 
 	// Scan installed plugins for the MCP Adapter (folder prefix: mcp-adapter/).
 	static function get_installed_mcp_adapter_file(){
+
 		if(!function_exists('get_plugins')){
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
-		foreach(array_keys(get_plugins()) as $plugin_file){
-			if(0 === strpos($plugin_file, 'mcp-adapter/')){
-				return $plugin_file;
-			}
+		
+		$all_plugins = get_plugins();
+		$target_file = 'mcp-adapter/mcp-adapter.php';
+        
+		if(isset($all_plugins[ $target_file ])){
+			return $target_file;
 		}
+        
 		return '';
 	}
 
@@ -505,6 +508,30 @@ class Abilities{
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Read the installed MCP Adapter version from the plugin headers.
+	 *
+	 * @return string Empty string when the adapter is not installed.
+	 */
+	static function get_installed_mcp_adapter_version(){
+
+		$file = self::get_installed_mcp_adapter_file();
+
+		if('' === $file){
+			return '';
+		}
+
+		if(!function_exists('get_plugins')){
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$all_plugins = get_plugins();
+		if(!isset($all_plugins[ $file ]['Version'])){
+			return '';
+		}
+		return (string)$all_plugins[ $file ]['Version'];
 	}
 
 	// Read the saved test-connection status for the current user.

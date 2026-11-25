@@ -4,7 +4,7 @@ Tags: SEO, schema, xml sitemap, meta description
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.4.2
+Stable tag: 1.4.3
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,19 @@ Yes!
 6. SiteMap Settings
 
 == Changelog ==
+
+= 1.4.3 (November 25, 2026) =
+
+* [Security-Fix] Fixed a stored XSS vulnerability in the Table of Contents feature (reported by Patchstack).
+* [Improvement] Improved WPML compatibility to ensure HTML sitemap block strings are displayed in the correct language.
+* [Pro–Improvement] Improved Article schema author markup by correcting the author property and referencing the existing Person schema node.
+* [Bug-Fix] Fixed an issue where canonical URLs were incorrectly generated on paginated archive pages.
+* [Bug-Fix] Fixed issues with Additional Accounts in Knowledge Graph JSON-LD markup.
+* [Pro-Bug-Fix] Fixed an issue where AI SEO did not generate titles in Spanish.
+* [Pro-Bug-Fix] Fixed an issue with Article structured data (JSON-LD) generation related to special characters and HTML entities.
+* [Pro-Bug-Fix] Fixed an issue where automatic Instant Indexing was not triggered when saving content using the Thrive Architect builder.
+* [Pro-Bug-Fix] There was issue in updater if Object Cache was enabled on the site, that has been fixed.
+* [Task] Updated MCP Adapter installation to use the official WordPress Plugin Repository and removed redundant code related to the previous MCP Adapter installation method.
 
 = 1.4.2 (September 24 , 2026) =
 

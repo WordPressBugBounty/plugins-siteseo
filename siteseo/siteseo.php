@@ -4,7 +4,7 @@ Plugin Name: SiteSEO - SEO Simplified
 Plugin URI: https://siteseo.io/
 Description: SiteSEO is an easy, fast and powerful SEO plugin for WordPress. Unlock your Website's potential and Maximize your online visibility with our SiteSEO!
 Author: Softaculous
-Version: 1.4.2
+Version: 1.4.3
 Requires at least: 5.0
 Author URI: https://siteseo.io/
 License: GPLv2
@@ -24,7 +24,7 @@ if(defined('SITESEO_VERSION')){
 	return;
 }
 
-define('SITESEO_VERSION', '1.4.2');
+define('SITESEO_VERSION', '1.4.3');
 define('SITESEO_FILE', __FILE__);
 define('SITESEO_DOCS', 'https://siteseo.io/docs/');
 define('SITESEO_DIR_PATH', plugin_dir_path(SITESEO_FILE));
@@ -83,6 +83,19 @@ function siteseo_load_plugin(){
 		add_action('init','\SiteSEO\ImageSeo::init', 11); // Upload happens with AJAX so we need this here
 	}
 
+	// Thrive Architect saves over admin-ajax and never fires transition_post_status,
+	// so these hooks have to be registered before the AJAX return below.
+	if(!empty($siteseo->setting_enabled['toggle-instant-indexing']) && !empty($siteseo->instant_settings['instant_indexing_bing_api_key'])){
+		add_action('template_redirect', '\SiteSEO\InstantIndexing::bing_txt_file', 0);
+
+		if(!empty($siteseo->instant_settings['instant_indexing_automate_submission'])){
+			add_action('transition_post_status', '\SiteSEO\InstantIndexing::on_status_change', 10, 3);
+			add_action('tcb_after_save_post', '\SiteSEO\InstantIndexing::on_thrive_save');
+			add_action('added_post_meta', '\SiteSEO\InstantIndexing::on_thrive_meta', 10, 3);
+			add_action('updated_post_meta', '\SiteSEO\InstantIndexing::on_thrive_meta', 10, 3);
+		}
+	}
+
 	if(wp_doing_ajax()){
 		\SiteSEO\Ajax::hooks();
 		return;
@@ -96,6 +109,8 @@ function siteseo_load_plugin(){
 
 	// Image & Sitemap block
 	add_action('init', '\SiteSEO\Admin::register_sitmap_block');
+
+	add_action('enqueue_block_editor_assets', '\SiteSEO\Admin::enqueue_sitemap_block_assets');
 
 	// TOC 
 	add_shortcode('siteseo_toc', '\SiteSEO\TableofContent::render_toc');
@@ -121,14 +136,6 @@ function siteseo_load_plugin(){
 	// Redirect
 	add_action('template_redirect', '\SiteSEO\GoogleAnalytics::handle_custom_redirect');
 	add_action('init', '\SiteSEO\Advanced::remove_wc_category_base');
-
-	if(!empty($siteseo->setting_enabled['toggle-instant-indexing']) && !empty($siteseo->instant_settings['instant_indexing_bing_api_key'])){
-		add_action('template_redirect', '\SiteSEO\InstantIndexing::bing_txt_file', 0);
-
-		if(!empty($siteseo->instant_settings['instant_indexing_automate_submission'])){
-			add_action('transition_post_status', '\SiteSEO\InstantIndexing::on_status_change', 10, 3);
-		}
-	}
 
 	\SiteSEO\Admin::permission();
 

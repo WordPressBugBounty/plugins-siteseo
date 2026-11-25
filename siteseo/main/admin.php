@@ -464,25 +464,33 @@ class Admin{
 
 	static function register_sitmap_block(){
 		global $siteseo;
-			
+
 		if(empty($siteseo->sitemap_settings['xml_sitemap_html_enable'])){
 			return;
 		}
-		
-		wp_register_script('sitemap-html-block', SITESEO_ASSETS_URL.'/js/block.js', array('wp-blocks', 'wp-element', 'wp-editor'), filemtime(SITESEO_ASSETS_PATH . '/js/block.js'));
 
-		$html = \SiteSEO\GenerateSitemap::html_sitemap();
-
-		// Localize
-		wp_localize_script('sitemap-html-block', 'siteseositemap', array(
-			'previewData' => $html,
-		));
+		wp_register_script('sitemap-html-block',SITESEO_ASSETS_URL . '/js/block.js', array('wp-blocks', 'wp-element', 'wp-editor'), filemtime(SITESEO_ASSETS_PATH . '/js/block.js'), true);
 
 		register_block_type('siteseo/html-sitemap', array(
 			'editor_script' => 'sitemap-html-block',
 			'render_callback' => '\SiteSEO\GenerateSitemap::html_sitemap'
 		));
+		
+	}
+	
+	static function enqueue_sitemap_block_assets() {
+		global $siteseo;
 
+		if(empty($siteseo->sitemap_settings['xml_sitemap_html_enable'])){
+			return;
+		}
+
+		// Generate preview HTML using the current language context.
+		$html = \SiteSEO\GenerateSitemap::html_sitemap();
+
+		wp_localize_script('sitemap-html-block', 'siteseositemap', array(
+			'previewData' => $html,
+		));
 	}
 
 	static function create_siteseo_block($categories){
